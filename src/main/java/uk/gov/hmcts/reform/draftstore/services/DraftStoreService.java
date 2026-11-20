@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +59,14 @@ public class DraftStoreService {
                                         String caseId,
                                         Map<String, Object> payload,
                                         DraftType draftType) {
+        return createDraft(userId, caseId, null, payload, draftType);
+    }
+
+    public DraftStoreEntity createDraft(String userId,
+                                        String caseId,
+                                        String applicationId,
+                                        Map<String, Object> payload,
+                                        DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         Map<String, Object> payloadCopy = copyPayload(payload);
@@ -74,7 +83,8 @@ public class DraftStoreService {
             now,
             now,
             calculateExpiresAt(now, retentionDays),
-            null
+            null,
+            applicationId
         );
         return draftStoreTransactionService.saveInNewTransaction(draft);
     }
@@ -106,6 +116,61 @@ public class DraftStoreService {
             userId,
             draftType,
             caseId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<DraftStoreEntity> listActiveDraftsForCase(String userId, String caseId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(caseId, CASE_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findAllByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
+            userId,
+            draftType,
+            caseId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getActiveDraftForApplication(String userId,
+                                                                   String applicationId,
+                                                                   DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByUserIdAndDraftTypeAndApplicationIdAndExpiresAtAfter(
+            userId,
+            draftType,
+            applicationId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftForCase(String userId, String caseId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(caseId, CASE_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByUserIdAndDraftTypeAndCaseId(userId, draftType, caseId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftForApplication(String userId, String applicationId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByUserIdAndDraftTypeAndApplicationId(userId, draftType, applicationId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DraftStoreEntity> listActiveDraftsForUser(String userId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findAllByUserIdAndDraftTypeAndExpiresAtAfter(
+            userId,
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -266,7 +331,8 @@ public class DraftStoreService {
             now,
             now,
             calculateExpiresAt(now, draftType.getRetentionDays()),
-            submissionId
+            submissionId,
+            null
         );
         try {
             return Optional.of(draftStoreTransactionService.saveInNewTransaction(claimRow));

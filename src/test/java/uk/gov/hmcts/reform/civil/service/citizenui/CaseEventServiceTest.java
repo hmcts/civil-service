@@ -708,7 +708,7 @@ public class CaseEventServiceTest {
             now,
             now,
             now.plusDays(30),
-            null
-        );
+            null,
+            null);
     }
 }

@@ -77,8 +77,8 @@ public class ExpiredDraftStoreSchedulerIT {
             now.minusDays(3),
             now.minusDays(2),
             now.minusDays(1),
-            null
-        );
+            null,
+            null);
 
         DraftStoreEntity futureDraft = new DraftStoreEntity(
             UUID.randomUUID(),
@@ -89,8 +89,8 @@ public class ExpiredDraftStoreSchedulerIT {
             now.minusDays(1),
             now,
             now.plusHours(1),
-            null
-        );
+            null,
+            null);
 
         draftStoreRepository.save(expiredDraft);
         draftStoreRepository.save(futureDraft);
@@ -128,8 +128,8 @@ public class ExpiredDraftStoreSchedulerIT {
                 now.minusDays(3),
                 now.minusDays(2),
                 now.minusDays(1),
-                null
-            ));
+                null,
+                null));
         }
 
         draftStoreRepository.saveAll(expiredDrafts);
@@ -160,8 +160,8 @@ public class ExpiredDraftStoreSchedulerIT {
             now.minusDays(3),
             now.minusDays(2),
             now.minusDays(1),
-            null
-        );
+            null,
+            null);
 
         draftStoreRepository.save(expiredDraft);
 
