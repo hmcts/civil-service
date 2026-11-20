@@ -350,6 +350,56 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
     }
 
     @Test
+    void applicationExistsValidationReturnsErrorWhenUsersResponseIsNotFirstInList() {
+        mockIdamClient(DEF2_UID);
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppRespondentSolicitors(getRespondentSolicitors())
+            .respondentsResponses(List.of(
+                element(new GARespondentResponse().setGaRespondentDetails(DEF_UID)),
+                element(new GARespondentResponse().setGaRespondentDetails(DEF2_UID))))
+            .build();
+
+        List<String> errors = handler.applicationExistsValidation(
+            callbackParamsOf(caseData, CallbackType.ABOUT_TO_START));
+
+        assertThat(errors).containsExactly(RESPONDENT_ERROR);
+    }
+
+    @Test
+    void applicationExistsValidationReturnsNoErrorWhenOnlyOtherRespondentHasResponded() {
+        mockIdamClient(DEF2_UID);
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppRespondentSolicitors(getRespondentSolicitors())
+            .respondentsResponses(List.of(
+                element(new GARespondentResponse().setGaRespondentDetails(DEF_UID))))
+            .build();
+
+        List<String> errors = handler.applicationExistsValidation(
+            callbackParamsOf(caseData, CallbackType.ABOUT_TO_START));
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void applicationExistsValidationIgnoresResponsesWithoutRespondentDetails() {
+        mockIdamClient(DEF_UID);
+
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppRespondentSolicitors(getRespondentSolicitors())
+            .respondentsResponses(List.of(
+                element(new GARespondentResponse()),
+                element(new GARespondentResponse().setGaRespondentDetails(DEF2_UID))))
+            .build();
+
+        List<String> errors = handler.applicationExistsValidation(
+            callbackParamsOf(caseData, CallbackType.ABOUT_TO_START));
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
     void aboutToStartCallbackAddsLocationDetails() {
 
         List<LocationRefData> locations = new ArrayList<>();
