@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -142,7 +143,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             fixedCost = ClaimFeeUtility.getCourtFee(caseData);
             claimFee = ZERO;
         }
-        return fixedCost.add(claimFee);
+        return Objects.requireNonNull(fixedCost, "court fee must not be null").add(claimFee);
     }
 
     private BigDecimal resolveJudgmentAmount(CaseData caseData) {

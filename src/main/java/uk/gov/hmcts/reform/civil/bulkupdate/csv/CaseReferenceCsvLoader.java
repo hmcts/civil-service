@@ -40,6 +40,7 @@ public class CaseReferenceCsvLoader {
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final int IV_SIZE = 12; // GCM recommended IV size
     private static final int TAG_LENGTH_BIT = 128;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @SuppressWarnings({"java:S3740", "java:S1488"})
     public <T extends CaseReference> List<T> loadCaseReferenceList(Class<T> type, String fileName) {
@@ -149,6 +150,9 @@ public class CaseReferenceCsvLoader {
 
     public static String decrypt(String encryptedData, SecretKey key) throws Exception {
         String[] parts = encryptedData.split(":");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid encrypted data format, expected <iv>:<cipherText>");
+        }
         byte[] iv = Base64.getDecoder().decode(parts[0]);
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -168,7 +172,7 @@ public class CaseReferenceCsvLoader {
 
     private static byte[] generateIv() {
         byte[] iv = new byte[IV_SIZE];
-        new SecureRandom().nextBytes(iv);
+        SECURE_RANDOM.nextBytes(iv);
         return iv;
     }
 }
