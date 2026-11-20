@@ -139,7 +139,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
                         .orElse(ZERO);
 
         if (caseData.isApplicantLipOneVOne()) {
-            fixedCost = ClaimFeeUtility.getCourtFee(caseData);
+            fixedCost = ofNullable(ClaimFeeUtility.getCourtFee(caseData)).orElse(ZERO);
             claimFee = ZERO;
         }
         return fixedCost.add(claimFee);

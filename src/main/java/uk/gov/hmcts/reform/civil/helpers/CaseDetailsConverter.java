@@ -36,7 +36,7 @@ public class CaseDetailsConverter {
     }
 
     public CaseData toCaseData(CaseDetails caseDetails) {
-        Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        Map<String, Object> data = copyData(caseDetails);
         data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {
             data.put(CCD_STATE, CaseState.valueOf(caseDetails.getState()));
@@ -50,7 +50,7 @@ public class CaseDetailsConverter {
     }
 
     public GeneralApplicationCaseData toGeneralApplicationCaseData(CaseDetails caseDetails) {
-        final Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        final Map<String, Object> data = copyData(caseDetails);
         data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {
             data.put(CCD_STATE, CaseState.valueOf(caseDetails.getState()));
@@ -62,7 +62,7 @@ public class CaseDetailsConverter {
     }
 
     public CaseData toGACaseData(CaseDetails caseDetails) {
-        Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        Map<String, Object> data = copyData(caseDetails);
         data.remove("hwfFeeType");
         data.put(CCD_CASE_REFERENCE, caseDetails.getId());
 
@@ -70,7 +70,7 @@ public class CaseDetailsConverter {
     }
 
     public GeneralApplication toGeneralApplication(CaseDetails caseDetails) {
-        Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        Map<String, Object> data = copyData(caseDetails);
 
         Map<String, Object> caseReference = new HashMap<>();
         caseReference.put("CaseReference", caseDetails.getId());
@@ -82,5 +82,10 @@ public class CaseDetailsConverter {
         }
 
         return objectMapper.convertValue(data, GeneralApplication.class);
+    }
+
+    private static Map<String, Object> copyData(CaseDetails caseDetails) {
+        Map<String, Object> source = caseDetails.getData();
+        return new HashMap<>(source == null ? Map.of() : source);
     }
 }
