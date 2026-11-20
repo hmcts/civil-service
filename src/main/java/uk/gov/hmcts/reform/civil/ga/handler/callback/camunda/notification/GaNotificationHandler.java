@@ -1,24 +1,20 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.notification.handlers.GaNotifierFactory;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.notification.handlers.NotificationSummaryParser;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 
 import java.util.List;
@@ -27,7 +23,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_NOTIFICATIONS;
 
 /**
  * The General Application entry point into the Notifier framework, mirroring the Civil
@@ -54,7 +49,7 @@ public class GaNotificationHandler extends CallbackHandler implements GeneralApp
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
     private final GaNotifierFactory gaNotifierFactory;
-    private final GaCoreCaseDataService gaCoreCaseDataService;
+    private final GaNotificationHistoryService notificationHistoryService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -100,34 +95,7 @@ public class GaNotificationHandler extends CallbackHandler implements GeneralApp
         final GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         final String caseId = caseData.getCcdCaseReference().toString();
 
-        // the Ga variants, because these carry GENERALAPPLICATION_CASE_TYPE. startUpdate and
-        // submitUpdate pass CASE_TYPE (CIVIL), which is what every other GA task handler avoids.
-        StartEventResponse startEventResponse = gaCoreCaseDataService.startGaUpdate(caseId, RECORD_NOTIFICATIONS);
-        gaCoreCaseDataService.submitGaUpdate(
-            caseId, getCaseContent(startEventResponse, caseData.getNotificationSummary()));
-
+        notificationHistoryService.recordNotifications(caseId, caseData.getNotificationSummary());
         return SubmittedCallbackResponse.builder().build();
-    }
-
-    private CaseDataContent getCaseContent(StartEventResponse startEventResponse, String fullSummary) {
-        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-
-        // cleared so the summary lives on the history event rather than on the case
-        data.put("notificationSummary", null);
-
-        Event.EventBuilder eventBuilder = Event.builder()
-            .id(startEventResponse.getEventId())
-            .summary(NotificationSummaryParser.attempted(fullSummary));
-
-        String errors = NotificationSummaryParser.errors(fullSummary);
-        if (errors != null && !errors.isEmpty()) {
-            eventBuilder.description("Errors: " + errors);
-        }
-
-        return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(eventBuilder.build())
-            .data(data)
-            .build();
     }
 }

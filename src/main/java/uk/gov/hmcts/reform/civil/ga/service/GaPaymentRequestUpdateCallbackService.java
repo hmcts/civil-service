@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.exceptions.GaNotificationHistoryException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -41,6 +42,7 @@ public class GaPaymentRequestUpdateCallbackService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaCoreCaseDataService coreCaseDataService;
     private final JudicialNotificationService judicialNotificationService;
+    private final GaNotificationHistoryService notificationHistoryService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final StateGeneratorService stateGeneratorService;
@@ -55,7 +57,9 @@ public class GaPaymentRequestUpdateCallbackService {
         return processServiceRequest(serviceRequestUpdateDto, caseData, true);
     }
 
-    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class,
+        noRetryFor = {IllegalArgumentException.class, GaNotificationHistoryException.class},
+        notRecoverable = {GaNotificationHistoryException.class}, backoff = @Backoff(delay = 500))
     public GeneralApplicationCaseData processServiceRequest(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                             GeneralApplicationCaseData caseData,
                                                             boolean hwf) {
@@ -75,7 +79,7 @@ public class GaPaymentRequestUpdateCallbackService {
             } else {
                 log.error("Case id {} not present", serviceRequestUpdateDto.getCcdCaseNumber());
             }
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | GaNotificationHistoryException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new CaseDataUpdateException(ex.getMessage(), ex);
@@ -113,15 +117,22 @@ public class GaPaymentRequestUpdateCallbackService {
                                                     boolean hwf) {
         log.info("Processing the callback for making Additional Payment"
                      + "for the caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
-        if (!isGeneralAppConsentOrder(caseData)) {
-            judicialNotificationService.sendNotification(caseData, "respondent");
+        GeneralApplicationCaseData notificationCaseData = caseData;
+        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
+        boolean paymentApplied = hwf || createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
+            serviceRequestUpdateDto.getCcdCaseNumber());
+        if (hwf) {
+            caseData.setNotificationSummary(null);
+        }
+        if (paymentApplied && !isGeneralAppConsentOrder(notificationCaseData)) {
+            String summary = judicialNotificationService.sendNotificationAndGetSummary(notificationCaseData, "respondent");
+            if (hwf) {
+                caseData.setNotificationSummary(summary);
+            } else {
+                notificationHistoryService.recordNotifications(serviceRequestUpdateDto.getCcdCaseNumber(), summary);
+            }
         }
 
-        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
-        if (!hwf) {
-            createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
-                        serviceRequestUpdateDto.getCcdCaseNumber());
-        }
         return caseData;
     }
 
@@ -179,7 +190,7 @@ public class GaPaymentRequestUpdateCallbackService {
             .setErrorMessage(null);
     }
 
-    private void createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
+    private boolean createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
         StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(
             generalApplicationCaseId,
             eventName
@@ -192,7 +203,7 @@ public class GaPaymentRequestUpdateCallbackService {
         if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
             log.info("{} Payment already applied for case {}. Skipping submission.",
                      eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT ? "Application" : "Additional", generalApplicationCaseId);
-            return;
+            return false;
         }
 
         populateFreshData(updatedStaleCaseData, eventName, freshData);
@@ -205,6 +216,7 @@ public class GaPaymentRequestUpdateCallbackService {
             freshData.getGeneralAppParentCaseLink()
         );
         coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
+        return true;
     }
 
     private static void populateFreshData(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, GeneralApplicationCaseData freshData) {
