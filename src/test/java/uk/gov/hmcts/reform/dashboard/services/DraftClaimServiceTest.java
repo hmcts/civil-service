@@ -321,7 +321,7 @@ class DraftClaimServiceTest {
             createdAt,
             createdAt,
             expiresAt,
-            null
-        );
+            null,
+            null);
     }
 }

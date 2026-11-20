@@ -333,8 +333,8 @@ class DraftStoreServiceTest {
                 createdAt,
                 createdAt,
                 soonExpiry,
-                null
-            );
+                null,
+                null);
             when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
                 eq(USER_ID),
@@ -928,7 +928,7 @@ class DraftStoreServiceTest {
             createdAt,
             createdAt,
             createdAt.plusDays(30),
-            null
-        );
+            null,
+            null);
     }
 }
