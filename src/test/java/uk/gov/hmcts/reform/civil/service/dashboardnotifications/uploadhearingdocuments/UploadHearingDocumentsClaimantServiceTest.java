@@ -9,10 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -39,8 +37,6 @@ class UploadHearingDocumentsClaimantServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private DashboardNotificationHelper dashboardDecisionHelper;
 
     @InjectMocks
@@ -58,7 +54,6 @@ class UploadHearingDocumentsClaimantServiceTest {
     void shouldCreateDashboardNotifications_ifApplicant1NotRepresented() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -110,11 +105,9 @@ class UploadHearingDocumentsClaimantServiceTest {
     }
 
     @Test
-    void shouldCreateDashboardNotificationsAfterNroChangesAndWelshEnabledForMainCase() {
+    void shouldCreateDashboardNotificationsAfterNroChanges() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -133,15 +126,9 @@ class UploadHearingDocumentsClaimantServiceTest {
     }
 
     @Test
-    void shouldNotCreateDashboardNotifications_ifNotCaseProgressionEnabledAndLocationWhiteListed() {
+    void shouldCreateDashboardNotificationsAfterNroChangesWithoutLocationWhitelist() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        DynamicListElement selectedCourt = new DynamicListElement();
-        selectedCourt.setCode(BASE_LOCATION);
-        selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -151,7 +138,12 @@ class UploadHearingDocumentsClaimantServiceTest {
 
         uploadHearingDocumentsClaimantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            scenarioRequestParams
+        );
     }
 
     @Test

@@ -602,7 +602,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLanguagePreferenceWhenWelshDocsSelected() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
                 .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))

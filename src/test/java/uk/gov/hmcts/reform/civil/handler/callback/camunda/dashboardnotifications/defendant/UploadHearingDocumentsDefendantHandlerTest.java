@@ -24,7 +24,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_DEFENDANT;
@@ -69,7 +68,6 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
     void createDashboardNotifications() {
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -93,12 +91,10 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
     }
 
     @Test
-    void createDashboardNotificationsAfterNroChangesAndWelshEnabledForMainCase() {
+    void createDashboardNotificationsAfterNroChanges() {
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -122,12 +118,10 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
     }
 
     @Test
-    void createDashboardNotificationsAfterNroChangesAndWelshNotEnabledForMainCase() {
+    void createDashboardNotificationsAfterNroChangesWithoutLocationWhitelist() {
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -142,7 +136,12 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
             .build();
 
         handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(params)
+        );
     }
 
 }

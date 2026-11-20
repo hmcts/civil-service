@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.manualdetermination.ClaimantLipManualDeterminationFormGenerator;
 
@@ -30,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION;
@@ -50,9 +48,6 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
 
     @Mock
     private ObjectMapper mapper;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     public static final CaseDocument FORM;
@@ -80,8 +75,7 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
         handler = new GenerateClaimantLipManualDeterminationCallBackHandler(
             mapper,
             formGenerator,
-            documentService,
-            featureToggleService
+            documentService
         );
 
     }
@@ -122,9 +116,8 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     }
 
     @Test
-    void shouldNotHideTheDocumentWhenFTisOff() {
+    void shouldStoreDocumentForPreTranslationWhenWelshClaimant() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -137,14 +130,13 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
+        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
-    void shouldHideTheDocumentWhenFTisONAndWelshClaimant() {
+    void shouldStoreDocumentForPreTranslationWhenWelshClaimantWithCompanyRespondent() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -164,7 +156,6 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     @Test
     void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()

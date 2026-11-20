@@ -43,7 +43,6 @@ class CreateSdoWorkflowTest extends WorkflowIntegrationTest {
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(anyString(), anyString(), anyString()))
             .thenReturn(List.of(locationRefData));
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
     }
 
     @Test

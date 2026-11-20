@@ -76,9 +76,6 @@ public class DashboardNotificationsParamsMapperTest {
     private CaseData caseData;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
     private ClaimantResponseUtils claimantResponseUtils;
 
     @Autowired
@@ -572,8 +569,7 @@ public class DashboardNotificationsParamsMapperTest {
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT"
     })
-    void shouldNotMapOrderDocument_whenWelshEnabledAndBilingual(CaseEvent caseEvent) {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+    void shouldNotMapOrderDocument_whenClaimantIsBilingual(CaseEvent caseEvent) {
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();

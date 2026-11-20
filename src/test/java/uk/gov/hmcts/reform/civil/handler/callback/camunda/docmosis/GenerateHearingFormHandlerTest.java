@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -47,14 +46,12 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     private GenerateHearingFormHandler handler;
     @Mock
     private HearingFormGenerator hearingFormGenerator;
-    @Mock
-    private FeatureToggleService featureToggleService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper, featureToggleService);
+        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -97,7 +94,6 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerateForm_when1v1ButHideIt_IfClaimantIsWelsh() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document documentLink = new Document();
         documentLink.setDocumentUrl("fake-url");
         documentLink.setDocumentFileName("file-name");

@@ -62,7 +62,7 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldMoveDocumentToSystemGeneratedWhenEnglishJourney() {
+    void shouldMoveDocumentToSystemGeneratedWhenCaseIsNotBilingual() {
         CaseDocument document = new CaseDocument();
         document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> generatedDocs = new ArrayList<>();
@@ -82,7 +82,7 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldMoveDocumentToPreTranslationForWelshJourney() {
+    void shouldMoveDocumentToPreTranslationWhenCaseIsBilingual() {
         CaseDocument document = new CaseDocument();
         document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> preTranslationDocs = new ArrayList<>();
@@ -116,18 +116,18 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldRespectLipCaseWhenCourtNotWhiteListed() {
+    void shouldSetEaCourtLocationForSpecLipCase() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("123"));
 
-        mockEaCourtMutation(caseData, YesOrNo.NO);
+        mockEaCourtMutation(caseData, YesOrNo.YES);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.NO);
+        assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
@@ -202,7 +202,7 @@ class SdoSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
+        verify(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN);
     }
 
     @Test
@@ -245,7 +245,7 @@ class SdoSubmissionServiceTest {
         doAnswer(invocation -> {
             caseData.setEaCourtLocation(value);
             return null;
-        }).when(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
+        }).when(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN);
     }
 
     private CaseData eligibleReconsiderationCase() {

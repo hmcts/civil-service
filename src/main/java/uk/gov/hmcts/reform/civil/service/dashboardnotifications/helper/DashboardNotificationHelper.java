@@ -40,8 +40,7 @@ public class DashboardNotificationHelper {
         return caseData.getBusinessProcess() != null
             && event.name().equals(caseData.getBusinessProcess().getCamundaEvent())
             && caseData.isApplicantLiP()
-            && LanguagePredicate.claimantIsBilingual.test(caseData)
-            && featureToggleService.isWelshEnabledForMainCase();
+            && LanguagePredicate.claimantIsBilingual.test(caseData);
     }
 
     public boolean isAwaitingWelshTranslation(GeneralApplicationCaseData caseData) {
@@ -63,12 +62,6 @@ public class DashboardNotificationHelper {
 
     public boolean isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
-    }
-
-    public boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase());
     }
 
     public boolean hasTrackChanged(CaseData caseData) {

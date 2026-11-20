@@ -78,7 +78,7 @@ class SdoTrackDefaultsServiceTest {
     }
 
     @Test
-    void shouldApplyFeatureFlagsAndPopulateTrackDefaults() {
+    void shouldApplyCarmAndBilingualFlagsAndPopulateTrackDefaults() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 

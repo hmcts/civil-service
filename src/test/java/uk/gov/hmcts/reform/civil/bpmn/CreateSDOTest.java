@@ -328,7 +328,6 @@ class CreateSDOTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         Map<String, Object> flowFlags = new HashMap<>(Map.of(
-            WELSH_ENABLED, true,
             CLAIM_ISSUE_BILINGUAL, claimantBilingual,
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, defendantBilingual
         ));

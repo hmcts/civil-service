@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import java.util.List;
@@ -29,13 +28,10 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
     public static final String TASK_ID_DEFENDANT_DRO = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT_DRO = "SendDORToClaimantLIP";
     private final SendHearingBulkPrintService sendDroBulkPrintService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isWelshEnabledForMainCase()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendDroDocument)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendDroDocument);
     }
 
     @Override
@@ -57,11 +53,8 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String taskId = camundaActivityId(callbackParams);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            sendDroBulkPrintService.sendDecisionReconsiderationToLip(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, taskId);
-
-        }
+        sendDroBulkPrintService.sendDecisionReconsiderationToLip(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, taskId);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }

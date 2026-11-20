@@ -197,7 +197,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSdoDisposal()
                 .build().toBuilder()
@@ -230,7 +229,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -248,7 +246,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("Yes");
@@ -266,7 +263,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -283,7 +279,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -301,7 +296,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -318,7 +312,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -335,7 +328,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -353,7 +345,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                .setBand(ComplexityBand.BAND_1))
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
@@ -372,7 +363,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("freeFormRecordedTextArea")).isNull();
@@ -400,7 +390,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(featureToggleService.isOtherRemedyEnabled()).thenReturn(otherRemedyEnabled);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
@@ -436,7 +425,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
@@ -457,7 +445,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
@@ -478,7 +465,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
@@ -499,7 +485,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("bilingualHint")).isNull();
@@ -1796,7 +1781,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")
@@ -1826,8 +1810,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        void shouldMoveBilingualClaimantDocumentToPreTranslationDocuments_onAboutToSubmit() {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")
@@ -1849,15 +1832,16 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getFinalOrderDocumentCollection()).hasSize(1);
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+            assertThat(updatedData.getBilingualHint()).isEqualTo(YES);
         }
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")

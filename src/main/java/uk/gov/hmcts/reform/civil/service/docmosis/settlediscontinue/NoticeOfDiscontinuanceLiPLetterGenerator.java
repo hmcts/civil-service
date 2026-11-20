@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.utils.LanguageUtils;
 
@@ -25,15 +24,11 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
     private static final String NOTICE_OF_DISCONTINUANCE_LETTER = "notice-of-discontinuance";
     private final BulkPrintService bulkPrintService;
     private final DocumentDownloadService documentDownloadService;
-    private final FeatureToggleService featureToggleService;
 
     public void printNoticeOfDiscontinuanceLetter(CaseData caseData, String authorisation) {
         CaseDocument discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc();
         if (Objects.nonNull(discontinuanceCaseDocument)) {
-            Language language = LanguageUtils.determineLanguageForBulkPrint(
-                caseData, false,
-                featureToggleService.isWelshEnabledForMainCase()
-            );
+            Language language = LanguageUtils.determineLanguageForBulkPrint(caseData, false);
             if ((Language.WELSH.equals(language) || Language.BOTH.equals(language))
                 && Objects.nonNull(caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc())) {
                 discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc();

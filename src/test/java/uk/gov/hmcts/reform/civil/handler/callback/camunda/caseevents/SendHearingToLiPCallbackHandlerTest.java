@@ -18,10 +18,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,13 +42,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SendHearingToLiPCallbackHandler handler;
     @Mock
     private SendHearingBulkPrintService sendHearingBulkPrintService;
-    @Mock
-    private DocumentDownloadService documentDownloadService;
-    @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
-    private DashboardScenariosService dashboardScenariosService;
-
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
     private static final String TEST = "test";
@@ -87,7 +77,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT), eq(false));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT));
     }
 
     @Test
@@ -103,7 +93,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT), eq(false));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT));
     }
 
     @Test
@@ -122,7 +112,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT_HMC), eq(true));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT_HMC));
     }
 
     @Test
@@ -141,6 +131,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT_HMC), eq(true));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT_HMC));
     }
 }

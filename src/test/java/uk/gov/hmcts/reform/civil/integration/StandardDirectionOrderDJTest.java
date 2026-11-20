@@ -923,29 +923,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        //LR scenarios trigger and ignore hmcLipEnabled
-        "true, YES, YES, YES",
-        "false, YES, YES, YES",
-        // LiP vs LR - ignore HMC court
-        "true,  NO, YES, NO",
-        "false,  NO, YES, NO",
-        //LR vs LiP - ignore HMC court
-        "true, YES, NO, YES",
-        "false, YES, NO, NO",
-        //LiP vs LiP - ignore HMC court
-        "true, NO, NO, YES",
-        "false, NO, NO, NO"
+        "YES, YES",
+        "NO, YES",
+        "YES, NO",
+        "NO, NO"
     })
-    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
-                                                             YesOrNo respondent1Represented,
-                                                             YesOrNo eaCourtLocation) {
-
-        if (NO.equals(respondent1Represented)) {
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-            if (!isCPAndWhitelisted) {
-                when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-            }
-        }
+    void shouldPopulateEaCourtLocationAsYesForSpecClaimsRegardlessOfRepresentation(YesOrNo applicantRepresented,
+                                                                                    YesOrNo respondent1Represented) {
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(caseLocation("111", "2"))
@@ -957,52 +941,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        //LR scenarios trigger and ignore hmcLipEnabled
-        "true, YES, YES, YES, true",
-        "false, YES, YES, YES, true",
-        // LiP vs LR - ignore HMC court
-        "true,  NO, YES, NO, false",
-        "false,  NO, YES, NO, false",
-        //LR vs LiP - ignore HMC court
-        "true, YES, NO, YES, true",
-        "false, YES, NO, YES, true",
-        //LiP vs LiP - ignore HMC court
-        "true, NO, NO, YES, true",
-        "false, NO, NO, YES, true",
-        "false, NO, NO, NO, false",
-        "true, NO, NO, YES, false"
-    })
-    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabledAndWelshConsidered(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
-                                                             YesOrNo respondent1Represented,
-                                                             YesOrNo eaCourtLocation, boolean isWelshEnabled) {
-
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
-        if (!isWelshEnabled && NO.equals(respondent1Represented)) {
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-        }
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-            .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(caseLocation("111", "2"))
-            .transferCourtLocationList(dynamicListWithValue(dynamicListElementWithLabel())).build();
-
-        caseData.setApplicant1Represented(applicantRepresented);
-        caseData.setRespondent1Represented(respondent1Represented);
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        assertEquals(YES, responseCaseData.getEaCourtLocation());
     }
 
     @Test
-    void shouldSetEaCourtLocationYes_whenSpecClaimAndWelshEnabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+    void shouldSetEaCourtLocationYes_whenSpecClaim() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
@@ -1019,8 +962,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSetEaCourtLocationYes_whenSpecClaimNonLipAndWelshDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+    void shouldSetEaCourtLocationYes_whenSpecClaimNonLip() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
@@ -1054,27 +996,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertNull(responseCaseData.getEaCourtLocation());
-    }
-
-    @Test
-    void shouldSetEaCourtLocationNo_whenSpecClaimLipCaseAndNotWhitelisted() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .caseAccessCategory(SPEC_CLAIM)
-            .applicant1Represented(NO) // LiP
-            .respondent1Represented(YES)
-            .caseManagementLocation(caseLocation("111", "2"))
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(NO, responseCaseData.getEaCourtLocation());
     }
 
     @Test

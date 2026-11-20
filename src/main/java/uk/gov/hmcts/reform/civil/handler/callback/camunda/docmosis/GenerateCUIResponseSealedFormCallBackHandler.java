@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -46,7 +45,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final AssignCategoryId assignCategoryId;
     private final CivilStitchService civilStitchService;
-    private final FeatureToggleService featureToggleService;
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
 
@@ -98,7 +96,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private void addToSystemGeneratedDocuments(CaseDocument document, CaseData caseData) {
-        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             caseData.setBilingualHint(YesOrNo.YES);
             caseData.setPreTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
@@ -119,7 +117,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+        if (caseData.getRespondent1OriginalDqDoc() != null) {
             documents.add(
                 new DocumentMetaData(
                     caseData.getRespondent1OriginalDqDoc().getDocumentLink(),

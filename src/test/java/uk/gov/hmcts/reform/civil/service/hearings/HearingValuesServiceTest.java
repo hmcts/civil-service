@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -54,8 +53,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import java.time.LocalDate;
@@ -104,10 +101,6 @@ public class HearingValuesServiceTest {
     private OrganisationService organisationService;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @Mock
-    private EarlyAdoptersService earlyAdoptersService;
-    @Mock
-    private FeatureToggleService featuretoggleService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -125,7 +118,6 @@ public class HearingValuesServiceTest {
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
-        when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
     }
 
     @Test
@@ -471,7 +463,7 @@ public class HearingValuesServiceTest {
     }
 
     @Nested
-    class EarlyAdopter {
+    class HearingValuesAvailability {
         Applicant1DQ applicant1DQ;
         Respondent1DQ respondent1DQ;
 
@@ -507,7 +499,7 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldThrowErrorIfLocationIsNotWhiteListed() {
+        void shouldAllowApplicantLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -529,100 +521,12 @@ public class HearingValuesServiceTest {
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
-
-            assertThrows(NotEarlyAdopterCourtException.class, () -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @Test
-        void shouldThrowNotThrowErrorIfLocationIsWhiteListed() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
-            when(featuretoggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
-
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @SneakyThrows
-        @Test
-        void shouldNotThrowErrorIfApplicantLiPPresent() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @SneakyThrows
-        @Test
-        void shouldNotThrowErrorIfRespondentLiPPresentAndHmcLipToggleOn() {
+        void shouldAllowRespondentLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -645,13 +549,12 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfRespondent2LiPPresentAndHmcLipEnabled() {
+        void shouldAllowSecondRespondentLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -674,13 +577,12 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfNoLiPPresent() {
+        void shouldAllowCaseWithoutLipParties() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -702,12 +604,11 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @Test
-        void shouldThrowNotThrowErrorIfEaCourtIsYes() {
+        void shouldAllowCaseWithEaCourtLocation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -730,7 +631,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
     }
