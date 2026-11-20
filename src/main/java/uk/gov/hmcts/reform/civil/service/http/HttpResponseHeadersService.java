@@ -12,15 +12,26 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class HttpResponseHeadersService {
 
+    public static final String CLIENT_CONTEXT = "client-context";
+
     private final ObjectMapper mapper;
 
     public void addClientContextHeader(CallbackResponse callbackResponse, HttpServletResponse response) {
+        clientContextHeader(callbackResponse)
+            .ifPresent(encodedClientContext -> response.addHeader(CLIENT_CONTEXT, encodedClientContext));
+    }
+
+    /**
+     * The client-context header that asks ExUI to complete the WA task a submitted callback names, if it names one.
+     */
+    public Optional<String> clientContextHeader(CallbackResponse callbackResponse) {
         try {
             if (callbackResponse instanceof TaskCompletionSubmittedCallbackResponse submittedResponse) {
                 ClientContext clientContext = submittedResponse.getClientContext();
@@ -30,13 +41,12 @@ public class HttpResponseHeadersService {
                     taskToComplete.getTaskTitle(),
                     taskToComplete.getId()
                 );
-                String encodedClientContext = encodeClientContext(
-                    new ClientContextWrapper().setClientContext(clientContext));
-                response.addHeader("client-context", encodedClientContext);
+                return Optional.ofNullable(encodeClientContext(new ClientContextWrapper().setClientContext(clientContext)));
             }
         } catch (Exception e) {
             log.error("There was a problem adding the client context header to callback response: {}", e.getMessage());
         }
+        return Optional.empty();
     }
 
     public String encodeClientContext(ClientContextWrapper clientContext) {

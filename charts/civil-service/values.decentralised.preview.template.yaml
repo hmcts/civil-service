@@ -1,0 +1,32 @@
+# Runs this PR's preview with CIVIL and GENERALAPPLICATION cases kept by civil-service's decentralised runtime.
+# The pipeline adds this file when the PR has the label pr-values:decentralised. Without it preview runs
+# centralised, as every other environment does while CIVIL_DECENTRALISED_ENABLED is off.
+java:
+  environment:
+    CIVIL_DECENTRALISED_ENABLED: true
+    # The ccd-definition/exclusions.json entry this environment loads.
+    CIVIL_DECENTRALISED_DEFINITIONS_ENVIRONMENT: preview
+
+ccd:
+  ccd-data-store-api:
+    java:
+      # Until hmcts/ccd-data-store-api#3077 is released: it passes Client-Context through decentralised submissions.
+      image: hmctsprod.azurecr.io/ccd/data-store-api:pr-3077-8a4a4d7-20261116124731
+      environment:
+        SPRING_APPLICATION_JSON: |
+          {
+            "ccd": {
+              "decentralised": {
+                "case-type-service-urls": {
+                  "CIVIL": "http://${SERVICE_NAME}-java",
+                  "GENERALAPPLICATION": "http://${SERVICE_NAME}-java"
+                }
+              }
+            }
+          }
+
+ccd-case-document-am-api:
+  java:
+    # Until hmcts/ccd-case-document-am-api#820 is released: it lets civil_service attach the documents its
+    # callbacks return.
+    image: hmctsprod.azurecr.io/ccd/case-document-am-api:pr-820-54c0f0b-20261116124734
