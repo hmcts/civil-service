@@ -114,8 +114,10 @@ class TopicRoutingExternalTaskClientTest {
 
         @Test
         void shouldSubscribeACaseDrivenTopicOnEveryCaseDrivenClient() {
-            when(caseDrivenClient.subscribe(CASE_TOPIC)).thenReturn(mock(TopicSubscriptionBuilder.class));
-            when(secondCaseDrivenClient.subscribe(CASE_TOPIC)).thenReturn(mock(TopicSubscriptionBuilder.class));
+            TopicSubscriptionBuilder caseDrivenSubscription = mock(TopicSubscriptionBuilder.class);
+            TopicSubscriptionBuilder secondCaseDrivenSubscription = mock(TopicSubscriptionBuilder.class);
+            when(caseDrivenClient.subscribe(CASE_TOPIC)).thenReturn(caseDrivenSubscription);
+            when(secondCaseDrivenClient.subscribe(CASE_TOPIC)).thenReturn(secondCaseDrivenSubscription);
 
             assertThat(multiRouter.subscribe(CASE_TOPIC)).isInstanceOf(FanOutTopicSubscriptionBuilder.class);
 
@@ -251,8 +253,11 @@ class TopicRoutingExternalTaskClientTest {
      */
     @Test
     void shouldRejectAnEmptyCaseDrivenClientList() {
+        List<ExternalTaskClient> noCaseDrivenClients = List.of();
+        Set<String> schedulerTopics = Set.of(SCHEDULER_TOPIC);
+
         assertThatThrownBy(() -> new TopicRoutingExternalTaskClient(
-            List.of(), schedulerClient, Set.of(SCHEDULER_TOPIC)))
+            noCaseDrivenClients, schedulerClient, schedulerTopics))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("At least one case driven");
     }

@@ -87,21 +87,26 @@ class UpdateSystemTTLTaskTest {
     @Test
     void shouldRejectMissingLastModifiedDateWhenTtlNeedsCreating() {
         CaseDetails caseDetails = CaseDetails.builder().data(Map.of()).build();
+        UpdateTTLCaseReference missingLastModified = caseReference(null);
 
-        assertThatThrownBy(() -> task.migrateCmcCaseData(caseDetails, caseReference(null)))
+        assertThatThrownBy(() -> task.migrateCmcCaseData(caseDetails, missingLastModified))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Last modified date must not be null when system TTL is missing");
     }
 
     @Test
     void shouldRejectInvalidCivilMigrationInputs() {
-        assertThatThrownBy(() -> task.migrateCaseData(null, caseReference(null)))
+        UpdateTTLCaseReference missingReference = caseReference(null);
+        CaseData emptyCaseData = CaseData.builder().build();
+        UpdateTTLCaseReference blankReference = new UpdateTTLCaseReference();
+
+        assertThatThrownBy(() -> task.migrateCaseData(null, missingReference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), null))
+        assertThatThrownBy(() -> task.migrateCaseData(emptyCaseData, null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), new UpdateTTLCaseReference()))
+        assertThatThrownBy(() -> task.migrateCaseData(emptyCaseData, blankReference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
     }
@@ -109,17 +114,20 @@ class UpdateSystemTTLTaskTest {
     @Test
     void shouldRejectInvalidCmcMigrationInputs() {
         UpdateTTLCaseReference reference = caseReference(null);
+        CaseDetails emptyDetails = CaseDetails.builder().build();
+        CaseDetails details = caseDetails();
+        UpdateTTLCaseReference blankReference = new UpdateTTLCaseReference();
 
         assertThatThrownBy(() -> task.migrateCmcCaseData(null, reference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
-        assertThatThrownBy(() -> task.migrateCmcCaseData(CaseDetails.builder().build(), reference))
+        assertThatThrownBy(() -> task.migrateCmcCaseData(emptyDetails, reference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
-        assertThatThrownBy(() -> task.migrateCmcCaseData(caseDetails(), null))
+        assertThatThrownBy(() -> task.migrateCmcCaseData(details, null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
-        assertThatThrownBy(() -> task.migrateCmcCaseData(caseDetails(), new UpdateTTLCaseReference()))
+        assertThatThrownBy(() -> task.migrateCmcCaseData(details, blankReference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("CaseData and CaseReference fields must not be null");
     }
