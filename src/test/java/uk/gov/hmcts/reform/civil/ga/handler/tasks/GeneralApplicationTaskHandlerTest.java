@@ -6,6 +6,9 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +35,13 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -136,6 +143,17 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
             verify(coreCaseDataService).submitGaUpdate(GA_CASE_ID, caseDataContent);
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"GA_EndBusinessProcess", "GA_EndJudgeMakesDecisionBusinessProcess",
+            "UPLOAD_TRANSLATED_FREE_GA_SUMMARY_DOC"})
+        void shouldUseGaCaseIdForWorkflowsStartedOnGaCase(String processDefinitionKey) {
+            when(mockTask.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
+            when(mockTask.getAllVariables()).thenReturn(Map.of(
+                "caseId", GA_CASE_ID, "caseEvent", LINK_GENERAL_APPLICATION_CASE_TO_PARENT_CASE.name()));
+
+            shouldLinkGAParentCaseLinkWhenParentCaseReferenceIsNull();
+        }
+
         @Test
         void shouldLinkGAParentCaseLinkWhenParentCaseReferenceIsEmpty() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
@@ -169,6 +187,26 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
 
             verify(coreCaseDataService).submitGaUpdate(GA_CASE_ID, caseDataContent);
         }
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = "   ")
+    void shouldFailWithoutCallingCcdWhenGaIdMissingDuringInitiation(String gaId) {
+        when(mockTask.getProcessDefinitionKey()).thenReturn("GA_INITIATE_PROCESS_ID");
+        when(mockTask.getProcessInstanceId()).thenReturn("process-123");
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("caseId", "parent-123");
+        variables.put("caseEvent", LINK_GENERAL_APPLICATION_CASE_TO_PARENT_CASE.name());
+        variables.put("generalApplicationCaseId", gaId);
+        when(mockTask.getAllVariables()).thenReturn(variables);
+
+        generalApplicationTaskHandler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).handleFailure(eq(mockTask),
+            eq("generalApplicationCaseId missing for parent case parent-123, process instance process-123"),
+            anyString(), eq(0), eq(1000L));
     }
 
     @Test
