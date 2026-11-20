@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP;
 
 public class UploadTranslatedDocumentServiceTest {
 
@@ -383,6 +386,75 @@ public class UploadTranslatedDocumentServiceTest {
         // Then
         assertThat(caseData.getHearingOrderDocument().isEmpty()).isFalse();
         assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(GaFinalOrderSelection.class)
+    void shouldPrepareOriginalAndTranslatedFinalOrderForBulkPrint(GaFinalOrderSelection finalOrderSelection) {
+        Document originalFile = new Document().setDocumentFileName("final-order.pdf");
+        Document translatedFile = new Document().setDocumentFileName("translated-final-order.pdf");
+        CaseDocument originalOrder = new CaseDocument()
+            .setDocumentType(DocumentType.GENERAL_ORDER)
+            .setDocumentLink(originalFile)
+            .setDocumentName("final-order.pdf");
+        TranslatedDocument translation = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
+            .file(translatedFile)
+            .build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .finalOrderSelection(finalOrderSelection)
+            .preTranslationGaDocumentType(PreTranslationGaDocumentType.FINAL_ORDER_DOC)
+            .preTranslationGaDocuments(new ArrayList<>(List.of(element(originalOrder))))
+            .translatedDocuments(new ArrayList<>(List.of(element(translation))))
+            .build();
+        GeneralApplicationCaseData builder = caseData.copy();
+
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        GeneralApplicationCaseData updated = uploadTranslatedDocumentService
+            .processTranslatedDocument(builder.build(), "CTSC translator").build();
+
+        assertThat(updated.getOriginalDocumentsBulkPrint()).hasSize(1);
+        assertThat(updated.getOriginalDocumentsBulkPrint().getFirst().getValue()).isEqualTo(originalOrder);
+        assertThat(updated.getTranslatedDocumentsBulkPrint()).hasSize(1);
+        assertThat(updated.getTranslatedDocumentsBulkPrint().getFirst().getValue()).isEqualTo(translation);
+        assertThat(updated.getPreTranslationGaDocuments()).isEmpty();
+        assertThat(updated.getTranslatedDocuments()).isNull();
+        assertThat(uploadTranslatedDocumentService.getBusinessProcessEvent(caseData))
+            .isEqualTo(UPLOAD_TRANSLATED_DOCUMENT_GA_LIP);
+    }
+
+    @ParameterizedTest
+    @EnumSource(GaFinalOrderSelection.class)
+    void shouldPreparePublishedFinalOrderForBulkPrintWhenNoPreTranslationCollectionExists(
+        GaFinalOrderSelection finalOrderSelection) {
+        CaseDocument previousOrder = new CaseDocument()
+            .setDocumentType(DocumentType.GENERAL_ORDER)
+            .setDocumentLink(new Document().setDocumentFileName("previous-order.pdf"));
+        CaseDocument originalOrder = new CaseDocument()
+            .setDocumentType(DocumentType.GENERAL_ORDER)
+            .setDocumentLink(new Document().setDocumentFileName("final-order.pdf"));
+        TranslatedDocument translation = TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
+            .file(new Document().setDocumentFileName("translated-final-order.pdf"))
+            .build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .finalOrderSelection(finalOrderSelection)
+            .generalOrderDocument(new ArrayList<>(List.of(element(previousOrder), element(originalOrder))))
+            .translatedDocuments(new ArrayList<>(List.of(element(translation))))
+            .build();
+        GeneralApplicationCaseData builder = caseData.copy();
+
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        GeneralApplicationCaseData updated = uploadTranslatedDocumentService
+            .processTranslatedDocument(builder.build(), "CTSC translator").build();
+
+        assertThat(updated.getOriginalDocumentsBulkPrint()).hasSize(1);
+        assertThat(updated.getOriginalDocumentsBulkPrint().getFirst().getValue()).isEqualTo(originalOrder);
+        assertThat(updated.getTranslatedDocumentsBulkPrint()).hasSize(1);
+        assertThat(updated.getTranslatedDocumentsBulkPrint().getFirst().getValue()).isEqualTo(translation);
+        assertThat(updated.getGeneralOrderDocument()).hasSize(3);
+        assertThat(updated.getGeneralOrderDocument().get(0).getValue()).isEqualTo(previousOrder);
+        assertThat(updated.getGeneralOrderDocument().get(1).getValue()).isEqualTo(originalOrder);
     }
 
     @Test
@@ -1149,7 +1221,7 @@ public class UploadTranslatedDocumentServiceTest {
 
         var caseEvent = uploadTranslatedDocumentService.getBusinessProcessEvent(caseData);
 
-        assertThat(caseEvent).isEqualTo(uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP);
+        assertThat(caseEvent).isEqualTo(UPLOAD_TRANSLATED_DOCUMENT_GA_LIP);
     }
 
     @Test

@@ -377,13 +377,23 @@ public class UploadTranslatedDocumentService {
     private void moveGeneralOrder(GeneralApplicationCaseData caseDataBuilder,
                                   List<Element<CaseDocument>> preTranslationGaDocuments,
                                   List<Element<CaseDocument>> bulkPrintOriginalDocuments) {
+        Optional<Element<CaseDocument>> originalDocument = findAndRemovePreTranslationDocument(
+            preTranslationGaDocuments,
+            item -> item.getDocumentType() == DocumentType.GENERAL_ORDER
+        );
+        List<Element<CaseDocument>> generalOrderDocuments = getCaseDocuments(caseDataBuilder.build().getGeneralOrderDocument());
+        if (originalDocument.isEmpty()
+            && caseDataBuilder.getFinalOrderSelection() != null
+            && !generalOrderDocuments.isEmpty()) {
+            // Final orders already published in English are not held in the pre-translation collection.
+            bulkPrintOriginalDocuments.add(generalOrderDocuments.getLast());
+            caseDataBuilder.originalDocumentsBulkPrint(bulkPrintOriginalDocuments);
+            return;
+        }
         appendTranslatedOrderDocument(
             caseDataBuilder,
-            findAndRemovePreTranslationDocument(
-                preTranslationGaDocuments,
-                item -> item.getDocumentType() == DocumentType.GENERAL_ORDER
-            ),
-            getCaseDocuments(caseDataBuilder.build().getGeneralOrderDocument()),
+            originalDocument,
+            generalOrderDocuments,
             caseDataBuilder::generalOrderDocument,
             bulkPrintOriginalDocuments
         );
