@@ -166,6 +166,19 @@ class ParentCaseUpdateHelperTest {
     }
 
     @Test
+    void updateParentApplicationVisibilityWithNewStateWhenMasterCollectionIsNull() {
+        GeneralApplicationCaseData caseData = getCaseWithApplicationData(false).copy()
+            .gaDetailsMasterCollection(null)
+            .build();
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+
+        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(caseData, ORDER_MADE.toString());
+
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
+    @Test
     void updateCaseDocumentByType_null() {
         GeneralApplicationCaseData gaCase = getCaseWithApplicationDataAndGeneralOrder();
         GeneralApplicationCaseData civilCase = getCaseWithApplicationData(false);
