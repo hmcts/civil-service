@@ -68,7 +68,8 @@ class RoboticsDataMapperForSpecTest {
             nullable(String.class),
             nullable(String.class),
             nullable(String.class),
-            nullable(LocalDate.class)
+            nullable(LocalDate.class),
+            nullable(Long.class)
         )).thenAnswer(invocation -> {
             Party party = invocation.getArgument(0);
             String type = invocation.getArgument(2);
