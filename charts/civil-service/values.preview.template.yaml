@@ -3,7 +3,10 @@ java:
   imagePullPolicy: Always
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devcpuRequests: 50m
-  devcpuLimits: 500m
+  # The functional tests' Camunda business processes run in this pod. At 500m, eight Playwright
+  # workers made each journey about 3x slower than on AAT staging, and startup took ~2.5 min.
+  # The request stays at 50m so scheduling cost is unchanged; only the burst ceiling is raised.
+  devcpuLimits: 2000m
   devmemoryRequests: 1536Mi
   devmemoryLimits: 2048Mi
   environment:
@@ -220,7 +223,7 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 50m
-      devcpuLimits: 500m
+      devcpuLimits: 1000m
       devmemoryRequests: 4096Mi
       devmemoryLimits: 8192Mi
       autoscaling:
@@ -289,7 +292,7 @@ camunda-bpm:
     ingressHost: camunda-${SERVICE_FQDN}
     devcpuRequests: 50m
     devmemoryRequests: 1024Mi
-    devcpuLimits: 500m
+    devcpuLimits: 1000m
     devmemoryLimits: 1Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
