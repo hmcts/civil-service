@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -63,7 +64,9 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             String errorMessage = "Could not trigger event to update location on application under case: "
                 + caseData.getCcdCaseReference();
             log.error(errorMessage, e);
-            return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(CallbackFailureClassifier.labelledError(errorMessage, e)))
+                .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

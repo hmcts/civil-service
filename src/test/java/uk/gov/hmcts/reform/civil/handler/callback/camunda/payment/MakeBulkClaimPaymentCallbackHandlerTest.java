@@ -127,7 +127,8 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
             .doesNotHaveToString("paymentErrorMessage");
         assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
             .doesNotHaveToString("paymentErrorCode");
-        assertThat(response.getErrors()).containsOnly("Technical error occurred");
+        assertThat(response.getErrors()).singleElement().asString()
+            .startsWith((status == 409 ? "RETRYABLE: " : "NOT RETRYABLE: ") + "Technical error occurred (");
     }
 
     @Test

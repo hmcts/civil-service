@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidTokenException;
@@ -53,6 +54,17 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
             );
             throw new UpstreamUnavailableException("CCD", serviceRequestUpdateDto.getCcdCaseNumber(), null, ex);
         } catch (Exception ex) {
+            if (ex instanceof FeignException feignException
+                && CallbackFailureClassifier.isRetryableCallbackError(feignException)) {
+                // A civil-service callback failed transiently and CCD did not save the event (DTSCCI-7095):
+                // answer 503 as for a CCD 502, so the payment service retries the update.
+                log.warn(
+                    "Transient callback failure for CaseID: {}",
+                    serviceRequestUpdateDto.getCcdCaseNumber(),
+                    ex
+                );
+                throw new UpstreamUnavailableException("CCD", serviceRequestUpdateDto.getCcdCaseNumber(), null, ex);
+            }
             log.error(
                 "Payment callback is unsuccessful for the CaseID: {}",
                 serviceRequestUpdateDto.getCcdCaseNumber(),

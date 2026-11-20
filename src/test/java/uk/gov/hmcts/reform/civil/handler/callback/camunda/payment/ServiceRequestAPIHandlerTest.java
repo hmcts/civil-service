@@ -244,6 +244,24 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldLabelPaymentsGatewayTimeoutAsRetryable_whenServiceRequestFails() {
+            // DTSCCI-7095: payments 504 on POST /service-request (seen on 19 Nov 2026) is transient, so the
+            // callback error is labelled RETRYABLE and the Camunda task retries instead of raising an incident
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
+            feign.Request request = feign.Request.create(feign.Request.HttpMethod.POST,
+                "http://payment-api-prod.service.core-compute-prod.internal/service-request",
+                java.util.Map.of(), null, java.nio.charset.StandardCharsets.UTF_8, null);
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenThrow(new FeignException.GatewayTimeout("[504 Gateway Timeout]", request, null, null));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith("RETRYABLE: Technical error occurred (feign.FeignException$GatewayTimeout: [504 Gateway Timeout]");
+        }
+
+        @Test
         void shouldNotMakePaymentServiceRequestForClaimFee_whenInvoked() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
