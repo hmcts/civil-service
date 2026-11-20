@@ -89,12 +89,12 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
             && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForGa() == YesOrNo.YES
             && Objects.nonNull(caseData.getGaHwfDetails())
             && Objects.nonNull(caseData.getGaHwfDetails().getOutstandingFee())
-            && !Objects.equals(caseData.getGaHwfDetails().getOutstandingFee(), BigDecimal.ZERO))
+            && caseData.getGaHwfDetails().getOutstandingFee().compareTo(BigDecimal.ZERO) != 0)
             || (caseData.isHWFTypeAdditional()
             && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForAdditionalFee() == YesOrNo.YES
             && Objects.nonNull(caseData.getAdditionalHwfDetails())
             && Objects.nonNull(caseData.getAdditionalHwfDetails().getOutstandingFee())
-            && !Objects.equals(caseData.getAdditionalHwfDetails().getOutstandingFee(), BigDecimal.ZERO))) {
+            && caseData.getAdditionalHwfDetails().getOutstandingFee().compareTo(BigDecimal.ZERO) != 0)) {
             errors.add(WRONG_REMISSION_TYPE_SELECTED);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
