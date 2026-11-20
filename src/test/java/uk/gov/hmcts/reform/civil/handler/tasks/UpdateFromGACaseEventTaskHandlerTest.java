@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
@@ -503,7 +502,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
-    void shouldAddToCivilDocsCopyIfGADocsNotInCivilDocs() throws Exception {
+    void shouldAddGaDocsNotInCivilDocsAndKeepExistingCivilDocs() throws Exception {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
@@ -531,7 +530,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         civilDocs = handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
 
-        assertNotSame(civilDocs.getFirst().getId(), civilDocsPre.getFirst().getId());
+        // A document already on the main case must stay there even when the GA also holds it
+        UUID gaOnlyDocId = UUID.fromString("f000aa01-0451-4000-b000-000000000111");
+        assertThat(civilDocs).extracting(Element::getId)
+            .containsExactly(civilDocsPre.getFirst().getId(), gaOnlyDocId);
     }
 
     @Test
@@ -1323,5 +1325,142 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         return new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
+    }
+
+    @Nested
+    class LipDraftApplicationSync {
+
+        private final UUID ga1DraftId = UUID.fromString("a1a1a1a1-0000-4000-b000-000000000001");
+        private final UUID ga2DraftId = UUID.fromString("a2a2a2a2-0000-4000-b000-000000000002");
+        private final UUID ga2NewDraftId = UUID.fromString("a2a2a2a2-0000-4000-b000-000000000003");
+        private final UUID directionOrderId = UUID.fromString("d0d0d0d0-0000-4000-b000-000000000004");
+
+        @Test
+        void shouldKeepDraftOnMainCaseWhenSameGaIsSyncedAgain() {
+            List<Element<CaseDocument>> civilDocs = newArrayList(draft(ga1DraftId, "Draft_application_2026-02-20 15:59:38.pdf", 1));
+
+            handler.checkDraftDocumentsInMainCase(civilDocs, List.of(draft(ga1DraftId, "Draft_application_2026-02-20 15:59:38.pdf", 1)));
+
+            assertThat(civilDocs).extracting(Element::getId).containsExactly(ga1DraftId);
+        }
+
+        @Test
+        void shouldBeStableWhenSameGaIsSyncedRepeatedly() {
+            List<Element<CaseDocument>> gaDocs = List.of(draft(ga1DraftId, "Draft_application_a.pdf", 1));
+            List<Element<CaseDocument>> civilDocs = newArrayList();
+
+            for (int sync = 0; sync < 3; sync++) {
+                handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+                assertThat(civilDocs).extracting(Element::getId).containsExactly(ga1DraftId);
+            }
+        }
+
+        @Test
+        void shouldNotRemoveAnotherGasDraftWhenGaIsSynced() {
+            List<Element<CaseDocument>> civilDocs = newArrayList(
+                draft(ga1DraftId, "Draft_application_ga1.pdf", 1),
+                draft(ga2DraftId, "Draft_application_ga2.pdf", 2)
+            );
+
+            handler.checkDraftDocumentsInMainCase(civilDocs, List.of(draft(ga2DraftId, "Draft_application_ga2.pdf", 2)));
+
+            assertThat(civilDocs).extracting(Element::getId).containsExactly(ga1DraftId, ga2DraftId);
+        }
+
+        @Test
+        void shouldReplaceDraftSupersededByTheSameGa() {
+            List<Element<CaseDocument>> civilDocs = newArrayList(
+                draft(ga1DraftId, "Draft_application_ga1.pdf", 1),
+                draft(ga2DraftId, "Draft_application_ga2_old.pdf", 2)
+            );
+            List<Element<CaseDocument>> ga2Docs = List.of(
+                draft(ga2DraftId, "Draft_application_ga2_old.pdf", 2),
+                draft(ga2NewDraftId, "Draft_application_ga2_new.pdf", 3)
+            );
+
+            handler.checkDraftDocumentsInMainCase(civilDocs, ga2Docs);
+
+            assertThat(civilDocs).extracting(Element::getId).containsExactly(ga1DraftId, ga2NewDraftId);
+        }
+
+        @Test
+        void shouldKeepLatestDraftAndLatestTranslatedDraftSeparately() {
+            UUID translatedId = UUID.fromString("7a7a7a7a-0000-4000-b000-000000000005");
+            List<Element<CaseDocument>> gaDocs = List.of(
+                draft(ga1DraftId, "Draft_application_ga1.pdf", 1),
+                draft(translatedId, "Translated_draft_application_ga1.pdf", 2)
+            );
+            List<Element<CaseDocument>> civilDocs = newArrayList(draft(ga1DraftId, "Draft_application_ga1.pdf", 1));
+
+            handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+
+            assertThat(civilDocs).extracting(Element::getId).containsExactly(ga1DraftId, translatedId);
+        }
+
+        @Test
+        void shouldKeepNonDraftDocumentsAndAddNewGaDrafts() {
+            List<Element<CaseDocument>> civilDocs = newArrayList(draft(directionOrderId, "Direction_order.pdf", 1));
+
+            handler.checkDraftDocumentsInMainCase(civilDocs, List.of(draft(ga1DraftId, "Draft_application_ga1.pdf", 2)));
+
+            assertThat(civilDocs).extracting(Element::getId).containsExactly(directionOrderId, ga1DraftId);
+        }
+
+        @Test
+        void shouldKeepOtherGaDraftOnMainCaseWhenAnotherGaIsSyncedForLipCase() {
+            when(mockExternalTask.getTopicName()).thenReturn("test");
+            when(mockExternalTask.getAllVariables())
+                .thenReturn(Map.of(
+                    "caseId", GENERAL_APP_CASE_ID,
+                    "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                    "generalAppParentCaseLink", CIVIL_CASE_ID
+                ));
+
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraftLip()
+                .respondent1Represented(YesOrNo.NO)
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .build()
+                .setGaDraftDocStaff(newArrayList(
+                    draft(ga1DraftId, "Draft_application_ga1.pdf", 1),
+                    draft(ga2DraftId, "Draft_application_ga2.pdf", 2)
+                ));
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+            StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+            CaseData ga2CaseData = new CaseDataBuilder().build().toBuilder()
+                .ccdCaseReference(parseLong(GENERAL_APP_CASE_ID))
+                .gaDraftDocument(newArrayList(draft(ga2DraftId, "Draft_application_ga2.pdf", 2)))
+                .build();
+
+            when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+                .thenReturn(ga2CaseData);
+            when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+            when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+            when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            handler.execute(mockExternalTask, externalTaskService);
+
+            ArgumentCaptor<CaseDataContent> caseDataContentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+            verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), caseDataContentCaptor.capture());
+            CaseData submittedCaseData = objectMapper.convertValue(
+                caseDataContentCaptor.getValue().getData(),
+                CaseData.class
+            );
+            assertThat(submittedCaseData.getGaDraftDocStaff())
+                .extracting(Element::getId)
+                .containsExactly(ga1DraftId, ga2DraftId);
+        }
+
+        private Element<CaseDocument> draft(UUID id, String name, int minutesAfterBase) {
+            return new Element<CaseDocument>()
+                .setId(id)
+                .setValue(new CaseDocument()
+                              .setDocumentName(name)
+                              .setCreatedDatetime(java.time.LocalDateTime.of(2026, 2, 20, 15, 0).plusMinutes(minutesAfterBase))
+                              .setDocumentLink(new Document()
+                                                   .setDocumentUrl("http://dm-store/documents/" + id)
+                                                   .setDocumentBinaryUrl("http://dm-store/documents/" + id + "/binary")
+                                                   .setDocumentFileName(name)));
+        }
     }
 }
