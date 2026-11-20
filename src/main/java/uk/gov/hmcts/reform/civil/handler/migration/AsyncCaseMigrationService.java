@@ -61,7 +61,7 @@ public class AsyncCaseMigrationService {
             try {
                 RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
                 if (count == migrationBatchSize) {
-                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    logBatchPause(batchCount);
                     TimeUnit.MINUTES.sleep(migrationWaitTime);
                     count = 0;
                     batchCount++;
@@ -91,7 +91,7 @@ public class AsyncCaseMigrationService {
             try {
                 RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
                 if (count == migrationBatchSize) {
-                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    logBatchPause(batchCount);
                     TimeUnit.MINUTES.sleep(migrationWaitTime);
                     count = 0;
                     batchCount++;
@@ -134,7 +134,7 @@ public class AsyncCaseMigrationService {
             try {
                 RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
                 if (count == migrationBatchSize) {
-                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    logBatchPause(batchCount);
                     TimeUnit.MINUTES.sleep(migrationWaitTime);
                     count = 0;
                     batchCount++;
@@ -203,6 +203,15 @@ public class AsyncCaseMigrationService {
             task.migrateCaseData(caseData, caseReference);
         }
         log.info("Read-only verification completed for case ID: {}", caseReference.getCaseReference());
+    }
+
+    private void logBatchPause(int batchCount) {
+        log.info(
+            "Batch {} limit reached {}, pausing for {} minutes",
+            batchCount,
+            migrationBatchSize,
+            migrationWaitTime
+        );
     }
 
     protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask<?> task) {

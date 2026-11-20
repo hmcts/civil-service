@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,16 +29,29 @@ public class DraftStoreService {
 
     private static final String USER_ID_NOT_NULL = "userId must not be null";
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
+    private static final String CASE_ID_NOT_NULL = "caseId must not be null";
+    private static final String DRAFT_ID_NOT_NULL = "draftId must not be null";
+    private static final String SUBMISSION_ID_NOT_NULL = "submissionId must not be null";
     private static final ZoneId EXPIRY_ZONE = ZoneId.of("Europe/London");
     static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
 
     private final DraftStoreRepository draftStoreRepository;
     private final DraftStoreTransactionService draftStoreTransactionService;
+    private DraftStoreService self;
 
     public DraftStoreService(DraftStoreRepository draftStoreRepository,
                              DraftStoreTransactionService draftStoreTransactionService) {
         this.draftStoreRepository = draftStoreRepository;
         this.draftStoreTransactionService = draftStoreTransactionService;
+    }
+
+    /**
+     * Internal reads go through this proxy. They still join the caller's transaction;
+     * {@code readOnly} applies when the read method is the entry point.
+     */
+    @Autowired
+    public void setSelf(@Lazy DraftStoreService self) {
+        this.self = self;
     }
 
     public DraftStoreEntity createDraft(String userId,
@@ -85,7 +100,7 @@ public class DraftStoreService {
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftForCase(String userId, String caseId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(caseId, CASE_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
             userId,
@@ -97,7 +112,7 @@ public class DraftStoreService {
 
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getDraft(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
@@ -112,7 +127,7 @@ public class DraftStoreService {
     public Optional<DraftStoreEntity> getDraftBySubmissionId(String submissionId,
                                                              String userId,
                                                              DraftType draftType) {
-        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(submissionId, SUBMISSION_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return draftStoreRepository.findBySubmissionIdAndUserIdAndDraftTypeAndExpiresAtAfter(
@@ -129,7 +144,7 @@ public class DraftStoreService {
                                                   Map<String, Object> payload,
                                                   DraftType draftType) {
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return getDraft(draftId, userId, draftType)
+        return self.getDraft(draftId, userId, draftType)
             .map(existingDraft -> {
                 validatePayloadRetention(payload, draftType);
                 return applyDraftUpdate(existingDraft, caseId, payload);
@@ -137,9 +152,9 @@ public class DraftStoreService {
     }
 
     public Optional<DraftStoreEntity> linkCaseId(UUID draftId, String userId, String caseId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(caseId, CASE_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         int linked = draftStoreTransactionService.linkCaseIdInNewTransaction(
             draftId,
@@ -151,7 +166,7 @@ public class DraftStoreService {
         if (linked == 0) {
             return Optional.empty();
         }
-        return getDraft(draftId, userId, draftType);
+        return self.getDraft(draftId, userId, draftType);
     }
 
     /**
@@ -163,13 +178,13 @@ public class DraftStoreService {
                                                               String submissionId,
                                                               DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(caseId, CASE_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         if (submissionId == null || submissionId.isBlank()) {
             return Optional.empty();
         }
 
-        Optional<DraftStoreEntity> claimed = getDraftBySubmissionId(submissionId, userId, draftType);
+        Optional<DraftStoreEntity> claimed = self.getDraftBySubmissionId(submissionId, userId, draftType);
         if (claimed.isEmpty() || claimed.get().getCaseId() != null) {
             return Optional.empty();
         }
@@ -188,9 +203,9 @@ public class DraftStoreService {
      * caller that successfully set {@code submission_id} while {@code case_id} was still null.
      */
     public boolean claimSubmission(UUID draftId, String userId, String submissionId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(submissionId, SUBMISSION_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return draftStoreTransactionService.claimSubmissionInNewTransaction(
             draftId,
@@ -202,7 +217,7 @@ public class DraftStoreService {
     }
 
     public boolean releaseSubmission(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return draftStoreTransactionService.releaseSubmissionInNewTransaction(
@@ -219,11 +234,11 @@ public class DraftStoreService {
      * they do not block the unique active-draft index on the next attempt.
      */
     public void releaseFailedSubmissionClaim(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
 
-        Optional<DraftStoreEntity> draft = getDraft(draftId, userId, draftType);
+        Optional<DraftStoreEntity> draft = self.getDraft(draftId, userId, draftType);
         if (draft.isEmpty() || draft.get().getCaseId() != null) {
             return;
         }
@@ -239,7 +254,7 @@ public class DraftStoreService {
                                                             String submissionId,
                                                             DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(submissionId, SUBMISSION_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         DraftStoreEntity claimRow = new DraftStoreEntity(
@@ -271,7 +286,7 @@ public class DraftStoreService {
     private Optional<DraftStoreEntity> reuseBlankDraftForLegacySubmission(String userId,
                                                                           String submissionId,
                                                                           DraftType draftType) {
-        Optional<DraftStoreEntity> blank = getBlankDraft(userId, draftType);
+        Optional<DraftStoreEntity> blank = self.getBlankDraft(userId, draftType);
         if (blank.isEmpty() || blank.get().getCaseId() != null) {
             return Optional.empty();
         }
@@ -286,7 +301,7 @@ public class DraftStoreService {
             return Optional.empty();
         }
         log.info("Reused blank draft receipt draftId={} for legacy submissionId={}", draftId, submissionId);
-        return getDraft(draftId, userId, draftType);
+        return self.getDraft(draftId, userId, draftType);
     }
 
     private static boolean isLegacyClaimReceipt(DraftStoreEntity draft) {
@@ -295,11 +310,11 @@ public class DraftStoreService {
     }
 
     public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
 
-        return getDraft(draftId, userId, draftType).map(draft -> {
+        return self.getDraft(draftId, userId, draftType).map(draft -> {
             OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
             OffsetDateTime paymentExpiresAt = calculateExpiresAt(now, draftType.getPaymentRetentionDays());
             if (!paymentExpiresAt.isBefore(draft.getExpiresAt())) {
@@ -319,7 +334,7 @@ public class DraftStoreService {
     }
 
     public boolean deleteDraft(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         log.info("Deleting draft type={} draftId={}", draftType, draftId);
