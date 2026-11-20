@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -33,14 +34,21 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
      */
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getCurrentDefendantClaimResponseTypeForSpec())
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            caseData.getCurrentDefendantPaymentTimeRoute())) {
             return Optional.empty();
         }
 
-        BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        BigDecimal admitOwed = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getRespondToAdmittedClaimOwingAmountPounds2()
+            : caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        RespondToClaimAdmitPartLRspec admitPart = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getRespondToClaimAdmitPartLRspec2()
+            : caseData.getRespondToClaimAdmitPartLRspec();
+        LocalDate whenWillYouPay = Optional.ofNullable(admitPart)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (Stream.of(admitOwed, whenWillYouPay, totalClaimAmount)
             .anyMatch(Objects::isNull)) {

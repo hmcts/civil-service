@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Component
 public class CounterClaimConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
@@ -19,17 +22,23 @@ public class CounterClaimConfirmationText implements RespondToClaimConfirmationT
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!isCounterClaim(caseData)) {
+        if (!RespondentResponseTypeSpec.COUNTER_CLAIM.equals(
+            caseData.getCurrentDefendantClaimResponseTypeForSpec())) {
+            return Optional.empty();
+        }
+        // Same-solicitor divergent responses are handled by SpecResponse1v2DivergentText
+        if (isSameSolicitorDivergentResponse(caseData)) {
             return Optional.empty();
         }
         return Optional.of(TEXT);
     }
 
-    private boolean isCounterClaim(CaseData caseData) {
-        return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && (caseData.getRespondent2() == null
-            || YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            );
+    private boolean isSameSolicitorDivergentResponse(CaseData caseData) {
+        return NO.equals(caseData.getRespondentResponseIsSame())
+            && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+            && !caseData.getRespondent1ClaimResponseTypeForSpec()
+            .equals(caseData.getRespondent2ClaimResponseTypeForSpec());
     }
 }

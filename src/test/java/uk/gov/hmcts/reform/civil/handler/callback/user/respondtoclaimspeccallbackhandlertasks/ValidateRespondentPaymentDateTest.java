@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateRespondentPaymentDateTest {
@@ -58,5 +59,23 @@ class ValidateRespondentPaymentDateTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentPaymentDate.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldValidateRespondent2PaymentDateWhenCurrentDefendantIsRespondent2() {
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec2 = new RespondToClaimAdmitPartLRspec();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        caseData.setRespondToClaimAdmitPartLRspec2(respondToClaimAdmitPartLRspec2);
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        List<String> errors = Collections.singletonList("Invalid R2 payment date");
+        when(paymentDateValidator.validate(respondToClaimAdmitPartLRspec2)).thenReturn(errors);
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) validateRespondentPaymentDate.execute(callbackParams);
+
+        assertThat(response.getErrors()).isEqualTo(errors);
     }
 }

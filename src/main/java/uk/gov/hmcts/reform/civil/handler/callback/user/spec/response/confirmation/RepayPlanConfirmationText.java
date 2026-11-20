@@ -23,11 +23,11 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
      */
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-
+        RespondentResponseTypeSpec currentResponseType = caseData.getCurrentDefendantClaimResponseTypeForSpec();
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            caseData.getCurrentDefendantPaymentTimeRoute())
             || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
-            .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            .contains(currentResponseType)
         ) {
             return Optional.empty();
         }
@@ -39,7 +39,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         sb.append("<br>We've emailed ").append(applicantName)
             .append(" to say you've suggested paying by instalments.")
             .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.");
-        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(currentResponseType)) {
             sb.append(String
                         .format(
                             "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",

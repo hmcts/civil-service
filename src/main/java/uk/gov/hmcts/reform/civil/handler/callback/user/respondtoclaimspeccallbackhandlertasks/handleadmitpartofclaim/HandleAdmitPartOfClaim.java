@@ -68,8 +68,10 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
     private List<String> validatePaymentDate(CaseData caseData) {
         log.info("Validating payment date for caseId: {}", caseData.getCcdCaseReference());
-        return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                .orElseGet(() -> new RespondToClaim()));
+        RespondToClaim alreadyPaid = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getRespondToAdmittedClaim2()
+            : caseData.getRespondToAdmittedClaim();
+        return paymentDateValidator.validate(Optional.ofNullable(alreadyPaid).orElseGet(RespondToClaim::new));
     }
 
     private CallbackResponse buildErrorResponse(List<String> errors) {
