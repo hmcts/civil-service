@@ -29,6 +29,11 @@ group = 'uk.gov.hmcts.reform'
 ccdSdk {
   jackson2ClasspathGuard {
     allowedSourceFiles = ['build.gradle']
+    // auth-checker-lib 3.2.x (its Spring Boot 4 line) uses a Jackson 3 ObjectMapper internally in this
+    // one class; civil-service never touches it. Pinned to the version so an upgrade gets re-checked.
+    allowedClasses = [
+      'com.github.hmcts:auth-checker-lib:3.2.2|uk.gov.hmcts.reform.auth.parser.idam.core.user.token.HttpComponentsBasedUserTokenParser'
+    ]
   }
 }
 version = '0.0.1'
