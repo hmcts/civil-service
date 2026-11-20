@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
@@ -85,7 +86,11 @@ public class CaseDetailsConverter {
     }
 
     private static Map<String, Object> copyData(CaseDetails caseDetails) {
+        Objects.requireNonNull(caseDetails, "caseDetails");
         Map<String, Object> source = caseDetails.getData();
-        return new HashMap<>(source == null ? Map.of() : source);
+        if (source == null) {
+            return new HashMap<>();
+        }
+        return new HashMap<>(source);
     }
 }
