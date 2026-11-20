@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.REPAYMENT_PLAN_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_1_DOES_NOT_PAY_IMMEDIATELY;
@@ -245,5 +246,73 @@ class ShowConditionFlagsCaseUpdaterTest {
 
         assertThat(caseData.getShowConditionFlags()).isNotEmpty();
         assertThat(caseData.getShowConditionFlags()).doesNotContain(WHEN_WILL_CLAIM_BE_PAID);
+    }
+
+    @Test
+    void shouldAddNeedFinancialDetails2WhenIndividualRespondent2InOneVTwoTwoLegalRepDoesNotPayImmediately() {
+        CaseData caseData = oneVTwoTwoLegalRepRespondent2(Party.Type.INDIVIDUAL,
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags()).contains(
+                NEED_FINANCIAL_DETAILS_2,
+                WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+                REPAYMENT_PLAN_2
+        );
+    }
+
+    @Test
+    void shouldAddRepaymentPlan2AndWhy2ButNotFinancialDetailsWhenCompanyRespondent2PaysByInstalments() {
+        CaseData caseData = oneVTwoTwoLegalRepRespondent2(Party.Type.COMPANY,
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags())
+                .contains(REPAYMENT_PLAN_2, WHY_2_DOES_NOT_PAY_IMMEDIATELY)
+                .doesNotContain(NEED_FINANCIAL_DETAILS_2);
+    }
+
+    @Test
+    void shouldAddWhy2ButNotFinancialDetailsWhenOrganisationRespondent2PaysBySetDate() {
+        CaseData caseData = oneVTwoTwoLegalRepRespondent2(Party.Type.ORGANISATION,
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags())
+                .contains(WHY_2_DOES_NOT_PAY_IMMEDIATELY)
+                .doesNotContain(NEED_FINANCIAL_DETAILS_2, REPAYMENT_PLAN_2);
+    }
+
+    @Test
+    void shouldRemoveStaleRepaymentPlan2WhenRespondent2NoLongerPaysByInstalments() {
+        CaseData caseData = oneVTwoTwoLegalRepRespondent2(Party.Type.INDIVIDUAL,
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2, REPAYMENT_PLAN_2));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags())
+                .contains(NEED_FINANCIAL_DETAILS_2)
+                .doesNotContain(REPAYMENT_PLAN_2);
+    }
+
+    private CaseData oneVTwoTwoLegalRepRespondent2(Party.Type partyType,
+                                                   RespondentResponsePartAdmissionPaymentTimeLRspec paymentRoute) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(NO);
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(partyType);
+        caseData.setRespondent2(party);
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSpecDefenceAdmitted2Required(NO);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(paymentRoute);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
+        return caseData;
     }
 }
