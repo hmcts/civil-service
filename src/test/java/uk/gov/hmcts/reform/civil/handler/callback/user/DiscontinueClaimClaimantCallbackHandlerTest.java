@@ -59,7 +59,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
     private CaseDetailsConverter caseDetailsConverter;
     @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private GenAppStateHelperService genAppStateHelperService;
 
     @Autowired
