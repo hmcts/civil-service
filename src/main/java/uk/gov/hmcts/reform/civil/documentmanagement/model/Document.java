@@ -30,6 +30,7 @@ public class Document {
     @JsonAlias("document_hash")
     String documentHash;
     @JsonAlias("category_id")
+    @JsonProperty("category_id")
     String categoryID;
     @JsonAlias("upload_timestamp")
     String uploadTimestamp;
