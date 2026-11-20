@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -201,7 +202,7 @@ public class GaCoreCaseDataService {
                 userToken,
                 authTokenGenerator.generate(),
                 GENERALAPPLICATION_CASE_TYPE,
-                query.toString()
+                Objects.requireNonNull(query, "query must not be null").toString()
         );
     }
 

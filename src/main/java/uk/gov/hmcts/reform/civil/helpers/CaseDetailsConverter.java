@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
@@ -36,6 +37,7 @@ public class CaseDetailsConverter {
     }
 
     public CaseData toCaseData(CaseDetails caseDetails) {
+        Objects.requireNonNull(caseDetails, "caseDetails must not be null");
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
         data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {

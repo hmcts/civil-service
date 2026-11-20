@@ -150,6 +150,9 @@ public class CaseReferenceCsvLoader {
 
     public static String decrypt(String encryptedData, SecretKey key) throws Exception {
         String[] parts = encryptedData.split(":");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid encrypted data format, expected <iv>:<cipherText>");
+        }
         byte[] iv = Base64.getDecoder().decode(parts[0]);
         GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);

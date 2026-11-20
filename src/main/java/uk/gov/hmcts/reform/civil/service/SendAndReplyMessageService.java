@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -158,6 +159,7 @@ public class SendAndReplyMessageService {
     }
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
+        Objects.requireNonNull(message, "message to reply to must not be null");
         Message baseMessage = message.getValue().copyNoHistory().setSentTime(message.getValue().getUpdatedTime());
         return Stream.concat(Stream.of(baseMessage), message.getValue().getHistory().stream()
                 .map(historyItem -> message.getValue().buildFullReplyMessageForTable(historyItem.getValue())))
