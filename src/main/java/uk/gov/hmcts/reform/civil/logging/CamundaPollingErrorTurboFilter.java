@@ -85,8 +85,10 @@ public class CamundaPollingErrorTurboFilter extends TurboFilter {
         long start = windowStart.get();
         if (now - start >= windowMs && windowStart.compareAndSet(start, now)) {
             int count = suppressed.getAndSet(0);
-            SUMMARY.warn("Suppressed {} transient Camunda external-task fetchAndLock error(s) in the "
-                + "last ~{}s; most recent cause: {}", count, windowMs / 1000L, describe(t));
+            if (SUMMARY.isWarnEnabled()) {
+                SUMMARY.warn("Suppressed {} transient Camunda external-task fetchAndLock error(s) in the "
+                    + "last ~{}s; most recent cause: {}", count, windowMs / 1000L, describe(t));
+            }
         }
     }
 

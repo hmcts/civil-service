@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -64,10 +65,9 @@ class PdfMergerTest {
     @Test
     void should_identify_invalid_document_in_multiple_documents() throws Exception {
         byte[] validPdf = loadResource("stitch-documents/test1.pdf");
+        List<byte[]> documents = asList(validPdf, "not-pdf".getBytes());
 
-        assertThatThrownBy(() -> PdfMerger.mergeDocuments(
-            asList(validPdf, "not-pdf".getBytes()), "1776674103714442"
-        ))
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(documents, "1776674103714442"))
             .isInstanceOf(PdfMergeException.class)
             .hasMessage("Document at index 1 is not a valid PDF for caseId 1776674103714442 (size: 7 bytes)");
     }
