@@ -197,13 +197,13 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldRetryTokenTimeout() {
-        when(idamClient.getAccessToken(SUB, PASSWORD))
-            .thenThrow(new RuntimeException(new SocketTimeoutException("Timed out")))
-            .thenReturn(AUTHORISATION);
+    void shouldNotRepeatTimeoutAfterClientRetriesAreExhausted() {
+        RuntimeException failure = new RuntimeException(new SocketTimeoutException("Timed out"));
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure);
 
-        assertThat(userService.getAccessToken(SUB, PASSWORD)).isEqualTo(AUTHORISATION);
-        verify(idamClient, times(2)).getAccessToken(SUB, PASSWORD);
+        assertThat(assertThrows(RuntimeException.class, () -> userService.getAccessToken(SUB, PASSWORD)))
+            .isSameAs(failure);
+        verify(idamClient).getAccessToken(SUB, PASSWORD);
     }
 
     @Test

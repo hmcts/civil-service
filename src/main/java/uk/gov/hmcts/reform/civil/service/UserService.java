@@ -11,9 +11,6 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.net.SocketTimeoutException;
-import java.net.http.HttpTimeoutException;
-
 @Service
 public class UserService {
 
@@ -39,7 +36,11 @@ public class UserService {
 
     @Cacheable(value = "accessTokenCache")
     public String getAccessToken(String username, String password) {
-        // Retry inside the cached invocation so cache hits never enter the retry policy.
+        return fetchAccessToken(username, password);
+    }
+
+    protected String fetchAccessToken(String username, String password) {
+        // Retry inside the cache boundary; the bundle service calls this without caching.
         return accessTokenRetry.execute(context -> idamClient.getAccessToken(username, password));
     }
 
@@ -65,15 +66,8 @@ public class UserService {
     }
 
     private boolean isTransientTokenFailure(Throwable failure) {
-        if (failure instanceof FeignException feignException && feignException.status() >= 0) {
-            return isServerError(feignException);
-        }
-        for (Throwable cause = failure; cause != null; cause = cause.getCause()) {
-            if (cause instanceof SocketTimeoutException || cause instanceof HttpTimeoutException) {
-                return true;
-            }
-        }
-        return false;
+        // Feign already retries transport failures; repeating them here multiplies its attempts.
+        return failure instanceof FeignException feignException && isServerError(feignException);
     }
 
     private boolean isServerError(FeignException exception) {
