@@ -86,11 +86,10 @@ class MediationFileTransferServiceTest {
         assertThat(emailData.getAttachments()).singleElement().satisfies(attachment -> {
             assertThat(attachment.getFilename()).isEqualTo("ocmc_mediation_data.csv");
             assertThat(attachment.getContentType()).isEqualTo("text/csv");
-            assertThat(attachmentContent(attachment)).isEqualTo(
-                "SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,"
-                    + "COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r\n"
-                    + "row-one\r\n"
-            );
+            assertThat(attachmentContent(attachment)).isEqualTo("""
+                SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r
+                row-one\r
+                """);
         });
         assertThat(loggedMessages())
             .contains("MMT_MEDIATION_EMAIL_SEND_ATTEMPT")
@@ -229,8 +228,9 @@ class MediationFileTransferServiceTest {
         when(mediationCsvServiceFactory.getMediationCSVService(caseData)).thenReturn(mediationCSVService);
         when(mediationCSVService.generateCSVContent(caseData)).thenReturn("row-one\r\n");
         when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(" ");
+        List<CaseData> cases = List.of(caseData);
 
-        assertThatThrownBy(() -> mediationFileTransferService.sendCsv(List.of(caseData)))
+        assertThatThrownBy(() -> mediationFileTransferService.sendCsv(cases))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Missing mediation email recipient config: mediation.emails.recipient");
         verifyNoInteractions(sendGridClient);
@@ -242,8 +242,9 @@ class MediationFileTransferServiceTest {
         MediationCase mediationCase = new MediationCase().setCcdCaseNumber(1L);
         when(mediationJsonService.generateJsonContent(caseData)).thenReturn(mediationCase);
         when(mediationCSVEmailConfiguration.getJsonRecipient()).thenReturn(" ");
+        List<CaseData> cases = List.of(caseData);
 
-        assertThatThrownBy(() -> mediationFileTransferService.sendJson(List.of(caseData)))
+        assertThatThrownBy(() -> mediationFileTransferService.sendJson(cases))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Missing mediation email recipient config: mediation.emails.jsonRecipient");
         verifyNoInteractions(sendGridClient);

@@ -7,8 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -68,7 +68,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     HearingNoticeHmcGenerator.class,
-    JacksonAutoConfiguration.class
+    Jackson2AutoConfiguration.class
 })
 
 class HearingNoticeHmcGeneratorTest {
@@ -92,17 +92,17 @@ class HearingNoticeHmcGeneratorTest {
         .documentType(HEARING_FORM)
         .build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private HearingNoticeHmcGenerator generator;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private HearingFeesService hearingFeesService;
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
 
     @BeforeEach
