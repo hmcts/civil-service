@@ -248,7 +248,8 @@ class ExternalTaskListenerConfigurationTest {
             .withPropertyValues("feign.client.config.processInstance.url=http://localhost")
             .withUserConfiguration(TestAuthTokenGeneratorImpl.class)
             .withUserConfiguration(ExternalTaskListenerConfiguration.class)
-            .withBean(EventProperties.class, () -> props);
+            .withBean(EventProperties.class, () -> props)
+            .withBean(GuardedTopicRegistry.class, GuardedTopicRegistry::new);
     }
 
     private static final class StubHandler extends BaseExternalTaskHandler {

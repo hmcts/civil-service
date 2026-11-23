@@ -24,6 +24,9 @@ final class TopicRecordingExternalTaskClient {
             ExternalTaskClient.class.getClassLoader(),
             new Class<?>[]{ExternalTaskClient.class},
             (proxy, method, args) -> {
+                if (isEquals(method)) {
+                    return proxy == args[0];
+                }
                 Object result = invoke(method, delegate, args);
                 if ("subscribe".equals(method.getName())
                     && args != null && args.length == 1
@@ -43,6 +46,9 @@ final class TopicRecordingExternalTaskClient {
             TopicSubscriptionBuilder.class.getClassLoader(),
             new Class<?>[]{TopicSubscriptionBuilder.class},
             (proxy, method, args) -> {
+                if (isEquals(method)) {
+                    return proxy == args[0];
+                }
                 if ("handler".equals(method.getName())
                     && args != null && args.length == 1
                     && args[0] instanceof ExternalTaskHandler handler) {
@@ -52,6 +58,17 @@ final class TopicRecordingExternalTaskClient {
                 return result == delegate ? proxy : result;
             }
         );
+    }
+
+    /**
+     * A wrapper is equal only to itself. Forwarding {@code equals} would compare the delegate with
+     * the proxy, so a wrapper would not even equal itself, and matching it against the raw delegate
+     * would not be symmetric. Identity keeps {@code hashCode}, which is forwarded, consistent.
+     */
+    private static boolean isEquals(Method method) {
+        return "equals".equals(method.getName())
+            && method.getParameterCount() == 1
+            && method.getParameterTypes()[0] == Object.class;
     }
 
     private static Object invoke(Method method, Object target, Object[] args) throws Throwable {

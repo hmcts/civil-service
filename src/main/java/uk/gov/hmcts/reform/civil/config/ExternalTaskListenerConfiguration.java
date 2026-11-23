@@ -163,7 +163,7 @@ public class ExternalTaskListenerConfiguration {
      * router and the scheduler client in its place.
      */
     @Bean
-    public CaseDrivenExternalTaskClients caseDrivenExternalTaskClients() {
+    public CaseDrivenExternalTaskClients caseDrivenExternalTaskClients(GuardedTopicRegistry guardedTopicRegistry) {
         int count = eventProperties.getCaseDrivenClients();
         if (count < 1) {
             throw new IllegalStateException(
@@ -171,14 +171,14 @@ public class ExternalTaskListenerConfiguration {
         }
         List<ExternalTaskClient> clients = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            clients.add(buildClient(newBackoffStrategy(), eventProperties.getCaseDrivenMaxTasks()));
+            clients.add(buildClient(newBackoffStrategy(), guardedTopicRegistry, eventProperties.getCaseDrivenMaxTasks()));
         }
         return new CaseDrivenExternalTaskClients(clients);
     }
 
     @Bean("schedulerExternalTaskClient")
-    public ExternalTaskClient schedulerExternalTaskClient() {
-        return buildClient(newBackoffStrategy(), eventProperties.getSchedulerMaxTasks());
+    public ExternalTaskClient schedulerExternalTaskClient(GuardedTopicRegistry guardedTopicRegistry) {
+        return buildClient(newBackoffStrategy(), guardedTopicRegistry, eventProperties.getSchedulerMaxTasks());
     }
 
     /**
@@ -192,7 +192,7 @@ public class ExternalTaskListenerConfiguration {
     private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy,
                                            GuardedTopicRegistry guardedTopicRegistry,
                                            int maxTasks) {
-        return ExternalTaskClient.create()
+        ExternalTaskClient client = ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
             .maxTasks(maxTasks)
