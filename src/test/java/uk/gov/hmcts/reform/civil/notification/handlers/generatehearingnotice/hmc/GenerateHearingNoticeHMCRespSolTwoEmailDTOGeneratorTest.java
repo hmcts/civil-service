@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.hm
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -109,6 +111,18 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = baseCaseData()
                 .solicitorReferences(new SolicitorReferences()
                     .setRespondentSolicitor1Reference(DEF_ONE_REF))
+                .build();
+
+        Map<String, String> result = addCustomProperties(caseData);
+
+        assertEquals(NOT_PROVIDED, result.get(DEFENDANT_REFERENCE_NUMBER));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void addCustomProperties_whenDefendantTwoRefCleared_usesNotProvided(String clearedReference) {
+        CaseData caseData = baseCaseData()
+                .respondentSolicitor2Reference(clearedReference)
                 .build();
 
         Map<String, String> result = addCustomProperties(caseData);

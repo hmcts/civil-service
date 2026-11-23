@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.hmc;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_NOT_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
@@ -55,6 +55,6 @@ public class GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator extends RespSol
     }
 
     private String getDefRefNumber(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondentSolicitor2Reference()).orElse(REFERENCE_NOT_PROVIDED);
+        return StringUtils.defaultIfBlank(caseData.getRespondentSolicitor2Reference(), REFERENCE_NOT_PROVIDED);
     }
 }
