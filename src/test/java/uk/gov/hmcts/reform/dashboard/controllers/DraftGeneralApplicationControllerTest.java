@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -98,6 +99,92 @@ class DraftGeneralApplicationControllerTest {
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void shouldReturnTheResponseDraftForAnApplication() {
+        when(draftGeneralApplicationService.getResponseForApplication(USER_ID, APPLICATION_ID))
+            .thenReturn(Optional.of(responseDraft(APPLICATION_ID)));
+
+        ResponseEntity<DraftGeneralApplicationResponse> response = controller.getForApplication(APPLICATION_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getApplicationId()).isEqualTo(APPLICATION_ID);
+    }
+
+    @Test
+    void shouldThrowWhenTheResponseDraftIsMissing() {
+        when(draftGeneralApplicationService.getResponseForApplication(USER_ID, APPLICATION_ID))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.getForApplication(APPLICATION_ID, AUTH))
+            .isInstanceOf(DraftGeneralApplicationNotFoundException.class);
+    }
+
+    @Test
+    void shouldReturnADraftById() {
+        when(draftGeneralApplicationService.get(DRAFT_ID, USER_ID)).thenReturn(Optional.of(applicationDraft()));
+
+        ResponseEntity<DraftGeneralApplicationResponse> response = controller.get(DRAFT_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+    }
+
+    @Test
+    void shouldThrowWhenTheDraftIdIsMissing() {
+        when(draftGeneralApplicationService.get(DRAFT_ID, USER_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.get(DRAFT_ID, AUTH))
+            .isInstanceOf(DraftGeneralApplicationNotFoundException.class);
+    }
+
+    @Test
+    void shouldReturnTheUpdatedDraft() {
+        Map<String, Object> payload = Map.of("generalApplication", Map.of("step", "next"));
+        DraftGeneralApplicationRequest request = new DraftGeneralApplicationRequest(CASE_ID, null, payload);
+        when(draftGeneralApplicationService.update(DRAFT_ID, USER_ID, CASE_ID, payload))
+            .thenReturn(applicationDraft());
+
+        ResponseEntity<DraftGeneralApplicationResponse> response = controller.update(DRAFT_ID, AUTH, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+    }
+
+    @Test
+    void shouldDeleteEveryApplicationDraftForTheUser() {
+        ResponseEntity<Void> response = controller.deleteApplicationDraftsForUser(AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(draftGeneralApplicationService).deleteApplicationDraftsForUser(USER_ID);
+    }
+
+    @Test
+    void shouldDeleteTheResponseDraftForAnApplication() {
+        ResponseEntity<Void> response = controller.deleteResponseForApplication(APPLICATION_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(draftGeneralApplicationService).deleteResponseForApplication(USER_ID, APPLICATION_ID);
+    }
+
+    @Test
+    void shouldDeleteADraftById() {
+        ResponseEntity<Void> response = controller.delete(DRAFT_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(draftGeneralApplicationService).delete(DRAFT_ID, USER_ID);
+    }
+
+    @Test
+    void shouldReturnBadRequestForAnIllegalArgument() {
+        ResponseEntity<String> response = controller.badRequest(new IllegalArgumentException("caseId must not be blank"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo("caseId must not be blank");
     }
 
     @Test

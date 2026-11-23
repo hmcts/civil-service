@@ -104,6 +104,152 @@ class DraftGeneralApplicationServiceTest {
     }
 
     @Test
+    void shouldReturnTheApplicationDraftWhenItExists() {
+        DraftStoreEntity application = draft(null, OffsetDateTime.now().plusDays(1));
+        when(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.of(application));
+
+        assertThat(service.get(DRAFT_ID, USER_ID)).contains(application);
+        verify(draftStoreService, never()).getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE);
+    }
+
+    @Test
+    void shouldReturnTheActiveApplicationDraftForACase() {
+        DraftStoreEntity application = draft(null, OffsetDateTime.now().plusDays(1));
+        when(draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.of(application));
+
+        assertThat(service.getApplicationForCase(USER_ID, CASE_ID)).contains(application);
+    }
+
+    @Test
+    void shouldIgnoreABlankCaseWhenLookingUpAnApplication() {
+        assertThat(service.getApplicationForCase(USER_ID, "  ")).isEmpty();
+        verify(draftStoreService, never()).getActiveDraftForCase(any(), any(), any());
+    }
+
+    @Test
+    void shouldIgnoreABlankCaseWhenListingResponses() {
+        assertThat(service.getResponsesForCase(USER_ID, "  ")).isEmpty();
+        verify(draftStoreService, never()).listActiveDraftsForCase(any(), any(), any());
+    }
+
+    @Test
+    void shouldIgnoreABlankApplicationWhenLookingUpAResponse() {
+        assertThat(service.getResponseForApplication(USER_ID, "  ")).isEmpty();
+        verify(draftStoreService, never()).getActiveDraftForApplication(any(), any(), any());
+    }
+
+    @Test
+    void shouldUpdateAnExistingDraft() {
+        Map<String, Object> payload = Map.of("step", "next");
+        DraftStoreEntity existing = draft(null, OffsetDateTime.now().plusDays(1));
+        DraftStoreEntity updated = draft(null, OffsetDateTime.now().plusDays(2));
+        when(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.of(existing));
+        when(draftStoreService.updateDraft(
+            DRAFT_ID, USER_ID, CASE_ID, payload, DraftType.DRAFT_GENERAL_APPLICATION
+        )).thenReturn(Optional.of(updated));
+
+        assertThat(service.update(DRAFT_ID, USER_ID, CASE_ID, payload)).isEqualTo(updated);
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenTheDraftDisappearsDuringUpdate() {
+        when(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.of(draft(null, OffsetDateTime.now().plusDays(1))));
+        when(draftStoreService.updateDraft(
+            eq(DRAFT_ID), eq(USER_ID), eq(CASE_ID), any(), eq(DraftType.DRAFT_GENERAL_APPLICATION)
+        )).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(DRAFT_ID, USER_ID, CASE_ID, Map.of("step", "next")))
+            .isInstanceOf(DraftGeneralApplicationNotFoundException.class);
+    }
+
+    @Test
+    void shouldDeleteAnApplicationDraft() {
+        when(draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(true);
+
+        service.delete(DRAFT_ID, USER_ID);
+
+        verify(draftStoreService, never()).deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE);
+    }
+
+    @Test
+    void shouldDeleteAResponseDraftWhenTheApplicationDraftIsMissing() {
+        when(draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(false);
+        when(draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE))
+            .thenReturn(true);
+
+        service.delete(DRAFT_ID, USER_ID);
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenNeitherDraftCanBeDeleted() {
+        when(draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(false);
+        when(draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> service.delete(DRAFT_ID, USER_ID))
+            .isInstanceOf(DraftGeneralApplicationNotFoundException.class);
+    }
+
+    @Test
+    void shouldDeleteTheApplicationDraftForACase() {
+        DraftStoreEntity application = draft(null, OffsetDateTime.now().plusDays(1));
+        when(draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.of(application));
+
+        service.deleteApplicationForCase(USER_ID, CASE_ID);
+
+        verify(draftStoreService).deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION);
+    }
+
+    @Test
+    void shouldDoNothingWhenTheCaseHasNoApplicationDraft() {
+        when(draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(Optional.empty());
+
+        service.deleteApplicationForCase(USER_ID, CASE_ID);
+
+        verify(draftStoreService, never()).deleteDraft(any(), any(), any());
+    }
+
+    @Test
+    void shouldDeleteTheResponseDraftForAnApplication() {
+        DraftStoreEntity response = draft(APPLICATION_ID, OffsetDateTime.now().plusDays(1));
+        when(draftStoreService.getActiveDraftForApplication(
+            USER_ID, APPLICATION_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE
+        )).thenReturn(Optional.of(response));
+
+        service.deleteResponseForApplication(USER_ID, APPLICATION_ID);
+
+        verify(draftStoreService).deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION_RESPONSE);
+    }
+
+    @Test
+    void shouldDeleteEveryActiveApplicationDraftForTheUser() {
+        DraftStoreEntity application = draft(null, OffsetDateTime.now().plusDays(1));
+        when(draftStoreService.listActiveDraftsForUser(USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
+            .thenReturn(List.of(application));
+
+        service.deleteApplicationDraftsForUser(USER_ID);
+
+        verify(draftStoreService).deleteDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION);
+    }
+
+    @Test
+    void shouldRejectABlankCaseId() {
+        assertThatThrownBy(() -> service.create(USER_ID, "  ", null, Map.of("step", "type")))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("caseId must not be blank");
+        verify(draftStoreService, never()).createDraft(any(), any(), any(), any(), any());
+    }
+
+    @Test
     void shouldThrowNotFoundWhenUpdatingAMissingDraft() {
         when(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_GENERAL_APPLICATION))
             .thenReturn(Optional.empty());

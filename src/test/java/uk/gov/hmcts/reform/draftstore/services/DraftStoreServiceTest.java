@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -248,6 +249,82 @@ class DraftStoreServiceTest {
             Optional<DraftStoreEntity> result = draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE);
 
             assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldListActiveDraftsForCase() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findAllByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(List.of(draft));
+
+            List<DraftStoreEntity> result = draftStoreService.listActiveDraftsForCase(USER_ID, CASE_ID, DRAFT_TYPE);
+
+            assertThat(result).containsExactly(draft);
+        }
+
+        @Test
+        void shouldReturnActiveDraftForApplication() {
+            DraftStoreEntity draft = draft();
+            String applicationId = "9876543210987654";
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndApplicationIdAndExpiresAtAfter(
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(applicationId),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getActiveDraftForApplication(
+                USER_ID,
+                applicationId,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldReturnDraftForCaseIncludingExpired() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseId(USER_ID, DRAFT_TYPE, CASE_ID))
+                .thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE);
+
+            assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldReturnDraftForApplicationIncludingExpired() {
+            DraftStoreEntity draft = draft();
+            String applicationId = "9876543210987654";
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndApplicationId(USER_ID, DRAFT_TYPE, applicationId))
+                .thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getDraftForApplication(
+                USER_ID,
+                applicationId,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldListActiveDraftsForUser() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findAllByUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(List.of(draft));
+
+            List<DraftStoreEntity> result = draftStoreService.listActiveDraftsForUser(USER_ID, DRAFT_TYPE);
+
+            assertThat(result).containsExactly(draft);
         }
 
         @Test
