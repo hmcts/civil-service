@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +55,11 @@ class DraftStoreServiceTest {
 
     @InjectMocks
     private DraftStoreService draftStoreService;
+
+    @BeforeEach
+    void useDirectSelfInvocation() {
+        draftStoreService.setSelf(draftStoreService);
+    }
 
     @Nested
     class CreateDraftTests {
@@ -182,7 +188,7 @@ class DraftStoreServiceTest {
             OffsetDateTime expiresAt = DraftStoreService.calculateExpiresAt(createdAt, 1);
 
             // 28 Mar + 2 days = 30 Mar 00:00 Europe/London (BST, UTC+1)
-            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate().toString()).isEqualTo("2026-03-30");
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate()).hasToString("2026-03-30");
             assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalTime()).isEqualTo(LocalTime.MIDNIGHT);
             assertThat(expiresAt).isEqualTo(OffsetDateTime.parse("2026-03-29T23:00:00Z"));
         }
@@ -195,7 +201,7 @@ class DraftStoreServiceTest {
             OffsetDateTime expiresAt = DraftStoreService.calculateExpiresAt(createdAt, 1);
 
             // 24 Oct + 2 days = 26 Oct 00:00 Europe/London (GMT)
-            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate().toString()).isEqualTo("2026-10-26");
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate()).hasToString("2026-10-26");
             assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalTime()).isEqualTo(LocalTime.MIDNIGHT);
             assertThat(expiresAt).isEqualTo(OffsetDateTime.parse("2026-10-26T00:00:00Z"));
         }
@@ -305,11 +311,11 @@ class DraftStoreServiceTest {
                 )
             );
             verify(draftStoreTransactionService).updateExpiresAtInNewTransaction(
-                eq(DRAFT_ID),
-                eq(USER_ID),
-                eq(DRAFT_TYPE),
-                eq(result.get().getExpiresAt()),
-                eq(result.get().getUpdatedAt())
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE,
+                result.get().getExpiresAt(),
+                result.get().getUpdatedAt()
             );
         }
 
