@@ -27,6 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
@@ -92,7 +93,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void should_include_header_and_body() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Claim marked as settled"));
@@ -106,7 +107,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
             verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
@@ -131,7 +132,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
             verify(taskListService, times(0)).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
@@ -156,7 +157,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
             verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
