@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -32,16 +32,16 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_COND
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class HearingScheduledWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private HearingFeesService hearingFeesService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     private static final LocalDateTime NOW = LocalDateTime.of(2026, 6, 1, 10, 0);
