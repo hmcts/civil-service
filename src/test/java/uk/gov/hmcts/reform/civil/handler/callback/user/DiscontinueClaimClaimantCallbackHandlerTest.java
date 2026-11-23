@@ -6,9 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -47,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_DISCONTI
 
 @SpringBootTest(classes = {
     DiscontinueClaimClaimantCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -55,7 +54,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
     @Autowired
     private DiscontinueClaimClaimantCallbackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
     @MockitoBean
     private FeatureToggleService featureToggleService;
