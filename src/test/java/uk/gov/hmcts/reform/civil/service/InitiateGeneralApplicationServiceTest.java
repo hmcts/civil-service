@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -98,7 +98,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     InitiateGeneralApplicationServiceHelper.class,
     GeneralAppFeesService.class
 })
