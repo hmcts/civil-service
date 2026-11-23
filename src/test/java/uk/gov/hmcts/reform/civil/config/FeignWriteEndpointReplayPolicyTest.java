@@ -76,7 +76,6 @@ class FeignWriteEndpointReplayPolicyTest {
         Map.entry("CoreCaseDataApi POST /searchCases?ctid={caseType}", true),
         Map.entry("DocmosisApiClient POST /rs/render", true),
         Map.entry("IdamApi POST /o/token", true),
-        Map.entry("OidcApi POST /o/token", true),
         Map.entry("RoleAssignmentsApi POST /am/role-assignments/query", true),
         Map.entry("ServiceAuthorisationApi POST /lease", true),
         Map.entry("WaTaskManagementApiClient POST /task", true),
