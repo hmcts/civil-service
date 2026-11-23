@@ -259,11 +259,9 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isLinkDefendantTestingEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenJudgmentBufferEnabled(Boolean toggleStat) {
-        givenToggle("judgment-buffer", toggleStat);
-        assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
+    @Test
+    void shouldReturnTrue_whenJudgmentBufferEnabled() {
+        assertThat(featureToggleService.isJudgmentBufferEnabled()).isTrue();
     }
 
     @ParameterizedTest
