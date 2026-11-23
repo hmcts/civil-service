@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationDispatcher;
@@ -44,7 +44,7 @@ class DashboardNotificationTransactionalServiceIntegrationTest extends Dashboard
     @Autowired
     private NotificationActionRepository notificationActionRepository;
 
-    @MockBean
+    @MockitoBean
     private DashboardNotificationDispatcher dashboardNotificationDispatcher;
 
     @Test
