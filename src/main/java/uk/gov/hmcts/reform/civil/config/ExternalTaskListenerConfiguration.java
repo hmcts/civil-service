@@ -75,14 +75,6 @@ public class ExternalTaskListenerConfiguration {
     }
 
     /**
-     * HttpClient 5 pool tuning for Camunda {@code fetchAndLock} (EXC-CS-037).
-     *
-     * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
-     * are reused after Camunda pod restarts or idle timeouts and surface as
-     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
-     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
-     */
-    /**
      * Topics whose handlers are batch dispatchers. They either sleep on the subscription thread
      * via {@code BaseExternalTaskHandler.throttle()} once a batch exceeds 25, or they process very
      * large batches. Isolating them stops a paced batch stalling pickup for case driven work.
@@ -139,7 +131,10 @@ public class ExternalTaskListenerConfiguration {
      * The client every listener injects. Routes each subscription to the real clients below, so
      * none of the 39 listeners needs to know there is more than one, or how many.
      */
-    @Bean
+    // Spring infers close() or shutdown() as destroy methods, never stop(). Without this, every
+    // client keeps its subscription thread running after the context closes. In unit tests that
+    // thread has no subscriptions, so it spins on a full core for the life of the test JVM.
+    @Bean(destroyMethod = "stop")
     @Primary
     public ExternalTaskClient client(
         CaseDrivenExternalTaskClients caseDrivenClients,
@@ -185,6 +180,14 @@ public class ExternalTaskListenerConfiguration {
         return buildClient(newBackoffStrategy(), eventProperties.getSchedulerMaxTasks());
     }
 
+    /**
+     * HttpClient 5 pool tuning for Camunda {@code fetchAndLock} (EXC-CS-037).
+     *
+     * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
+     * are reused after Camunda pod restarts or idle timeouts and surface as
+     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
+     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
+     */
     private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy, int maxTasks) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
