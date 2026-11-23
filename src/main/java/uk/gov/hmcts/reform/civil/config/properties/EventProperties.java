@@ -23,8 +23,11 @@ public class EventProperties {
     protected long clientBackoffInitial;
     // multiplier applied to the client backoff for each consecutive failed fetchAndLock.
     protected float clientBackoffFactor;
-    // maximum wait in milliseconds the external task client backs off for between fetchAndLock attempts;
-    // only applied while calls are failing (a successful or empty poll resets the backoff to zero).
+    /**
+     * Maximum wait in milliseconds the external task client backs off for between fetchAndLock
+     * attempts. Only applied while calls are failing. A successful or empty poll resets the backoff
+     * to zero.
+     */
     protected long clientBackoffMax;
     // period of inactivity after which pooled Camunda HTTP connections are validated before reuse.
     protected long httpValidateAfterInactivityMs = 2000;

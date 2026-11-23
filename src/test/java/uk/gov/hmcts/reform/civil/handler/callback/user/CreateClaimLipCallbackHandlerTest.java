@@ -50,7 +50,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -318,10 +317,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
             when(draftStoreService.linkDraftBySubmissionId(
-                eq(CLAIMANT_USER_ID),
-                eq(CASE_ID.toString()),
-                eq(LIP_CLAIM_SUBMISSION_ID),
-                eq(DraftType.DRAFT_CLAIM)
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
+                DraftType.DRAFT_CLAIM
             )).thenReturn(Optional.empty());
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -389,10 +388,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
             when(draftStoreService.linkDraftBySubmissionId(
-                eq(CLAIMANT_USER_ID),
-                eq(CASE_ID.toString()),
-                eq(LIP_CLAIM_SUBMISSION_ID),
-                eq(DraftType.DRAFT_CLAIM)
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
+                DraftType.DRAFT_CLAIM
             )).thenThrow(new RuntimeException("draft store unavailable"));
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
