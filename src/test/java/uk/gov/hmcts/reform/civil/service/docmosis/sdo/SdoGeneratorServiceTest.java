@@ -7,8 +7,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
@@ -141,7 +141,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
     SdoSmallClaimsTemplateService.class,
     SdoR2TrialTemplateFieldService.class,
     SdoR2SmallClaimsDirectionsService.class,
-    JacksonAutoConfiguration.class
+    Jackson2AutoConfiguration.class
 })
 public class SdoGeneratorServiceTest {
 
@@ -169,19 +169,19 @@ public class SdoGeneratorServiceTest {
         .documentType(SDO_ORDER)
         .build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     protected UserService userService;
 
-    @MockBean
+    @MockitoBean
     private DocumentHearingLocationHelper documentHearingLocationHelper;
 
     @Autowired

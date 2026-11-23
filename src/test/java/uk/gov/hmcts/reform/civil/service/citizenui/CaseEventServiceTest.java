@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -263,14 +262,15 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
             .willReturn(false);
+        EventSubmissionParams submission = new EventSubmissionParams()
+            .setUpdates(Maps.newHashMap())
+            .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+            .setCaseId(DRAFT)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORISATION)
+            .setSubmissionId(SUBMISSION_ID);
 
-        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
-                                                                  .setUpdates(Maps.newHashMap())
-                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
-                                                                  .setCaseId(DRAFT)
-                                                                  .setUserId(USER_ID)
-                                                                  .setAuthorisation(AUTHORISATION)
-                                                                  .setSubmissionId(SUBMISSION_ID)))
+        assertThatThrownBy(() -> caseEventService.submitEvent(submission))
             .isInstanceOf(ResponseStatusException.class)
             .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
             .isEqualTo(CONFLICT);
@@ -484,7 +484,7 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(otherDraft));
         given(draftStoreService.claimSubmission(otherDraftId, USER_ID, otherSubmissionId, DraftType.DRAFT_CLAIM))
             .willReturn(true);
-        given(draftStoreService.linkCaseId(eq(otherDraftId), eq(USER_ID), eq("1"), eq(DraftType.DRAFT_CLAIM)))
+        given(draftStoreService.linkCaseId(otherDraftId, USER_ID, "1", DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(otherDraft));
 
         CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
@@ -594,14 +594,15 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(inProgress));
+        EventSubmissionParams submission = new EventSubmissionParams()
+            .setUpdates(Maps.newHashMap())
+            .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+            .setCaseId(DRAFT)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORISATION)
+            .setSubmissionId(redisSubmissionId);
 
-        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
-                                                                  .setUpdates(Maps.newHashMap())
-                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
-                                                                  .setCaseId(DRAFT)
-                                                                  .setUserId(USER_ID)
-                                                                  .setAuthorisation(AUTHORISATION)
-                                                                  .setSubmissionId(redisSubmissionId)))
+        assertThatThrownBy(() -> caseEventService.submitEvent(submission))
             .isInstanceOf(ResponseStatusException.class)
             .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
             .isEqualTo(CONFLICT);
@@ -621,14 +622,15 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.claimLegacySubmission(USER_ID, redisSubmissionId, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.empty());
+        EventSubmissionParams submission = new EventSubmissionParams()
+            .setUpdates(Maps.newHashMap())
+            .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+            .setCaseId(DRAFT)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORISATION)
+            .setSubmissionId(redisSubmissionId);
 
-        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
-                                                                  .setUpdates(Maps.newHashMap())
-                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
-                                                                  .setCaseId(DRAFT)
-                                                                  .setUserId(USER_ID)
-                                                                  .setAuthorisation(AUTHORISATION)
-                                                                  .setSubmissionId(redisSubmissionId)))
+        assertThatThrownBy(() -> caseEventService.submitEvent(submission))
             .isInstanceOf(ResponseStatusException.class)
             .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
             .isEqualTo(CONFLICT);

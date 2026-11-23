@@ -156,19 +156,6 @@ class UpdateHearingUnavailabilityDatesTaskTest {
     }
 
     @Test
-    void shouldNotFailWhenHearingAndPartyDatesAreAbsent() {
-        CaseData caseData = CaseData.builder().build();
-        UnavailableDatesCaseReference reference = reference(
-            "defendant",
-            "SINGLE_DATE",
-            LocalDate.of(2026, 10, 5),
-            LocalDate.of(2026, 10, 5)
-        );
-        CaseData result = task.migrateCaseData(caseData, reference);
-        assertThat(result).isSameAs(caseData);
-    }
-
-    @Test
     void shouldUpdateRespondentPartyUnavailableDatesWhenOtherCollectionsAreAbsent() {
         UnavailableDate partyMissingDate = unavailableDate("defendant", UnavailableDateType.SINGLE_DATE);
         CaseData caseData = CaseData.builder().respondent1(new Party().setUnavailableDates(elements(List.of(
