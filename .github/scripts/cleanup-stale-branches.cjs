@@ -57,7 +57,8 @@ async function getBranchData(github, owner, repo) {
   let hasNextPage = true;
 
   while (hasNextPage) {
-    const result = await github.graphql(
+    // The next page cursor is only known after the previous response.
+    const result = await github.graphql( // NOSONAR
       `query($owner: String!, $repo: String!, $endCursor: String) {
         repository(owner: $owner, name: $repo) {
           refs(refPrefix: "refs/heads/", first: 100, after: $endCursor) {
@@ -118,7 +119,8 @@ async function run({ github, context, core, dryRun, daysBefore }) {
 
   for (const branch of eligible) {
     if (!dryRun) {
-      await github.rest.git.deleteRef({
+      // Sequential deletes avoid changing GitHub rate-limit and partial-failure behaviour.
+      await github.rest.git.deleteRef({ // NOSONAR
         owner,
         repo,
         ref: `heads/${branch.name}`

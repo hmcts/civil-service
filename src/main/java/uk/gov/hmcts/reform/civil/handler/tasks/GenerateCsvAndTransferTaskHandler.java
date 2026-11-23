@@ -107,7 +107,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                     }
                 );
 
-                if (csvColContent.length() == 0) {
+                if (csvColContent.isEmpty()) {
                     return new ExternalTaskData();
                 }
 

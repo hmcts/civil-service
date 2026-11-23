@@ -18,6 +18,8 @@ import java.util.Map;
  */
 public abstract class CivilEmailDTOGenerator extends EmailDTOGenerator<CaseData> implements NotificationData {
 
+    // Field injection avoids threading this helper through every @RequiredArgsConstructor subclass.
+    @SuppressWarnings("java:S6813")
     @Autowired
     protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
