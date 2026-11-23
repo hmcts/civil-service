@@ -188,7 +188,14 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsFormData data) {
-        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        alreadyPaid(caseData.getResponseToClaim(), data);
+    }
+
+    private static void alreadyPaid(RespondToClaim respondToClaim, ResponseRepaymentDetailsFormData data) {
+        if (respondToClaim == null || respondToClaim.getHowMuchWasPaid() == null) {
+            data.setWhyReject("ALREADY_PAID");
+            return;
+        }
         String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
         data.setWhyReject("ALREADY_PAID")
             .setHowMuchWasPaid(howMuchWasPaidAsString)
@@ -218,11 +225,14 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
-        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+        boolean respondent2 = useRespondent2(caseData);
+        if (respondent2 && caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES) {
+            alreadyPaid(caseData.getRespondToAdmittedClaim2(), data);
+        } else if (!respondent2 && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, data);
         } else {
             BigDecimal amountInPennies =
-                useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
+                respondent2 ? caseData.getRespondToAdmittedClaimOwingAmount2() :
                     caseData.getRespondToAdmittedClaimOwingAmount();
 
             addRepaymentMethod(
