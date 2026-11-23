@@ -26,6 +26,7 @@ REPOSITORIES = ('civil-ccd-definition',)
 # holds generalapplication/, so the GA root adds no labels the Civil root lacks.
 TOGGLE = 'ccd-definition/SOURCE_OF_TRUTH'
 IN_REPO_DEFINITIONS = ('ccd-definition/civil', 'ccd-definition/generalapplication')
+IN_REPO_PREFIXES = tuple(f'{path}/' for path in IN_REPO_DEFINITIONS)
 DOCUMENTS = ('docs/email-notifications.md', 'docs/email-notifications.html')
 STRICT_FILES = {*DOCUMENTS, MANIFEST, TOGGLE,
                 'scripts/generate_email_notifications_table.py', 'scripts/email_docs.py'}
@@ -71,7 +72,7 @@ def classify(paths, in_repo: bool = False) -> str:
     if any(path.startswith(('src/main/java/', 'src/main/resources/camunda/',
                             'src/main/resources/notification-templates/'))
            or path == 'src/main/resources/application.yaml'
-           or (in_repo and path.startswith(tuple(f'{root}/' for root in IN_REPO_DEFINITIONS)))
+           or (in_repo and path.startswith(IN_REPO_PREFIXES))
            for path in paths):
         return 'report'
     return 'skip'
