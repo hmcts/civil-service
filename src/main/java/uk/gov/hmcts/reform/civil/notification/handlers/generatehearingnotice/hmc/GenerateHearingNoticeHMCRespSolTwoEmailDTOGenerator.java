@@ -10,7 +10,9 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_NOT_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
@@ -46,9 +48,13 @@ public class GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator extends RespSol
 
         properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingDate(caseData.getHearingDate()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString()));
-        properties.put(DEFENDANT_REFERENCE_NUMBER, caseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+        properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                                                                                         isRespondent1, organisationService));
         return properties;
+    }
+
+    private String getDefRefNumber(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondentSolicitor2Reference()).orElse(REFERENCE_NOT_PROVIDED);
     }
 }

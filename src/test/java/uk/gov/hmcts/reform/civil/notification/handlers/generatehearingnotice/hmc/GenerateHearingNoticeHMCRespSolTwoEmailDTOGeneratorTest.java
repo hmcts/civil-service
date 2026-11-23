@@ -38,6 +38,8 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
     private static final String HMC_TEMPLATE = "hmc-template-two";
     private static final String PROCESS_ID = "proc-456";
     private static final String DEF_REF = "SOL-REF-2";
+    private static final String DEF_ONE_REF = "SOL-REF-1";
+    private static final String NOT_PROVIDED = "Not provided";
     private static final LocalDate HEARING_DATE_VAL = LocalDate.of(2025, 8, 15);
     private static final LocalDateTime START_DT = LocalDateTime.of(2025, 8, 15, 9, 45);
     private static final String FORMATTED_DATE = "15-08-2025";
@@ -75,14 +77,52 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void addCustomProperties_populatesDateTimeAndDefendantRef() {
-        CaseData caseData = CaseData.builder()
-                .hearingDate(HEARING_DATE_VAL)
-                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
+    void addCustomProperties_populatesDateTimeAndDefendantTwoRef() {
+        CaseData caseData = baseCaseData()
+                .respondentSolicitor2Reference(DEF_REF)
                 .solicitorReferences(new SolicitorReferences()
-                    .setRespondentSolicitor1Reference(DEF_REF))
+                    .setRespondentSolicitor1Reference(DEF_ONE_REF))
                 .build();
 
+        Map<String, String> result = addCustomProperties(caseData);
+
+        assertAll("result",
+                () -> assertEquals("bar", result.get("foo")),
+                () -> assertEquals(FORMATTED_DATE, result.get(HEARING_DATE)),
+                () -> assertEquals(FORMATTED_TIME, result.get(HEARING_TIME)),
+                () -> assertEquals(DEF_REF, result.get(DEFENDANT_REFERENCE_NUMBER)),
+                () -> assertEquals(RESPONDENT_LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
+        );
+    }
+
+    @Test
+    void addCustomProperties_whenNoSolicitorReferences_usesNotProvided() {
+        CaseData caseData = baseCaseData().build();
+
+        Map<String, String> result = addCustomProperties(caseData);
+
+        assertEquals(NOT_PROVIDED, result.get(DEFENDANT_REFERENCE_NUMBER));
+    }
+
+    @Test
+    void addCustomProperties_whenOnlyDefendantOneRef_usesNotProvided() {
+        CaseData caseData = baseCaseData()
+                .solicitorReferences(new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(DEF_ONE_REF))
+                .build();
+
+        Map<String, String> result = addCustomProperties(caseData);
+
+        assertEquals(NOT_PROVIDED, result.get(DEFENDANT_REFERENCE_NUMBER));
+    }
+
+    private CaseData.CaseDataBuilder<?, ?> baseCaseData() {
+        return CaseData.builder()
+                .hearingDate(HEARING_DATE_VAL)
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID));
+    }
+
+    private Map<String, String> addCustomProperties(CaseData caseData) {
         when(camundaService.getProcessVariables(PROCESS_ID))
                 .thenReturn(new HearingNoticeVariables()
                         .setHearingStartDateTime(START_DT));
@@ -92,26 +132,18 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
                     .thenReturn(FORMATTED_DATE);
             utils.when(() -> NotificationUtils.getFormattedHearingTime("09:45"))
                     .thenReturn(FORMATTED_TIME);
-
             utils.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.FALSE, organisationService))
-                .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
+                    .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
 
             Map<String, String> base = new HashMap<>();
             base.put("foo", "bar");
 
-            Map<String, String> result = generator.addCustomProperties(base, caseData);
-
-            assertAll("result",
-                    () -> assertEquals("bar", result.get("foo")),
-                    () -> assertEquals(FORMATTED_DATE, result.get(HEARING_DATE)),
-                    () -> assertEquals(FORMATTED_TIME, result.get(HEARING_TIME)),
-                    () -> assertEquals(DEF_REF, result.get(DEFENDANT_REFERENCE_NUMBER)),
-                      () -> assertEquals(RESPONDENT_LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
-            );
+            final Map<String, String> result = generator.addCustomProperties(base, caseData);
 
             verify(camundaService).getProcessVariables(PROCESS_ID);
             utils.verify(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VAL));
             utils.verify(() -> NotificationUtils.getFormattedHearingTime("09:45"));
+            return result;
         }
     }
 }
