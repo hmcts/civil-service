@@ -4,7 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -56,22 +56,22 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
         .setCourtAddress("Thomas More Building")
         .setPostcode("WC2A 2LL");
 
-    @MockBean
+    @MockitoBean
     private TelemetryClient telemetryClient;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private CasemanReferenceNumberRepository referenceNumberRepository;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationReferenceDataService;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
