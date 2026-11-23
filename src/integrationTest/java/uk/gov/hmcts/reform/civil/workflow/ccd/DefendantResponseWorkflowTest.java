@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -41,16 +41,16 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFix
 @SuppressWarnings("java:S5960")
 class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean(name = "deadlinesCalculator")
+    @MockitoBean(name = "deadlinesCalculator")
     private DeadlinesCalculator deadlinesCalculator;
 
     @BeforeEach
