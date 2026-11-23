@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
@@ -20,7 +20,7 @@ class StartBusinessProcessWorkflowTest extends WorkflowIntegrationTest {
     @Autowired
     private IStateFlowEngine stateFlowEngine;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test

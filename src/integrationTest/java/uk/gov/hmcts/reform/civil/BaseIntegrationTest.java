@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -100,71 +100,71 @@ public abstract class BaseIntegrationTest {
         .roles(List.of("caseworker-civil-solicitor"))
         .build();
 
-    @MockBean
+    @MockitoBean
     private AutomatedHearingNoticeScheduler automatedHearingNoticeScheduler;
-    @MockBean
+    @MockitoBean
     private BundleCreationScheduler bundleCreationScheduler;
-    @MockBean
+    @MockitoBean
     private CaseDismissedScheduler caseDismissedScheduler;
-    @MockBean
+    @MockitoBean
     private ClaimDetailsNotificationDeadlineScheduler claimDetailsNotificationDeadlineScheduler;
-    @MockBean
+    @MockitoBean
     private DecisionOutcomeScheduler decisionOutcomeScheduler;
-    @MockBean
+    @MockitoBean
     private DefendantResponseDeadlineScheduler defendantResponseDeadlineScheduler;
-    @MockBean
+    @MockitoBean
     private EvidenceUploadScheduler evidenceUploadScheduler;
-    @MockBean
+    @MockitoBean
     private FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler fullAdmitPayImmediatelyNoPaymentFromDefendantScheduler;
-    @MockBean
+    @MockitoBean
     private GADocumentUploadNotifyScheduler gaDocumentUploadNotifyScheduler;
-    @MockBean
+    @MockitoBean
     private GAOrderMadeScheduler gaOrderMadeScheduler;
-    @MockBean
+    @MockitoBean
     private GAProofOfDebtScheduler gaProofOfDebtScheduler;
-    @MockBean
+    @MockitoBean
     private GAUnlessOrderScheduler gaUnlessOrderScheduler;
-    @MockBean
+    @MockitoBean
     private HearingCvpLinkScheduler hearingCvpLinkScheduler;
-    @MockBean
+    @MockitoBean
     private HearingFeeScheduler hearingFeeScheduler;
-    @MockBean
+    @MockitoBean
     private JudgementBufferScheduler judgementBufferScheduler;
-    @MockBean
+    @MockitoBean
     private ManageStayWATaskScheduler manageStayWATaskScheduler;
-    @MockBean
+    @MockitoBean
     private MediationFileTransferScheduler mediationFileTransferScheduler;
-    @MockBean
+    @MockitoBean
     private OrderReviewObligationCheckScheduler orderReviewObligationCheckScheduler;
-    @MockBean
+    @MockitoBean
     private PollingEventEmitterScheduler pollingEventEmitterScheduler;
-    @MockBean
+    @MockitoBean
     private RequestForReconsiderationNotificationScheduler requestForReconsiderationNotificationScheduler;
-    @MockBean
+    @MockitoBean
     private TakeCaseOfflineScheduler takeCaseOfflineScheduler;
-    @MockBean
+    @MockitoBean
     private TrialReadyCheckScheduler trialReadyCheckScheduler;
-    @MockBean
+    @MockitoBean
     private TrialReadyNotificationScheduler trialReadyNotificationScheduler;
-    @MockBean
+    @MockitoBean
     private SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
 
-    @MockBean
+    @MockitoBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
-    @MockBean (name = "userService")
+    @MockitoBean (name = "userService")
     protected UserService userService;
-    @MockBean
+    @MockitoBean
     protected Authentication authentication;
-    @MockBean
+    @MockitoBean
     protected SecurityContext securityContext;
-    @MockBean
+    @MockitoBean
     protected JwtDecoder jwtDecoder;
-    @MockBean
+    @MockitoBean
     public AuthorisationService authorisationService;
-    @MockBean
+    @MockitoBean
     public IdamApi idamApi;
 
-    @MockBean
+    @MockitoBean
     public RequestAuthorizer<User> userRequestAuthorizerMock;
 
     @Autowired

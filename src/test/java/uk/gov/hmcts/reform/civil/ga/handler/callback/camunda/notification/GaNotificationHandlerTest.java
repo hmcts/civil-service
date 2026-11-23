@@ -78,12 +78,12 @@ class GaNotificationHandlerTest {
     void shouldDispatchToTheNotifierRegisteredForTheActivityId() {
         when(gaNotifierFactory.getNotifier(TASK_ID)).thenReturn(notifier);
 
-        when(notifier.notifyParties(eq(caseData), eq(NOTIFY_EVENT.toString()), eq(TASK_ID)))
+        when(notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID))
             .thenReturn(SUMMARY);
 
         handler.callbacks().get(ABOUT_TO_SUBMIT.getValue()).execute(params);
 
-        verify(notifier).notifyParties(eq(caseData), eq(NOTIFY_EVENT.toString()), eq(TASK_ID));
+        verify(notifier).notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
         // kept on the case so the submitted callback can write it to the history event
         verify(caseData).setNotificationSummary(SUMMARY);
     }
@@ -162,8 +162,9 @@ class GaNotificationHandlerTest {
     @Test
     void shouldFailLoudlyWhenNoNotifierIsRegistered() {
         when(gaNotifierFactory.getNotifier(TASK_ID)).thenReturn(null);
+        var callback = handler.callbacks().get(ABOUT_TO_SUBMIT.getValue());
 
-        assertThatThrownBy(() -> handler.callbacks().get(ABOUT_TO_SUBMIT.getValue()).execute(params))
+        assertThatThrownBy(() -> callback.execute(params))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("No GA Notifier registered for taskId '" + TASK_ID + "'")
             .hasMessageContaining(String.valueOf(CASE_ID));
