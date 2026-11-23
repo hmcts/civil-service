@@ -135,7 +135,7 @@ class FeignFailureHandlingTest {
             long delay = !replay && firstRequestDelayMs > 0 ? firstRequestDelayMs : responseDelayMs;
             if (delay > 0) {
                 try {
-                    delayResponse();
+                    delayResponse(delay);
                 } catch (InterruptedException _) {
                     Thread.currentThread().interrupt();
                 }
@@ -157,8 +157,8 @@ class FeignFailureHandlingTest {
 
     // Simulated upstream delay inside the local HTTP server, not a test waiting for a condition.
     @SuppressWarnings("java:S2925")
-    private static void delayResponse() throws InterruptedException {
-        Thread.sleep(responseDelayMs);
+    private static void delayResponse(long delay) throws InterruptedException {
+        Thread.sleep(delay);
     }
 
     @DynamicPropertySource
