@@ -1,0 +1,21 @@
+[
+  {
+    "ID": "JoPaymentPlan",
+    "ListElementCode": "type",
+    "ElementLabel": "Select how the judgment will be paid",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "JoPaymentPlanTypeList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoPaymentPlan",
+    "ListElementCode": "paymentDeadlineDate",
+    "ElementLabel": "Enter the date the judgment will be paid by",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "type = \"PAY_BY_DATE\""
+  }
+]

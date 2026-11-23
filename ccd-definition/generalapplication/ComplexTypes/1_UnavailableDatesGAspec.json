@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "GAUnavailabilityDates",
+    "ListElementCode": "unavailableTrialDateFrom",
+    "ElementLabel": "Date from",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAUnavailabilityDates",
+    "ListElementCode": "unavailableTrialDateTo",
+    "ElementLabel": "Date to",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  }
+]

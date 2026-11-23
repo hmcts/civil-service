@@ -1,0 +1,108 @@
+[
+  {
+   "CaseTypeID": "CIVIL",
+   "CaseEventID": "CHECK_PAID_IN_FULL_SCHED_DEADLINE",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "caseworker-civil-staff"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "GENERATE_COSC_DOCUMENT",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "caseworker-civil-staff"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+   "CaseTypeID": "CIVIL",
+   "CaseEventID": "CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT",
+   "AccessControl": [
+     {
+       "UserRoles": [
+         "caseworker-civil-systemupdate"
+       ],
+       "CRUD": "CRU"
+     }
+   ]
+ },
+  {
+   "CaseTypeID": "CIVIL",
+   "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC",
+   "AccessControl": [
+     {
+       "UserRoles": [
+         "caseworker-civil-systemupdate"
+       ],
+       "CRUD": "CRU"
+     },
+     {
+       "UserRoles": [
+         "APP-SOL-SPEC-PROFILE",
+         "caseworker-civil-admin",
+         "caseworker-civil-staff"
+       ],
+       "CRUD": "R"
+     }
+   ]
+ },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION_COSC",
+    "AccessControl": [
+      {
+        "UserRoles": [
+         "CITIZEN-DEFENDANT-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

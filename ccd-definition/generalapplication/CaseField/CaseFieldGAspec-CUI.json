@@ -1,0 +1,213 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "claimantUserDetails",
+    "Label": " ",
+    "FieldType": "GAUserDetailsGAspec",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "defendantUserDetails",
+    "Label": " ",
+    "FieldType": "GAUserDetailsGAspec",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppResponseStatementOfTruth",
+    "Label": " ",
+    "FieldType": "GAStatementOfTruthGAspec",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppAskForCosts",
+    "FieldType": "YesOrNo",
+    "Label": "LIP asked for costs back",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppPaymentDetails",
+    "Label": "Details of PBA payment",
+    "FieldType": "PaymentDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "issueDate",
+    "Label": "Date general application issued",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationFeeAmountInPence",
+    "FieldType": "MoneyGBP",
+    "Label": "Original application fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppAddlnInfoText",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppWrittenRepText",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondentResponseDeadlineChecked",
+    "Label": "Response Deadline Checked",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseTitleTranslatedDoc",
+    "Label": "<h2>'${claimant1PartyName}' v '${defendant1PartyName}'</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "translatedDocuments",
+    "Label": "Translated Document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TranslatedDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "translatedDocumentsBulkPrint",
+    "Label": "Translated Document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TranslatedDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicantBilingualLanguagePreference",
+    "FieldType": "YesOrNo",
+    "Label": "LIP bilingual flag",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondentBilingualLanguagePreference",
+    "FieldType": "YesOrNo",
+    "Label": "LIP bilingual flag",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHint",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextFreeForm",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextDecision",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextHearing",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextGeneralOrder",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextMoreInfo",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextWrittenR",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "bilingualHintTextWrittenDraw",
+    "Label": "<h2>There is a Welsh speaking party on this application. Please adjust deadlines accordingly to allow for translation of the order.</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppDetailsOfOrderColl",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppReasonsOfOrderColl",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "notificationSummary",
+    "Label": "Summary",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

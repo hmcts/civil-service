@@ -1,0 +1,27 @@
+[
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "queryManagementRespondQuery",
+    "CaseFieldID": "QueryManagementComponentLauncher",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "queryManagementRespondQuery",
+    "PageLabel": "Respond to a query",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "queryManagementRespondQuery",
+    "CaseFieldID": "queries",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "queryManagementRespondQuery",
+    "PageLabel": "Respond to a query",
+    "DisplayContextParameter" : "#ARGUMENT(CREATE,QueryManagement)",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y"
+  }
+]

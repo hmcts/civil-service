@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "SameRateInterestSelectionList",
+    "ListElementCode": "SAME_RATE_INTEREST_8_PC",
+    "ListElement": "8%",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SameRateInterestSelectionList",
+    "ListElementCode": "SAME_RATE_INTEREST_DIFFERENT_RATE",
+    "ListElement": "A different rate",
+    "DisplayOrder": 2
+  }
+]

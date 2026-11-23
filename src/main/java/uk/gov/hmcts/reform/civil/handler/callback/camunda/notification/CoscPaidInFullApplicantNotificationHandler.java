@@ -23,6 +23,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
+/**
+ * Retained for pre-migration COSC_INITIATE_AFTER_PAYMENT_PROCESS_ID versions. Remove with the legacy
+ * event and CCD entry once production confirms that no instances remain on those versions after deployment.
+ *
+ * @deprecated Replaced by CoscApplicationAfterPaymentNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class CoscPaidInFullApplicantNotificationHandler extends CallbackHandler

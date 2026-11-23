@@ -1,0 +1,461 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersClaimantRepresentationList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantOneDynamic",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantTwoDynamic",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantOneDynamic",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantTwoDynamic",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantListLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Claimant: ${typeRepresentationClaimantOneDynamic}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationCounselForClaimantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"COUNSEL_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationSolicitorForClaimantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"SOLICITOR_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationCostDraftsmanList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"COST_DRAFTSMAN_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationTheClaimantInPersonList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${typeRepresentationClaimantOneDynamic}, the claimant, in person",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"THE_CLAIMANT_IN_PERSON\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLayRepresentativeList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Lay representative for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"LAY_REPRESENTATIVE_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLegalExecutiveList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Legal executive for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"LEGAL_EXECUTIVE_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationSolicitorsAgentList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor's Agent for ${typeRepresentationClaimantOneDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"SOLICITORS_AGENT_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "trialProcedureClaimantComplex",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "typeRepresentationClaimantList=\"CLAIMANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantListTwoLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Claimant: ${typeRepresentationClaimantTwoDynamic}",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantTwoDynamic=\"*\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationClaimantListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersClaimantRepresentationList",
+    "FieldShowCondition": "typeRepresentationClaimantTwoDynamic=\"*\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "CounselForClaimantListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"COUNSEL_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "SolicitorForClaimantListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"SOLICITOR_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationCostDraftsmanListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"COST_DRAFTSMAN_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationTheClaimantInPersonListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${typeRepresentationClaimantTwoDynamic}, he claimant, in person",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"THE_CLAIMANT_IN_PERSON\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLayRepresentativeListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Lay representative for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"LAY_REPRESENTATIVE_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLegalExecutiveListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Legal executive for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"LEGAL_EXECUTIVE_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationSolicitorsAgentListTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor's Agent for ${typeRepresentationClaimantTwoDynamic}, the claimant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"SOLICITORS_AGENT_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "trialProcedClaimTwoComplex",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "typeRepresentationClaimantListTwo=\"CLAIMANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantListLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Defendant: ${typeRepresentationDefendantOneDynamic}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersDefendantRepresentationList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationCounselForDefendantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"COUNSEL_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationSolicitorForDefendantList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"SOLICITOR_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationCostDraftsmanDefList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"COST_DRAFTSMAN_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationTheDefendantInPersonList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${typeRepresentationDefendantOneDynamic}, the defendant, in person",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"THE_DEFENDANT_IN_PERSON\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLayRepresentativeDefList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Lay representative for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"LAY_REPRESENTATIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationLegalExecutiveDefList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Legal executive for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"LEGAL_EXECUTIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationSolicitorsAgentDefList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor's Agent for ${typeRepresentationDefendantOneDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"SOLICITORS_AGENT_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "trialProcedureComplex",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "typeRepresentationDefendantList=\"DEFENDANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantTwoListLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Defendant: ${typeRepresentationDefendantTwoDynamic}",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoDynamic=\"*\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "typeRepresentationDefendantTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersDefendantRepresentationList",
+    "FieldShowCondition": "typeRepresentationDefendantTwoDynamic=\"*\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "CounselForDefendantTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"COUNSEL_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "SolicitorForDefendantTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"SOLICITOR_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "CostDraftsmanDefTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"COST_DRAFTSMAN_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "TheDefendantInPersonTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${typeRepresentationDefendantTwoDynamic}, the defendant, in person",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"THE_DEFENDANT_IN_PERSON\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "LayRepresentativeDefTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Lay representative for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"LAY_REPRESENTATIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "LegalExecutiveDefTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Legal executive for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"LEGAL_EXECUTIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "SolicitorsAgentDefTwoList",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor's Agent for ${typeRepresentationDefendantTwoDynamic}, the defendant",
+    "FieldType": "Label",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"SOLICITORS_AGENT_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "trialProcedureDefTwoComplex",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "typeRepresentationDefendantTwoList=\"DEFENDANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "detailsRepresentationLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Enter details of representation",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "detailsRepresentationText",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "HintText": "For example, the judge heard from Mr Smith, a director of the claimant company and Miss Smith as lay representative for the defendant",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

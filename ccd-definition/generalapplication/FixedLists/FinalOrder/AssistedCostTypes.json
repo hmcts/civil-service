@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "AssistedCostTypesList",
+    "ListElementCode": "COSTS_IN_CASE",
+    "ListElement": "Costs in the case",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AssistedCostTypesList",
+    "ListElementCode": "NO_ORDER_TO_COST",
+    "ListElement": "No order as to costs",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "AssistedCostTypesList",
+    "ListElementCode": "COSTS_RESERVED",
+    "ListElement": "Costs reserved",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "AssistedCostTypesList",
+    "ListElementCode": "MAKE_AN_ORDER_FOR_DETAILED_COSTS",
+    "ListElement": "Make an order for detailed/summary costs",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "AssistedCostTypesList",
+    "ListElementCode": "BESPOKE_COSTS_ORDER",
+    "ListElement": "Bespoke costs order (free text)",
+    "DisplayOrder": 5
+  }
+]
