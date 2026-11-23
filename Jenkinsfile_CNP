@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.13.4")
+@Library("Infrastructure@2.13.6")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -120,8 +120,6 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
-  // Caps unit test forks too: maxParallelForks cannot exceed the worker count. Each fork peaks at ~2.2G RSS.
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=5"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
   env.DMN_DEFINITION_BRANCH = dmnBranch
@@ -160,6 +158,52 @@ withPipeline(type, product, component) {
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     before('build') {
+      stage('Check chart size') {
+        // Reuse Jenkins registry access; GitHub-hosted runners cannot pull these private charts.
+        withAcrClient('nonprod') {
+          def chartCheckDir = sh(script: 'mktemp -d', returnStdout: true).trim()
+          withEnv(["CHART_CHECK_DIR=${chartCheckDir}"]) {
+            try {
+              sh 'cp -R charts/civil-service "$CHART_CHECK_DIR/civil-service"'
+              // Match Infrastructure@2.13.6's published chart: preview/staging keep these dependencies.
+              def chart = readYaml(file: "${chartCheckDir}/civil-service/Chart.yaml")
+              def previewDependencies = (chart.annotations?.get('hmcts.github.io/skip-publish') ?: '')
+                .split(',').collect { it.trim() }.findAll { it }
+              def dependencyNames = (chart.dependencies ?: []).collect { it.alias ?: it.name }
+              def unknownDependencies = previewDependencies.findAll { !dependencyNames.contains(it) }
+              if (unknownDependencies) {
+                error("Unknown skip-publish dependencies: ${unknownDependencies.join(', ')}")
+              }
+              chart.dependencies = (chart.dependencies ?: []).findAll {
+                !previewDependencies.contains(it.alias ?: it.name)
+              }
+              echo "Checking published chart dependencies: ${chart.dependencies.collect { it.alias ?: it.name }.join(', ')}"
+              writeYaml(file: "${chartCheckDir}/civil-service/Chart.yaml", data: chart, overwrite: true)
+              sh '''
+                set -eu
+                # Match the Azure CLI profile used by withAcrClient's subscription login.
+                # Avoid importing Helm here: its Acr/DockerImage dependency cycle fails Jenkinsfile compilation.
+                if [ -n "${EXTERNAL_ACR_SUBSCRIPTION_HMCTSPROD:-}" ]; then
+                  AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod --subscription "$EXTERNAL_ACR_SUBSCRIPTION_HMCTSPROD"
+                else
+                  AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+                fi
+                # Rebuild the lock after removing preview dependencies, as the publisher does.
+                rm -f "$CHART_CHECK_DIR/civil-service/Chart.lock"
+                helm dependency build "$CHART_CHECK_DIR/civil-service"
+                helm package "$CHART_CHECK_DIR/civil-service" --destination "$CHART_CHECK_DIR/package"
+                chart_size_script="$PWD/.github/scripts/check-chart-size.py"
+                (
+                  cd "$CHART_CHECK_DIR/package"
+                  python3 "$chart_size_script"
+                )
+              '''
+            } finally {
+              sh 'rm -rf "$CHART_CHECK_DIR"'
+            }
+          }
+        }
+      }
       sh """
       ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
        """
@@ -168,10 +212,11 @@ withPipeline(type, product, component) {
 
   onMaster {
     env.PACT_BRANCH_NAME = "master"
-    enableHighLevelDataSetup("", true)
+    // No prod skip: the prod import, like aat, runs only once ccd-definition/SOURCE_OF_TRUTH is in this repo
+    // (the highLevelDataSetup onlyIf in build.gradle). Until then civil-ccd-definition imports into both.
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
-    env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
     env.STASH_DIAGNOSTICS = 'false'
 
@@ -183,16 +228,19 @@ withPipeline(type, product, component) {
   }
 
   onDemo {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "demo"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onPerftest {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "perftest"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onIthc {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "ithc"
     loadVaultSecrets(secretsOtherenv)
   }
@@ -519,7 +567,7 @@ def runStagingHighLevelDataSetup() {
   withEnv([
     'ENVIRONMENT=aat',
     'TEST_DATA_LOAD_SKIP_PERIOD=0',
-    'SKIP_COMMON_AAT_CCD_SETUP=false',
+    'STAGING_HIGH_LEVEL_DATA_SETUP=true',
     'IDAM_API_URL_BASE=https://idam-api.aat.platform.hmcts.net',
     'S2S_URL_BASE=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
     'CCD_API_GATEWAY_S2S_ID=ccd_gw',

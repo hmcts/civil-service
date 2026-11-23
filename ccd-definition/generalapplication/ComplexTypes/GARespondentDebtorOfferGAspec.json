@@ -1,0 +1,49 @@
+[
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "respondentDebtorOffer",
+    "ElementLabel": "Do you accept the debtor's offer?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GARespondentDebtorOfferOptionsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "debtorOfferAccept",
+    "ElementLabel": "### The court will make an order for payment in the terms of the offer.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "paymentPlan",
+    "ElementLabel": "Proposed payment plan",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GADebtorPaymentPlanGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "monthlyInstalment",
+    "ElementLabel": "Proposed instalments per month",
+    "HintText": "Enter the amount in £",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "paymentSetDate",
+    "ElementLabel": "Proposed set date",
+    "HintText": "For example. 17 05 2025",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentDebtorOfferGAspec",
+    "ListElementCode": "debtorObjections",
+    "ElementLabel": "Enter your objections to the debtor's proposals",
+    "HintText": "Give your reasons why you do not accept the debtor's offer. The cour will fix the rate of payment and send you and the debtor a copy of the order.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

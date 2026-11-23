@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "ListElementCode": "title",
+    "FieldType": "Label",
+    "ElementLabel": "**Length of hearing**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "ListElementCode": "trialLengthDays",
+    "FieldType": "Number",
+    "HintText":"For example,2",
+    "ElementLabel": "Days",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "ListElementCode": "trialLengthHours",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Hours",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "ListElementCode": "trialLengthMinutes",
+    "FieldType": "Number",
+    "HintText":"For example,0",
+    "ElementLabel": "Minutes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

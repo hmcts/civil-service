@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -70,13 +69,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExter
     }
 
     private CaseData startGeneralApplicationBusinessProcess(ExternalTask externalTask) {
-        ExternalTaskInput externalTaskInput = null;
-        try {
-            externalTaskInput = mapper.convertValue(externalTask.getAllVariables(),
-                                                                  ExternalTaskInput.class);
-        } catch (ValueMapperException | IllegalArgumentException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
-        }
+        ExternalTaskInput externalTaskInput = toExternalTaskInput(externalTask, mapper);
 
         String caseId = ofNullable(externalTaskInput.getCaseId())
             .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));

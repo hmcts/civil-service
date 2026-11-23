@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 @AllArgsConstructor
 @Slf4j
-public class ResetPinDefendantLipEmailDTOGenerator extends EmailDTOGenerator {
+public class ResetPinDefendantLipEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claim-reset-pin-notification-%s";
     private final PinInPostConfiguration pipInPostConfiguration;

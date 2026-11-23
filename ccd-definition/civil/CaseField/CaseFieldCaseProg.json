@@ -1,0 +1,262 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyNotified",
+    "Label": "Was trial ready notification sent out?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyChecked",
+    "Label": "Was trial ready notification sent out?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNameLabelApplicant",
+    "Label": "${caseNameHmctsInternal} \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNameLabelRespondent1",
+    "Label": "${caseNameHmctsInternal} \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNameLabelRespondent2",
+    "Label": "${caseNameHmctsInternal} \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationTextApplicant",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationTextRespondent1",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationTextRespondent2",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyLabelApplicant",
+    "Label": "### Is the case ready for Trial or Hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyLabelRespondent1",
+    "Label": "### Is the case ready for Trial or Hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyLabelRespondent2",
+    "Label": "### Is the case ready for Trial or Hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyApplicant",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "TrialReadyList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyRespondent1",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "TrialReadyList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyRespondent2",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "TrialReadyList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicationNotReadyApplicant",
+    "Label": "### You will need to make an application to the court if this case is not ready for the trial or hearing. \nThe trial or hearing will go ahead as planned on the specified date unless a judge makes an order changing the date of hearing. If you want the date of hearing to be changed (or any other order to make the case ready for trial) you will need to make an application to the court. \n\nYou will still need to provide the following information on trial arrangements. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicationNotReadyRespondent1",
+    "Label": "### You will need to make an application to the court if this case is not ready for the trial or hearing. \nThe trial or hearing will go ahead as planned on the specified date unless a judge makes an order changing the date of hearing. If you want the date of hearing to be changed (or any other order to make the case ready for trial) you will need to make an application to the court. \n\nYou will still need to provide the following information on trial arrangements. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicationNotReadyRespondent2",
+    "Label": "### You will need to make an application to the court if this case is not ready for the trial or hearing. \nThe trial or hearing will go ahead as planned on the specified date unless a judge makes an order changing the date of hearing. If you want the date of hearing to be changed (or any other order to make the case ready for trial) you will need to make an application to the court. \n\nYou will still need to provide the following information on trial arrangements. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicantRevisedHearingRequirements",
+    "Label": " ",
+    "FieldType": "RevisedHearingRequirements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1RevisedHearingRequirements",
+    "Label": " ",
+    "FieldType": "RevisedHearingRequirements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2RevisedHearingRequirements",
+    "Label": " ",
+    "FieldType": "RevisedHearingRequirements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationNotReadyApplicant",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextApplicant}. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationNotReadyRespondent1",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextRespondent1}. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationNotReadyRespondent2",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextRespondent2}. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationReadyApplicant",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextApplicant}. \n\nIf you require less time please set out in your reasons in the 'Other Information' box below. \n\nIf you think you will need more time for the hearing, you will need to liaise with the other party and make an application to the court. The time allocated to the hearing or trial will not be increased until an application is received, the fee paid, and an order made. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationReadyRespondent1",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextRespondent1}. \n\nIf you require less time please set out in your reasons in the 'Other Information' box below. \n\nIf you think you will need more time for the hearing, you will need to liaise with the other party and make an application to the court. The time allocated to the hearing or trial will not be increased until an application is received, the fee paid, and an order made. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationReadyRespondent2",
+    "Label": "### Hearing Duration \nThe hearing time originally allocated is ${hearingDurationTextRespondent2}. \n\nIf you require less time please set out in your reasons in the 'Other Information' box below. \n\nIf you think you will need more time for the hearing, you will need to liaise with the other party and make an application to the court. The time allocated to the hearing or trial will not be increased until an application is received, the fee paid, and an order made. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicantHearingOtherComments",
+    "Label": " ",
+    "FieldType": "HearingOtherComments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1HearingOtherComments",
+    "Label": " ",
+    "FieldType": "HearingOtherComments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2HearingOtherComments",
+    "Label": " ",
+    "FieldType": "HearingOtherComments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialReadyDocuments",
+    "Label": "System generated Case Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "evidenceUploadOptionsLabel",
+    "Label": "You can use the options below to let the court know who this document is from",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "evidenceUploadOptions",
+    "Label": "Select one of the options",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

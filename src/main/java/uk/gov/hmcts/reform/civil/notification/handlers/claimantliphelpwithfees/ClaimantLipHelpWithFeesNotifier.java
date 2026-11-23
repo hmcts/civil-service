@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
@@ -7,7 +8,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 @Component
-public class ClaimantLipHelpWithFeesNotifier extends Notifier {
+public class ClaimantLipHelpWithFeesNotifier extends Notifier<CaseData> {
 
     public ClaimantLipHelpWithFeesNotifier(
             NotificationService notificationService,

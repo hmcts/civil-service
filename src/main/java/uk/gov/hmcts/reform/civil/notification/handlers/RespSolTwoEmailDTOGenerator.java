@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @AllArgsConstructor
-public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
+public abstract class RespSolTwoEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     protected static final String DEFENDANTS_TEXT = "'s claim against you";
 

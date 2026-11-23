@@ -9,9 +9,10 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotificati
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedRespondentDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.DeleteApplicationPaymentDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.FinalOrderApplicantDashboardTask;
-import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.GaFinalOrderDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.FinalOrderRespondentDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.GaFinalOrderDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.hwf.HwfOutcomeApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.hwf.HwfOutcomeDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionApplicantDashboardTask;
@@ -53,10 +54,11 @@ class GaDashboardTaskContributorsTest {
             new ContributorSpec(
                 new ApplicationSubmittedDashboardTaskContributor(
                     mock(ApplicationSubmittedApplicantDashboardTask.class),
-                    mock(ApplicationSubmittedRespondentDashboardTask.class)
+                    mock(ApplicationSubmittedRespondentDashboardTask.class),
+                    mock(DeleteApplicationPaymentDashboardTask.class)
                 ),
                 DashboardTaskIds.GA_APPLICATION_SUBMITTED,
-                2
+                3
             ),
             new ContributorSpec(
                 new HwfOutcomeDashboardTaskContributor(

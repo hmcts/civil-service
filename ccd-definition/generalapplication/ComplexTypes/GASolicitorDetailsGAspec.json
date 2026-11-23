@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "GASolicitorDetailsGAspec",
+    "ListElementCode": "id",
+    "FieldType": "Text",
+    "ElementLabel": "User ID",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorDetailsGAspec",
+    "ListElementCode": "email",
+    "FieldType": "Email",
+    "ElementLabel": "Email ID",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorDetailsGAspec",
+    "ListElementCode": "forename",
+    "FieldType": "Text",
+    "ElementLabel": "forename",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorDetailsGAspec",
+    "ListElementCode": "surname",
+    "FieldType": "Text",
+    "ElementLabel": "surname",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorDetailsGAspec",
+    "ListElementCode": "organisationIdentifier",
+    "FieldType": "Text",
+    "ElementLabel": "organisationIdentifier",
+    "SecurityClassification": "Public"
+  }
+]

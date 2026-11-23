@@ -1,0 +1,55 @@
+[
+  {
+    "ID": "UploadEvidenceExpert1",
+    "ListElementCode": "expertOptionName",
+    "FieldType": "Text",
+    "ElementLabel": "Expert's name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "expertOptionName != \"DO_NOT_SHOW_IN_UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "UploadEvidenceExpert1",
+    "ListElementCode": "expertOptionExpertise",
+    "FieldType": "Text",
+    "ElementLabel": "Field of expertise",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "expertOptionName != \"DO_NOT_SHOW_IN_UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "UploadEvidenceExpert1",
+    "ListElementCode": "expertOptionUploadDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date statement was made",
+    "HintText": "For example, 12/09/2022",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "expertOptionName != \"DO_NOT_SHOW_IN_UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "UploadEvidenceExpert1",
+    "ListElementCode": "expertDocument",
+    "ElementLabel": "Upload a file",
+    "HintText": "Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMG, TIF, TIFF",
+    "FieldType": "Document",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "expertOptionName != \"DO_NOT_SHOW_IN_UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "UploadEvidenceExpert1",
+    "ListElementCode": "createdDatetime",
+    "ElementLabel": "Document Uploaded DateTime",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "expertDocument = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "RetainHiddenValue": "Y"
+  }
+]

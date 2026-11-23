@@ -1,0 +1,50 @@
+[
+  {
+    "LiveFrom":"",
+    "LiveTo": "",
+    "CaseTypeID": "CIVIL",
+    "SearchPartyCollectionsFieldName": "",
+    "SearchPartyName": "respondent1.partyName",
+    "SearchPartyEmailAddress": "respondentSolicitor1EmailAddress",
+    "SearchPartyAddressLine1": "respondent1.primaryAddress.AddressLine1",
+    "SearchPartyPostCode": "respondent1.primaryAddress.PostCode",
+    "SearchPartyDOB":"respondent1.individualDateOfBirth",
+    "SearchPartyDOD": ""
+  },
+  {
+    "LiveFrom":"",
+    "LiveTo": "",
+    "CaseTypeID": "CIVIL",
+    "SearchPartyCollectionsFieldName": "",
+    "SearchPartyName": "respondent2.partyName",
+    "SearchPartyEmailAddress": "respondentSolicitor2EmailAddress",
+    "SearchPartyAddressLine1": "respondent2.primaryAddress.AddressLine1",
+    "SearchPartyPostCode": "respondent2.primaryAddress.PostCode",
+    "SearchPartyDOB":"respondent2.individualDateOfBirth",
+    "SearchPartyDoD": ""
+  },
+  {
+    "LiveFrom":"",
+    "LiveTo": "",
+    "CaseTypeID": "CIVIL",
+    "SearchPartyCollectionsFieldName": "",
+    "SearchPartyName": "applicant1.partyName",
+    "SearchPartyEmailAddress": "applicantSolicitor1UserDetails.email",
+    "SearchPartyAddressLine1": "applicant1.primaryAddress.AddressLine1",
+    "SearchPartyPostCode": "applicant1.primaryAddress.PostCode",
+    "SearchPartyDOB":"applicant1.individualDateOfBirth",
+    "SearchPartyDOD": ""
+  },
+  {
+    "LiveFrom":"",
+    "LiveTo": "",
+    "CaseTypeID": "CIVIL",
+    "SearchPartyCollectionsFieldName": "",
+    "SearchPartyName": "applicant2.partyName",
+    "SearchPartyEmailAddress": "",
+    "SearchPartyAddressLine1": "applicant2.primaryAddress.AddressLine1",
+    "SearchPartyPostCode": "applicant2.primaryAddress.PostCode",
+    "SearchPartyDOB":"applicant2.individualDateOfBirth",
+    "SearchPartyDOD": ""
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "PaymentBySetDate",
+    "ListElementCode": "paymentSetDate",
+    "FieldType": "Date",
+    "HintText": "For example, 12 11 2023",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,179 @@
+[
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "listFromLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "listFromDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "dateToLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "listToDate",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "lengthLabel",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "lengthOfNewHearing",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "lengthOfHearingOther",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidLabel",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidYesNo",
+    "DefaultValue": "No",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidDateDropdown",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesTopText",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDates",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesBottomText",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "alternativeHearingLabel",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "hearingLocationList",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "alternativeHearingDropdownLabel",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "alternativeHearingLocation",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "hearingMethodLabel",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "hearingMethods",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "hearingNotesLabel",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderFurtherHearingDetails",
+    "ListElementCode": "hearingNotesText",
+    "FieldDisplayOrder": 22,
+    "DisplayContext": "OPTIONAL"
+  }
+]

@@ -18,6 +18,11 @@ import java.util.UUID;
 @Slf4j
 public class DraftStoreTransactionService {
 
+    private static final String DRAFT_ID_NOT_NULL = "draftId must not be null";
+    private static final String USER_ID_NOT_NULL = "userId must not be null";
+    private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
+    private static final String UPDATED_AT_NOT_NULL = "updatedAt must not be null";
+
     private final DraftStoreRepository draftStoreRepository;
     private final EntityManager entityManager;
 
@@ -51,11 +56,11 @@ public class DraftStoreTransactionService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long deleteByIdInNewTransaction(UUID draftId, String userId, DraftType draftType) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         entityManager.joinTransaction();
-        log.info("Deleting draft type={} draftId={}", draftType, draftId);
+        log.info("Deleting draft type={} draftId={} with userId={}", draftType, draftId, userId);
         long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftType(
             draftId,
             userId,
@@ -83,11 +88,11 @@ public class DraftStoreTransactionService {
                                                DraftType draftType,
                                                OffsetDateTime expiresAt,
                                                OffsetDateTime updatedAt) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         Objects.requireNonNull(expiresAt, "expiresAt must not be null");
-        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        Objects.requireNonNull(updatedAt, UPDATED_AT_NOT_NULL);
         entityManager.joinTransaction();
         log.info("Updating expiresAt for draft type={} draftId={}", draftType, draftId);
         return draftStoreRepository.updateExpiresAt(draftId, userId, draftType, expiresAt, updatedAt);
@@ -104,11 +109,11 @@ public class DraftStoreTransactionService {
                                                DraftType draftType,
                                                String submissionId,
                                                OffsetDateTime updatedAt) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         Objects.requireNonNull(submissionId, "submissionId must not be null");
-        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        Objects.requireNonNull(updatedAt, UPDATED_AT_NOT_NULL);
         entityManager.joinTransaction();
         log.info("Claiming submission for draft type={} draftId={}", draftType, draftId);
         return draftStoreRepository.claimSubmission(draftId, userId, draftType, submissionId, updatedAt);
@@ -120,11 +125,11 @@ public class DraftStoreTransactionService {
                                           DraftType draftType,
                                           String caseId,
                                           OffsetDateTime updatedAt) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         Objects.requireNonNull(caseId, "caseId must not be null");
-        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        Objects.requireNonNull(updatedAt, UPDATED_AT_NOT_NULL);
         entityManager.joinTransaction();
         log.info("Linking caseId for draft type={} draftId={} caseId={}", draftType, draftId, caseId);
         return draftStoreRepository.linkCaseId(draftId, userId, draftType, caseId, updatedAt);
@@ -135,10 +140,10 @@ public class DraftStoreTransactionService {
                                                  String userId,
                                                  DraftType draftType,
                                                  OffsetDateTime updatedAt) {
-        Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftType, "draftType must not be null");
-        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        Objects.requireNonNull(draftId, DRAFT_ID_NOT_NULL);
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        Objects.requireNonNull(updatedAt, UPDATED_AT_NOT_NULL);
         entityManager.joinTransaction();
         log.info("Releasing submission claim for draft type={} draftId={}", draftType, draftId);
         return draftStoreRepository.releaseSubmission(draftId, userId, draftType, updatedAt);

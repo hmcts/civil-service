@@ -1,0 +1,10 @@
+{
+  "preview": ["*-prod.json"],
+  "local": ["*-prod.json"],
+  "demo": ["UserProfile.json", "*-prod.json"],
+  "perftest": ["UserProfile.json", "*-prod.json"],
+  "ithc": ["UserProfile.json", "*-prod.json"],
+  "aat": ["UserProfile.json", "*-nonprod.json"],
+  "staging": ["UserProfile.json", "*-nonprod.json", "*-testing*.json"],
+  "prod": ["UserProfile.json", "*-nonprod.json", "*-testing*.json"]
+}

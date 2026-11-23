@@ -9,13 +9,13 @@
   ],
   "timezone": "Europe/London",
   "automergeSchedule": [
-    "after 7am and before 8am every weekday",
-    "after 6pm and before 8pm every weekday"
+    "after 7am and before 9am every weekday",
+    "after 5pm and before 8pm every weekday"
   ],
   "platformAutomerge": false,
   "schedule": [
-    "after 7am and before 8am every weekday",
-    "after 6pm and before 8pm every weekday"
+    "after 7am and before 9am every weekday",
+    "after 5pm and before 8pm every weekday"
   ],
   "rebaseWhen": "behind-base-branch",
   "automergeStrategy": "squash",
@@ -35,8 +35,22 @@
       "matchPackageNames": [
         "com.github.hmcts:core-case-data-store-client"
       ],
+      "allowedVersions": "<5.4.0",
+      "description": "Version 5.4.0 already needs Spring Boot 4 (it requires org.springframework.boot:spring-boot-http-converter), as does version 6 with Jackson 3; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "org.springframework.cloud:spring-cloud-dependencies"
+      ],
+      "allowedVersions": "<2025.1.0",
+      "description": "Spring Cloud 2025.1 targets Spring Boot 4: its OpenFeign loads org.springframework.boot.http.converter.autoconfigure.ClientHttpMessageConvertersCustomizer, which Boot 3.5 lacks, so the application context fails to start"
+    },
+    {
+      "matchPackageNames": [
+        "com.github.hmcts:send-letter-client"
+      ],
       "allowedVersions": "<6.0.0",
-      "description": "Version 6 requires Spring Boot 4 and Jackson 3; retain the compatible client until the service migrates"
+      "description": "Version 6 is built for Java 25; the service still compiles for Java 21"
     },
     {
       "matchPackageNames": [
@@ -82,6 +96,26 @@
       "automergeType": "pr"
     },
     {
+      "description": "Keep the Terraform CLI version (infrastructure/.terraform-version) out of the npm non-major group; large jumps can affect state and providers, so review and merge manually",
+      "matchManagers": [
+        "terraform-version"
+      ],
+      "groupName": "Terraform version",
+      "groupSlug": "terraform-version",
+      "automerge": false
+    },
+    {
+      "description": "Keep the cnp-jenkins-library @Library bump in Jenkinsfiles out of the npm non-major group so pipeline changes are tested on their own",
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchPackageNames": [
+        "hmcts/cnp-jenkins-library"
+      ],
+      "groupName": "Jenkins library",
+      "groupSlug": "jenkins-library"
+    },
+    {
       "groupName": "Camunda updates",
       "groupSlug": "camunda",
       "automerge": false,
@@ -100,6 +134,28 @@
       "automergeType": "pr"
     },
     {
+      "description": "DTSCCI-7065: Hold CCD chart updates until the chart size regression is resolved and the packaged civil-service chart is safely below the size limit",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "ccd"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Require manual review of AAC chart updates because the chart also bundles CCD",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "aac-manage-case-assignment"
+      ],
+      "groupName": "AAC chart updates",
+      "groupSlug": "aac-chart",
+      "automerge": false
+    },
+    {
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
@@ -112,6 +168,21 @@
         "/jakarta.persistence/",
         "/org.hibernate/"
       ]
+    },
+    {
+      "description": "No Spring major updates until the Spring Boot 4 migration (the spring-boot-4 branch) lands: the major group needs Boot 4 and cannot compile on master, so its PR fails on every rebase",
+      "matchPackageNames": [
+        "/org.springframework/",
+        "/org.springdoc/",
+        "/spring-boot/",
+        "/spring-cloud/",
+        "/jakarta.persistence/",
+        "/org.hibernate/"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
     },
     {
       "matchManagers": [

@@ -1,0 +1,13 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ApplicationsStaff",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "UserRoles": [
+      "GS_profile"
+    ],
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "TabFieldDisplayOrder": 1
+  }
+]
