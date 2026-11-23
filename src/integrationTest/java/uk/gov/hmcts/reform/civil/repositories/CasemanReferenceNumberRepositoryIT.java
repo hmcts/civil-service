@@ -5,7 +5,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CasemanReferenceNumberRepositoryIT {
 
     @Container
-    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:14-alpine")
+    private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:14-alpine")
         .withDatabaseName("civil")
         .withUsername("civil")
         .withPassword("civil");
