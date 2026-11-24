@@ -7,6 +7,7 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
@@ -21,6 +22,7 @@ public class JsonSchemaValidationService {
 
     private String jsonSchemaFile;
 
+    @Autowired
     public JsonSchemaValidationService() {
         this.jsonSchemaFile = "schema/rpa-json-schema.json";
     }
