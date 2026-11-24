@@ -69,10 +69,6 @@ java:
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
-    ROBOTICS_NOTIFICATION_RECIPIENT: d38adcf68b78@euploading.com
-    ROBOTICS_NOTIFICATION_MULTIPARTYRECIPIENT: d38adcf68b78@euploading.com
-    ROBOTICS_NOTIFICATION_SPECRECIPIENT: d38adcf68b78@euploading.com
-    ROBOTICS_NOTIFICATION_LIPJRECIPIENT: d38adcf68b78@euploading.com
   keyVaults:
     civil:
       resourceGroup: civil
