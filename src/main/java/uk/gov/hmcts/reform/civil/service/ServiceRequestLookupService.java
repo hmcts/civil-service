@@ -26,6 +26,12 @@ import java.util.Optional;
  * and the payer would see both. Reusing the unpaid one makes the retry safe (DTSCCI-7095).
  *
  * <p>The lookup is best effort. If it fails for any reason the caller creates a new service request, as before.
+ *
+ * <p>Off by default ({@code payments.api.reuse-unpaid-service-request}). The payment service allows
+ * {@code GET /cases/{ccdCaseNumber}/paymentgroups} only for the {@code payments} and {@code pui-*} roles, and the
+ * civil system update user has neither (403 in AAT, 24 Nov 2026). Until it does, the payment handlers label a
+ * failure that may have reached payments as NOT RETRYABLE instead
+ * ({@code CallbackFailureClassifier.labelledErrorForNonIdempotentCall}).
  */
 @Slf4j
 @Service
@@ -37,7 +43,7 @@ public class ServiceRequestLookupService {
     private final PaymentGroupsApiClient paymentGroupsApiClient;
     private final AuthTokenGenerator authTokenGenerator;
 
-    @Value("${payments.api.reuse-unpaid-service-request:true}")
+    @Value("${payments.api.reuse-unpaid-service-request:false}")
     private boolean enabled;
 
     public Optional<String> findUnpaidServiceRequest(CreateServiceRequestDTO request, String authToken) {

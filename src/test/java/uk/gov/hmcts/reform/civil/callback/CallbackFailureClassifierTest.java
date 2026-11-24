@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -161,6 +163,40 @@ class CallbackFailureClassifierTest {
                                           "{\"callbackErrors\":[\"RETRYABLE: x\"]}".getBytes(StandardCharsets.UTF_8), null)))
             .isFalse();
         assertThat(CallbackFailureClassifier.isRetryableCallbackError(null)).isFalse();
+    }
+
+    @Test
+    void nonIdempotentCallIsRetryableOnlyWhenItCertainlyNeverArrived() {
+        Request post = request(Request.HttpMethod.POST);
+        assertThat(CallbackFailureClassifier.isNotDelivered(
+            new RetryableException(-1, "refused", Request.HttpMethod.POST, new ConnectException("Connection refused"), (Long) null, post))).isTrue();
+        assertThat(CallbackFailureClassifier.isNotDelivered(
+            new RetryableException(-1, "dns", Request.HttpMethod.POST, new UnknownHostException("payment-api"), (Long) null, post))).isTrue();
+        assertThat(CallbackFailureClassifier.isNotDelivered(
+            new RetryableException(-1, "connect", Request.HttpMethod.POST, new SocketTimeoutException("Connect timed out"), (Long) null, post))).isTrue();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.ServiceUnavailable("503", post, null, null))).isTrue();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.TooManyRequests("429", post, null, null))).isTrue();
+    }
+
+    @Test
+    void nonIdempotentCallIsNotRetryableWhenTheServiceMayHaveCommitted() {
+        Request post = request(Request.HttpMethod.POST);
+        assertThat(CallbackFailureClassifier.isNotDelivered(
+            new RetryableException(-1, "read", Request.HttpMethod.POST, new SocketTimeoutException("Read timed out"), (Long) null, post))).isFalse();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.BadGateway("502", post, null, null))).isFalse();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.GatewayTimeout("504", post, null, null))).isFalse();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.InternalServerError("500", post, null, null))).isFalse();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new FeignException.Conflict("409", post, null, null))).isFalse();
+        assertThat(CallbackFailureClassifier.isNotDelivered(new IllegalStateException("bug"))).isFalse();
+    }
+
+    @Test
+    void labelledErrorForNonIdempotentCallUsesTheStricterRule() {
+        FeignException gatewayTimeout = new FeignException.GatewayTimeout("[504 Gateway Timeout]", request(Request.HttpMethod.POST), null, null);
+
+        assertThat(CallbackFailureClassifier.labelledError("Technical error occurred", gatewayTimeout)).startsWith(RETRYABLE);
+        assertThat(CallbackFailureClassifier.labelledErrorForNonIdempotentCall("Technical error occurred", gatewayTimeout))
+            .isEqualTo(NOT_RETRYABLE + "Technical error occurred (feign.FeignException$GatewayTimeout: [504 Gateway Timeout])");
     }
 
     private static FeignException unprocessable(String body) {

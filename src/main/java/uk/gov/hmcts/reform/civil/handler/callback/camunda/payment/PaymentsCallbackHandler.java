@@ -99,7 +99,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             if (e.status() == 403 || e.status() == 422 || e.status() == 504) {
                 updateWithBusinessError(caseData, e);
             } else {
-                errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
+                errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
             }
         } catch (InvalidPaymentRequestException e) {
             log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",

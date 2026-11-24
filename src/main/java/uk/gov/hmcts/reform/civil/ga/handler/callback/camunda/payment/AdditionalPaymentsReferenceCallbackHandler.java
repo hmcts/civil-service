@@ -82,7 +82,7 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
                     throw e;
                 }
                 log.info(String.format("Http Status %s ", e.status()), e);
-                errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
+                errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
             } catch (InvalidPaymentRequestException e) {
                 log.error(String.format("Error handling payment for general application: %s, response body: [%s]",
                                         caseData.getCcdCaseReference(), e.getMessage()

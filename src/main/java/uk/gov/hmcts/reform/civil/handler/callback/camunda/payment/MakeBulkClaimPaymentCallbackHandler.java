@@ -95,7 +95,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 if (exception.status() == 403 || exception.status() == 422 || exception.status() == 504) {
                     updateWithBusinessError(caseData, exception);
                 } else {
-                    errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, exception));
+                    errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, exception));
                 }
             } catch (InvalidPaymentRequestException exception) {
                 log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",

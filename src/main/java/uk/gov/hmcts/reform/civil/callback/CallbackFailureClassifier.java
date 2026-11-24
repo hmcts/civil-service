@@ -8,8 +8,10 @@ import org.springframework.web.client.ResourceAccessException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 
 import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +28,9 @@ import java.util.regex.Pattern;
  * <p>A failed callback means CCD did not save the event, so retrying the whole submit is safe
  * whatever the HTTP method. Transient therefore covers every upstream status that is usually
  * temporary, including 500, unlike the task-level idempotency rules for direct calls.
+ *
+ * <p>That covers CCD only. If the callback itself made a non-idempotent call that reached another service, such as
+ * creating a payment service request, a retry repeats that call: use {@link #labelledErrorForNonIdempotentCall}.
  */
 public final class CallbackFailureClassifier {
 
@@ -86,7 +91,54 @@ public final class CallbackFailureClassifier {
      * {@code RETRYABLE: Technical error occurred (feign.FeignException$GatewayTimeout: ...)}.
      */
     public static String labelledError(String message, Throwable cause) {
-        String label = isTransient(cause) ? RETRYABLE : NOT_RETRYABLE;
+        return labelled(isTransient(cause), message, cause);
+    }
+
+    /**
+     * Like {@link #labelledError}, for a failed call that creates something in another service and is not
+     * idempotent: a payment service request, a PBA or credit account payment. A retry is safe only when the call
+     * certainly never reached the service, so only those failures are {@link #RETRYABLE}. A read timeout, a 504, a
+     * 500 or a 502 may come after the service committed (an Application Gateway answers 502 when the backend times
+     * out), and a retry would then create a second service request or take a payment twice. Those are
+     * {@link #NOT_RETRYABLE}, so support checks the case's service requests before retrying.
+     */
+    public static String labelledErrorForNonIdempotentCall(String message, Throwable cause) {
+        return labelled(isNotDelivered(cause), message, cause);
+    }
+
+    /**
+     * True when the failed request certainly did not reach the service: the connection was never made, or the
+     * service (or its gateway) turned it away without processing it (429, 503).
+     */
+    public static boolean isNotDelivered(Throwable throwable) {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            if (current instanceof ConnectException
+                || current instanceof UnknownHostException
+                || current instanceof NoRouteToHostException) {
+                return true;
+            }
+            if (current instanceof SocketTimeoutException) {
+                return StringUtils.containsIgnoreCase(current.getMessage(), "connect timed out");
+            }
+            if (current instanceof FeignException feignException && feignException.status() > 0) {
+                return isNotProcessedStatus(feignException.status());
+            }
+            if (current instanceof HttpStatusCodeException httpException) {
+                return isNotProcessedStatus(httpException.getStatusCode().value());
+            }
+            if (current.getCause() == current) {
+                break;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isNotProcessedStatus(int status) {
+        return status == 429 || status == 503;
+    }
+
+    private static String labelled(boolean retryable, String message, Throwable cause) {
+        String label = retryable ? RETRYABLE : NOT_RETRYABLE;
         String detail = cause.getClass().getName() + ": " + StringUtils.defaultString(cause.getMessage());
         return StringUtils.abbreviate(label + message + " (" + detail + ")", MAX_ERROR_LENGTH);
     }

@@ -244,21 +244,51 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldLabelPaymentsGatewayTimeoutAsRetryable_whenServiceRequestFails() {
-            // DTSCCI-7095: payments 504 on POST /service-request (seen on 19 Nov 2026) is transient, so the
-            // callback error is labelled RETRYABLE and the Camunda task retries instead of raising an incident
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
-            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
-            feign.Request request = feign.Request.create(feign.Request.HttpMethod.POST,
-                "http://payment-api-prod.service.core-compute-prod.internal/service-request",
-                java.util.Map.of(), null, java.nio.charset.StandardCharsets.UTF_8, null);
+        void shouldLabelPaymentsGatewayTimeoutAsNotRetryable_whenServiceRequestFails() {
+            // DTSCCI-7095: a payments 504 on POST /service-request (seen on 19 Nov 2026) may come after payments
+            // created the service request, so a retry could raise a second one: support checks before retrying
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenThrow(new FeignException.GatewayTimeout("[504 Gateway Timeout]", request, null, null));
+                .thenThrow(new FeignException.GatewayTimeout("[504 Gateway Timeout]", serviceRequestPost(), null, null));
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(hearingFeeParams());
 
             assertThat(response.getErrors()).singleElement().asString()
-                .startsWith("RETRYABLE: Technical error occurred (feign.FeignException$GatewayTimeout: [504 Gateway Timeout]");
+                .startsWith("NOT RETRYABLE: Technical error occurred (feign.FeignException$GatewayTimeout: [504 Gateway Timeout]");
+        }
+
+        @Test
+        void shouldLabelPaymentsServiceUnavailableAsRetryable_whenServiceRequestFails() {
+            // a 503 means payments (or its gateway) turned the request away, so nothing was created
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenThrow(new FeignException.ServiceUnavailable("[503 Service Unavailable]", serviceRequestPost(), null, null));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(hearingFeeParams());
+
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith("RETRYABLE: Technical error occurred (feign.FeignException$ServiceUnavailable");
+        }
+
+        @Test
+        void shouldLabelConnectionRefusedAsRetryable_whenServiceRequestFails() {
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenThrow(new feign.RetryableException(-1, "Connection refused", feign.Request.HttpMethod.POST,
+                    new java.net.ConnectException("Connection refused"), (Long) null, serviceRequestPost()));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(hearingFeeParams());
+
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith("RETRYABLE: Technical error occurred (feign.RetryableException");
+        }
+
+        private CallbackParams hearingFeeParams() {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
+            return callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
+        }
+
+        private feign.Request serviceRequestPost() {
+            return feign.Request.create(feign.Request.HttpMethod.POST,
+                "http://payment-api-prod.service.core-compute-prod.internal/service-request",
+                java.util.Map.of(), null, java.nio.charset.StandardCharsets.UTF_8, null);
         }
 
         @Test

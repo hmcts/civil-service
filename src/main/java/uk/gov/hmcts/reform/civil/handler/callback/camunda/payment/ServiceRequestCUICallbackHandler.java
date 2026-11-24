@@ -74,7 +74,7 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
             log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
                       caseData.getCcdCaseReference(), e.status(), e
             );
-            errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
+            errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

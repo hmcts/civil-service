@@ -97,7 +97,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
                 ));
                 updateWithDuplicatePaymentError(caseData, e);
             } else {
-                errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
+                errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
             }
         }
 

@@ -107,7 +107,7 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
                 .build();
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
-            errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
+            errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
