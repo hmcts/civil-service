@@ -202,6 +202,14 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    void shouldReturnNoContentWhenUserHasNoDraft() throws Exception {
+        draftStoreRepository.deleteAll();
+
+        doGet(BEARER_TOKEN, ACTIVE_DRAFT_CLAIM_URL)
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     void shouldReturnNoContentWhenNoDraftExistsForCase() throws Exception {
         doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
             .andExpect(status().isNoContent());
