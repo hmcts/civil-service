@@ -5,8 +5,8 @@ import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -42,13 +42,13 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     private static final String S2S_AUTH_TOKEN = "s2s AuthToken";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
-    @MockBean
+    @MockitoBean
     CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
-    @SpyBean
+    @MockitoSpyBean
     PaymentRequestUpdateCallbackService requestUpdateCallbackService;
 
     @BeforeEach

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
     classes = {
         SecuredDocumentManagementService.class,
         SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
-        JacksonAutoConfiguration.class,
+        Jackson2AutoConfiguration.class,
         DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
