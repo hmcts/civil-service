@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.Genera
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralApplicationCreationNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.SolicitorEmailValidation;
@@ -111,7 +112,7 @@ class GaApplicationCreatedNotifierTest {
         var parties = new GaApplicationCreatedAllPartiesEmailGenerator(respondents, converter, ccd, validator, fees);
         var notifier = new GaApplicationCreatedNotifier(newMail, mock(CaseTaskTrackingService.class), parties);
         var factory = new GaNotifierFactory(notifier);
-        var handler = new GaNotificationHandler(factory, gaCcd, mapper);
+        var handler = new GaNotificationHandler(factory, mock(GaNotificationHistoryService.class), mapper);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params(data, "NOTIFY_EVENT"));
 
         assertThat(factory.getNotifier(GaApplicationCreatedNotifier.TASK_ID)).isSameAs(notifier);

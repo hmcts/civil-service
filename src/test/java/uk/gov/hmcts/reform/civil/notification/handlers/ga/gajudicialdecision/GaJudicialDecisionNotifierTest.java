@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreIn
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.SolicitorEmailValidation;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -128,7 +128,7 @@ class GaJudicialDecisionNotifierTest {
             .setCamundaEvent(camundaEvent).setActivityId(GaJudicialDecisionNotifier.TASK_ID)).build();
         var notifier = notifier();
         var factory = new GaNotifierFactory(notifier);
-        var handler = new GaNotificationHandler(factory, mock(GaCoreCaseDataService.class), new ObjectMapper().registerModule(new JavaTimeModule()));
+        var handler = new GaNotificationHandler(factory, mock(GaNotificationHistoryService.class), new ObjectMapper().registerModule(new JavaTimeModule()));
         var params = new CallbackParams().type(ABOUT_TO_SUBMIT).caseData(migrated)
             .request(CallbackRequest.builder().eventId(CaseEvent.NOTIFY_EVENT.name()).build());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -168,7 +168,7 @@ class GaJudicialDecisionNotifierTest {
             converter, ccd, new SolicitorEmailValidation(lips), helper);
         var notifier = new GaJudicialDecisionNotifier(notify, mock(CaseTaskTrackingService.class), parties);
         data.getBusinessProcess().setActivityId(GaJudicialDecisionNotifier.TASK_ID);
-        var handler = new GaNotificationHandler(new GaNotifierFactory(notifier), mock(GaCoreCaseDataService.class),
+        var handler = new GaNotificationHandler(new GaNotifierFactory(notifier), mock(GaNotificationHistoryService.class),
             new ObjectMapper().registerModule(new JavaTimeModule()));
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(new CallbackParams()
             .type(ABOUT_TO_SUBMIT).caseData(data).request(CallbackRequest.builder().eventId("NOTIFY_EVENT").build()));

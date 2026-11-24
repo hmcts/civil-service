@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.GaNoti
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.TranslatedDocumentUploadedApplicantNotificationHandler;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.TranslatedDocumentUploadedRespondentNotificationHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.SolicitorEmailValidation;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -100,7 +100,7 @@ class GaTranslatedDocumentUploadedNotifierTest {
         legacyRespondent().handle(params(data, NOTIFY_RESPONDENT_TRANSLATED_DOCUMENT_UPLOADED_GA.name()));
         var notifier = notifier(validator);
         var factory = new GaNotifierFactory(notifier);
-        var handler = new GaNotificationHandler(factory, mock(GaCoreCaseDataService.class), mapper());
+        var handler = new GaNotificationHandler(factory, mock(GaNotificationHistoryService.class), mapper());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params(data, NOTIFY_EVENT.name()));
 
         assertThat(factory.getNotifier(GaTranslatedDocumentUploadedNotifier.TASK_ID)).isSameAs(notifier);
@@ -161,7 +161,7 @@ class GaTranslatedDocumentUploadedNotifierTest {
         var data = caseData("WITH_NOTICE", 0, 0);
         var realValidator = new SolicitorEmailValidation(lips);
         var handler = new GaNotificationHandler(new GaNotifierFactory(notifier(realValidator)),
-            mock(GaCoreCaseDataService.class), mapper());
+            mock(GaNotificationHistoryService.class), mapper());
         capture(notificationService, actualEmails);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params(data, "NOTIFY_EVENT"));
         var saved = mapper().convertValue(response.getData(), GeneralApplicationCaseData.class);
