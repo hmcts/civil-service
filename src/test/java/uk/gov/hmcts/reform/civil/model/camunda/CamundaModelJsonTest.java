@@ -115,18 +115,20 @@ class CamundaModelJsonTest {
         Map<String, Object> asMap = mapper.readValue(
             mapper.writeValueAsString(correlation), new TypeReference<Map<String, Object>>() {});
 
-        assertThat(asMap).containsEntry("messageName", "queryManagementRaiseQuery");
-        assertThat(asMap).containsEntry("tenantId", "civil");
-        assertThat(asMap).containsKey("processVariables");
-        assertThat(asMap).doesNotContainKey("businessKey");
-        assertThat(asMap).doesNotContainKey("correlationKeys");
+        assertThat(asMap)
+            .containsEntry("messageName", "queryManagementRaiseQuery")
+            .containsEntry("tenantId", "civil")
+            .containsKey("processVariables")
+            .doesNotContainKey("businessKey")
+            .doesNotContainKey("correlationKeys");
 
         @SuppressWarnings("unchecked")
         Map<String, Object> vars = (Map<String, Object>) asMap.get("processVariables");
         @SuppressWarnings("unchecked")
         Map<String, Object> caseId = (Map<String, Object>) vars.get("caseId");
-        assertThat(caseId).containsEntry("value", "1234567890123456");
-        assertThat(caseId).containsEntry("type", "String");
+        assertThat(caseId)
+            .containsEntry("value", "1234567890123456")
+            .containsEntry("type", "String");
     }
 
     @Test

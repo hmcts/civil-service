@@ -51,7 +51,7 @@ public class AllGaPartiesEmailGenerator implements PartiesEmailGenerator<General
 
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         for (EmailDTOGenerator<GaNotificationContext> generator : generators) {
-            if ((generator != null) && generator.getShouldNotify(context)) {
+            if (generator != null && Boolean.TRUE.equals(generator.getShouldNotify(context))) {
                 log.info("Generating email for party [{}] for case ID: {}",
                          generator.getClass().getSimpleName(), context.getCcdCaseReference());
                 partiesToEmail.addAll(generator.buildEmailDTOs(context, taskId));

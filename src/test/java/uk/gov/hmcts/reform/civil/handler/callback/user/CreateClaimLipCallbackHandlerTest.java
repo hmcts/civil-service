@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -50,7 +50,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -62,7 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 
 @SpringBootTest(classes = {
     CreateClaimLipCallBackHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
@@ -318,10 +317,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
             when(draftStoreService.linkDraftBySubmissionId(
-                eq(CLAIMANT_USER_ID),
-                eq(CASE_ID.toString()),
-                eq(LIP_CLAIM_SUBMISSION_ID),
-                eq(DraftType.DRAFT_CLAIM)
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
+                DraftType.DRAFT_CLAIM
             )).thenReturn(Optional.empty());
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -389,10 +388,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
             when(draftStoreService.linkDraftBySubmissionId(
-                eq(CLAIMANT_USER_ID),
-                eq(CASE_ID.toString()),
-                eq(LIP_CLAIM_SUBMISSION_ID),
-                eq(DraftType.DRAFT_CLAIM)
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
+                DraftType.DRAFT_CLAIM
             )).thenThrow(new RuntimeException("draft store unavailable"));
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
