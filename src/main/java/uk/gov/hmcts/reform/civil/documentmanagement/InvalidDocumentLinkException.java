@@ -25,6 +25,7 @@ public class InvalidDocumentLinkException extends DocumentDownloadException {
         "Invalid document link '%s': the trailing document id is not a valid UUID.";
     public static final String CLIENT_ERROR_MESSAGE_TEMPLATE =
         "Document management rejected the request for '%s' (HTTP %d).";
+    private static final String FOR_CASE = " for case ";
 
     public InvalidDocumentLinkException(String selfHref) {
         super(String.format(MESSAGE_TEMPLATE, selfHref, SecuredDocumentManagementService.DOC_UUID_LENGTH));
@@ -60,13 +61,13 @@ public class InvalidDocumentLinkException extends DocumentDownloadException {
     }
 
     static String appendCaseId(String message, String caseId) {
-        if (caseId == null || caseId.isBlank() || message == null || message.contains(" for case ")) {
+        if (caseId == null || caseId.isBlank() || message == null || message.contains(FOR_CASE)) {
             return message;
         }
         int colon = message.indexOf(": ");
         if (colon < 0) {
-            return message + " for case " + caseId;
+            return message + FOR_CASE + caseId;
         }
-        return message.substring(0, colon) + " for case " + caseId + message.substring(colon);
+        return message.substring(0, colon) + FOR_CASE + caseId + message.substring(colon);
     }
 }

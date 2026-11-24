@@ -75,14 +75,6 @@ public class ExternalTaskListenerConfiguration {
     }
 
     /**
-     * HttpClient 5 pool tuning for Camunda {@code fetchAndLock} (EXC-CS-037).
-     *
-     * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
-     * are reused after Camunda pod restarts or idle timeouts and surface as
-     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
-     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
-     */
-    /**
      * Topics whose handlers are batch dispatchers. They either sleep on the subscription thread
      * via {@code BaseExternalTaskHandler.throttle()} once a batch exceeds 25, or they process very
      * large batches. Isolating them stops a paced batch stalling pickup for case driven work.
@@ -188,6 +180,14 @@ public class ExternalTaskListenerConfiguration {
         return buildClient(newBackoffStrategy(), eventProperties.getSchedulerMaxTasks());
     }
 
+    /**
+     * HttpClient 5 pool tuning for Camunda {@code fetchAndLock} (EXC-CS-037).
+     *
+     * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
+     * are reused after Camunda pod restarts or idle timeouts and surface as
+     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
+     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
+     */
     private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy, int maxTasks) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())

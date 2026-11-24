@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -257,6 +256,6 @@ class AllGaPartiesEmailGeneratorTest {
             .getPartiesToNotify(gaCaseData, TASK_ID);
 
         assertThat(parties).hasSize(1);
-        verify(coreCaseDataService, never()).getCase(eq(0L));
+        verify(coreCaseDataService, never()).getCase(0L);
     }
 }
