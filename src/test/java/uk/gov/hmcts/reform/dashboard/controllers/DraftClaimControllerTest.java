@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimAlreadyExistsException;
-import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -109,11 +108,14 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldThrowNotFoundWhenNoDraftExistsForCase() {
+    void shouldReturnNoContentWhenNoDraftExistsForCase() {
         when(draftClaimService.getDraftClaimForCase(USER_ID, CASE_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> controller.getDraftClaimForCase(CASE_ID, AUTH))
-            .isInstanceOf(DraftClaimNotFoundException.class);
+        ResponseEntity<DraftClaimResponse> response = controller.getDraftClaimForCase(CASE_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(draftClaimService).getDraftClaimForCase(USER_ID, CASE_ID);
     }
 
     @Test
@@ -125,6 +127,17 @@ class DraftClaimControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
+        verify(draftClaimService).getActiveDraftClaimForUser(USER_ID);
+    }
+
+    @Test
+    void shouldReturnNoContentWhenNoActiveDraftExists() {
+        when(draftClaimService.getActiveDraftClaimForUser(USER_ID)).thenReturn(Optional.empty());
+
+        ResponseEntity<DraftClaimResponse> response = controller.getActiveDraftClaim(AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
         verify(draftClaimService).getActiveDraftClaimForUser(USER_ID);
     }
 
