@@ -164,6 +164,8 @@ search:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
   defendant-response:
     pageSize: ${SEARCH_PAGE_SIZE_DEFENDANT_RESPONSE:50}
+  breathing-space-lift-pending:
+    pageSize: ${SEARCH_PAGE_SIZE_BREATHING_SPACE_LIFT_PENDING:50}
   evidence-upload:
     pageSize: ${SEARCH_PAGE_SIZE_EVIDENCE_UPLOAD:50}
   hearing-fee:
@@ -574,9 +576,13 @@ notifications:
 
   notifyApplicant1EnteredBreathingSpaceLip: "a615b5f4-4c51-42e5-baef-6f99fb7a760f"
   notifyEnteredBreathingSpaceForDefendantLip: "159c514a-57ef-41ae-b379-2f2ef6b1a985"
+  notifyApplicant1EnteredBreathingSpaceLipWelsh: "9d590339-194c-4bd9-96c4-4f2457218fc6"
+  notifyEnteredBreathingSpaceForDefendantLipWelsh: "98605ac9-f4db-406e-aa47-7b83ffca53af"
 
   notifyLiPApplicantBreathingSpaceLifted: "2e3387f3-a8fa-4411-aeb1-8c6e0e3d81f9"
+  notifyLiPApplicantBreathingSpaceLiftedWelsh: "44100d49-d8b7-4c70-bcd5-9347f9d0110c"
   notifyLiPRespondentBreathingSpaceLifted: "9dcb54ea-1402-422f-9f8d-e220c0d3a7e4"
+  notifyLiPRespondentBreathingSpaceLiftedWelsh: "52440946-2dc5-411f-8a54-454bbe36c4e1"
 
   notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "3cdd5e80-e243-4502-9fd9-857cb594ccb6"
   notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "814b10ef-3ddc-4be8-87c2-00cdee065b48"

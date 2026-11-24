@@ -39,6 +39,12 @@ import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaiman
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.areRespondentSolicitorsPresent;
 
+/**
+ * Retained for pre-migration GA translated-document process instances until they have drained.
+ *
+ * @deprecated Replaced by GaTranslatedDocumentUploadedNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Slf4j
 @Service
 @RequiredArgsConstructor
