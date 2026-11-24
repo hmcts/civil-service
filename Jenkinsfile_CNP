@@ -190,21 +190,9 @@ withPipeline(type, product, component) {
           def chartCheckDir = sh(script: 'mktemp -d', returnStdout: true).trim()
           withEnv(["CHART_CHECK_DIR=${chartCheckDir}"]) {
             try {
-              sh 'cp -R charts/civil-service "$CHART_CHECK_DIR/civil-service"'
-              // Match Infrastructure@2.13.6's published chart: preview/staging keep these dependencies.
-              def chart = readYaml(file: "${chartCheckDir}/civil-service/Chart.yaml")
-              def previewDependencies = (chart.annotations?.get('hmcts.github.io/skip-publish') ?: '')
-                .split(',').collect { it.trim() }.findAll { it }
-              def dependencyNames = (chart.dependencies ?: []).collect { it.alias ?: it.name }
-              def unknownDependencies = previewDependencies.findAll { !dependencyNames.contains(it) }
-              if (unknownDependencies) {
-                error("Unknown skip-publish dependencies: ${unknownDependencies.join(', ')}")
-              }
-              chart.dependencies = (chart.dependencies ?: []).findAll {
-                !previewDependencies.contains(it.alias ?: it.name)
-              }
-              echo "Checking published chart dependencies: ${chart.dependencies.collect { it.alias ?: it.name }.join(', ')}"
-              writeYaml(file: "${chartCheckDir}/civil-service/Chart.yaml", data: chart, overwrite: true)
+              def charts = load 'bin/helm/preview-chart.groovy'
+              def checkPreview = charts.previewCheckRequired()
+              charts.prepareSlim("${chartCheckDir}/civil-service")
               sh '''
                 set -eu
                 # Match the Azure CLI profile used by withAcrClient's subscription login.
@@ -214,8 +202,6 @@ withPipeline(type, product, component) {
                 else
                   AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
                 fi
-                # Rebuild the lock after removing preview dependencies, as the publisher does.
-                rm -f "$CHART_CHECK_DIR/civil-service/Chart.lock"
                 helm dependency build "$CHART_CHECK_DIR/civil-service"
                 helm package "$CHART_CHECK_DIR/civil-service" --destination "$CHART_CHECK_DIR/package"
                 chart_size_script="$PWD/.github/scripts/check-chart-size.py"
@@ -224,6 +210,11 @@ withPipeline(type, product, component) {
                   python3 "$chart_size_script"
                 )
               '''
+              if (checkPreview) {
+                def directory = "${chartCheckDir}/civil-service-preview"
+                charts.prepare(directory)
+                charts.verify(directory)
+              }
             } finally {
               sh 'rm -rf "$CHART_CHECK_DIR"'
             }
@@ -245,6 +236,26 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
     env.STASH_DIAGNOSTICS = 'false'
+
+    afterSuccess('Publish Helm chart') {
+      catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE', catchInterruptions: false,
+        message: 'Companion chart publication failed. Check civil-service-preview in ACR and retry the master build.') {
+        def directory = 'charts/civil-service-preview'
+        try {
+          def charts = load 'bin/helm/preview-chart.groovy'
+          charts.prepare(directory)
+          helmPublish(
+            appPipelineConfig: pipelineConf,
+            subscription: new uk.gov.hmcts.contino.Subscription(env).nonProdName,
+            environment: new uk.gov.hmcts.contino.Environment(env).nonProdName,
+            product: product,
+            component: 'service-preview'
+          )
+        } finally {
+          dir(directory) { deleteDir() }
+        }
+      }
+    }
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
