@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
-import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -45,10 +44,8 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -56,7 +53,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 @SpringBootTest(classes = {
     NotifyRoboticsOnContinuousFeedHandler.class,
     RoboticsNotifier.class,
-    JsonSchemaValidationService.class,
     RoboticsDataMapperForUnspec.class,
     RoboticsDataMapperForSpec.class,
     RoboticsAddressMapper.class,
@@ -96,9 +92,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     LocationRefDataUtil locationRefDataUtil;
     @Autowired
     private NotifyRoboticsOnContinuousFeedHandler handler;
-
-    @MockitoBean
-    private JsonSchemaValidationService validationService;
 
     @Nested
     class ValidJsonPayload {
@@ -143,15 +136,18 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
-            when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            doThrow(new JsonSchemaValidationException("Invalid final payload", Set.of(
+                new ValidationMessage.Builder().build()))).when(roboticsNotificationService)
+                .notifyRobotics(caseData, false, params.getParams().get(BEARER_TOKEN).toString());
             assertThrows(
                 JsonSchemaValidationException.class,
                 () -> handler.handle(params)
             );
-            verifyNoInteractions(roboticsNotificationService);
+
         }
 
     }

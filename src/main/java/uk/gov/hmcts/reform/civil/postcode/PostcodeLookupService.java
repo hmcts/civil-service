@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -39,6 +40,15 @@ public class PostcodeLookupService {
         return (countryName != null
             && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase(Locale.UK))
             || CountriesAllowed.WALES.name().equals(countryName.toUpperCase(Locale.UK))));
+    }
+
+    public Optional<String> findCountryForPostcode(String postcode) {
+        try {
+            return Optional.ofNullable(fetchCountryFromPostCode(postcode.toUpperCase(Locale.UK)));
+        } catch (RuntimeException exception) {
+            LOG.warn("Postcode country unavailable; retaining the original RPA address");
+            return Optional.empty();
+        }
     }
 
     private String fetchCountryFromPostCode(String postcode) {

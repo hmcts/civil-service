@@ -29,6 +29,26 @@ class PostcodeLookupServiceTest {
     @Autowired
     private PostcodeLookupService postcodeLookupService;
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {
+        "{}", "{\"results\":[]}",
+        "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"OTHER\",\"COUNTRY\":\"England\"}}]}"
+    })
+    void unknownCountryDoesNotFailRpaLookup(String body) {
+        mockConfiguration();
+        mockExchangeResponse(new ResponseEntity<>(body, HttpStatus.OK));
+        assertThat(postcodeLookupService.findCountryForPostcode("IG11 7YL")).isEmpty();
+    }
+
+    @Test
+    void lookupFailureIsUnknownForRpa() {
+        mockConfiguration();
+        when(restTemplate.exchange(ArgumentMatchers.anyString(), ArgumentMatchers.any(HttpMethod.class),
+                                  ArgumentMatchers.<HttpEntity<?>>any(), ArgumentMatchers.<Class<String>>any()))
+            .thenThrow(new RuntimeException("Unavailable"));
+        assertThat(postcodeLookupService.findCountryForPostcode("IG11 7YL")).isEmpty();
+    }
+
     @Test
     void shouldReturnFalseWhenCountryIsNullGivenPostCodeIsValid() {
         mockConfiguration();
