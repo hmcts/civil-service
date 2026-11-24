@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,10 +36,10 @@ class RaiseQueryWorkflowTest extends WorkflowIntegrationTest {
 
     private static final String TEST_USER_ID = "test-user-id";
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @BeforeEach

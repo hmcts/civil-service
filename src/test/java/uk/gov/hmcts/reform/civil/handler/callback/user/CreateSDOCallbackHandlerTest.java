@@ -12,10 +12,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -225,7 +224,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
@@ -357,10 +356,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         return witnessStatements;
     }
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @MockitoBean
@@ -375,19 +374,19 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private SdoNarrativeService sdoNarrativeService;
 
-    @MockBean
+    @MockitoBean
     protected LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private SdoGeneratorService sdoGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private CategoryService categoryService;
 
     @Value("${court-location.unspecified-claim.epimms-id}")
