@@ -178,6 +178,7 @@ public class FeatureToggleService {
     public boolean isEarlyClaimTerminationEnabled() {
         return featureToggleApi.isFeatureEnabled("early-claim-termination");
     }
+
     public boolean isBreathingSpaceEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-breathing-space");
     }
