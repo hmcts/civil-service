@@ -3,11 +3,12 @@ package uk.gov.hmcts.reform.civil.health;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthContributorAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
-import org.springframework.boot.actuate.health.HealthComponent;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.autoconfigure.contributor.HealthContributorAutoConfiguration;
+import org.springframework.boot.health.autoconfigure.actuate.endpoint.HealthEndpointAutoConfiguration;
+import org.springframework.boot.health.autoconfigure.registry.HealthContributorRegistryAutoConfiguration;
+import org.springframework.boot.health.actuate.endpoint.HealthDescriptor;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.health.contributor.Status;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.mock;
         S2sSecretReadinessDisabledStartupIntegrationTest.TestConfig.class,
         EndpointAutoConfiguration.class,
         HealthContributorAutoConfiguration.class,
+        HealthContributorRegistryAutoConfiguration.class,
         HealthEndpointAutoConfiguration.class,
     },
     properties = {
@@ -56,7 +58,7 @@ class S2sSecretReadinessDisabledStartupIntegrationTest {
     void contextStartsAndS2sGroupIsUpWhenTheCheckIsDisabled() {
         // Reaching this assertion proves the context started with the check disabled and the s2s
         // group still referencing the contributor under group-membership validation.
-        HealthComponent s2s = healthEndpoint.healthForPath("s2s");
+        HealthDescriptor s2s = healthEndpoint.healthForPath("s2s");
 
         assertThat(s2s.getStatus()).isEqualTo(Status.UP);
     }
