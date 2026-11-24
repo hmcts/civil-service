@@ -20,7 +20,7 @@ class VerificationTests(unittest.TestCase):
         self.root = Path(temporary.name)
         (self.root / '.github').mkdir()
         (self.root / 'docs').mkdir()
-        self.sources = {name: digit * 40 for name, digit in zip(docs.REPOSITORIES, ('a', 'b'))}
+        self.sources = {docs.REPOSITORIES[0]: 'a' * 40}
         (self.root / docs.MANIFEST).write_text(json.dumps(self.sources))
         self.markdown = '|head|\n|---|\n|row|\n'
         self.html = '<html>generated</html>\n'
@@ -28,15 +28,26 @@ class VerificationTests(unittest.TestCase):
             (self.root / name).write_text('old content')
 
     def generation(self, command, **kwargs):
+        self.command = command
         Path(command[command.index('--output') + 1]).write_text(self.markdown)
         Path(command[command.index('--html-output') + 1]).write_text(self.html)
 
-    def run_mode(self, mode):
+    def run_mode(self, mode, roots=None):
+        roots = roots if roots is not None else (self.root / 'civil', self.root / 'ga')
+        self.stdout = io.StringIO()
         with patch.object(docs.subprocess, 'run', side_effect=self.generation), \
                 patch.object(docs, 'git', return_value='c' * 40), \
                 patch.dict(os.environ, {}, clear=True), \
-                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            return docs.generate(mode, self.root / 'civil', self.root / 'ga', self.root)
+                contextlib.redirect_stdout(self.stdout), contextlib.redirect_stderr(io.StringIO()):
+            return docs.generate(mode, *roots, root=self.root)
+
+    def generated_roots(self):
+        return tuple(Path(self.command[self.command.index(flag) + 1])
+                     for flag in ('--ccd-definition-root', '--ga-ccd-definition-root'))
+
+    def add_toggle(self):
+        (self.root / docs.TOGGLE).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / docs.TOGGLE).write_text('civil-service is the source of truth\n')
 
     def test_sync_rejects_stale_outputs_without_modifying_them(self):
         self.assertEqual(1, self.run_mode('sync'))
@@ -65,6 +76,56 @@ class VerificationTests(unittest.TestCase):
         (self.root / docs.MANIFEST).write_text('{}')
         with self.assertRaises(ValueError):
             docs.load_sources(self.root)
+
+    def test_default_roots_read_civil_and_ga_from_the_civil_ccd_definition_checkout(self):
+        self.assertEqual(0, self.run_mode('report', roots=()))
+        checkout = (self.root / 'civil-ccd-definition/ccd-definition').resolve()
+        self.assertEqual((checkout, checkout / 'generalapplication'), self.generated_roots())
+        self.assertIn(f'- civil-ccd-definition: `{"a" * 40}`', self.stdout.getvalue())
+
+    def test_toggle_reads_in_repo_definitions_without_a_manifest(self):
+        self.add_toggle()
+        (self.root / docs.MANIFEST).write_text('{"stale": "pin"}')
+        self.assertEqual(0, self.run_mode('report', roots=()))
+        self.assertEqual(((self.root / 'ccd-definition/civil').resolve(),
+                          (self.root / 'ccd-definition/generalapplication').resolve()), self.generated_roots())
+        self.assertIn(f'- CCD definitions: in-repo `ccd-definition/` ({docs.TOGGLE} is present)',
+                      self.stdout.getvalue())
+        self.assertNotIn('civil-ccd-definition:', self.stdout.getvalue())
+        (self.root / docs.TOGGLE).unlink()
+        with self.assertRaises(ValueError):
+            self.run_mode('report', roots=())
+
+    def test_toggle_leaves_nothing_to_record(self):
+        self.add_toggle()
+        with self.assertRaises(ValueError):
+            docs.record_sources(self.root / 'civil-ccd-definition', self.root)
+        self.assertEqual(self.sources, json.loads((self.root / docs.MANIFEST).read_text()))
+
+    def test_refs_select_the_pinned_checkout_or_none_with_the_toggle(self):
+        def refs(*args, in_repo):
+            output = io.StringIO()
+            with patch.object(docs, 'in_repo_definitions', return_value=in_repo), \
+                    patch.object(docs, 'load_sources', return_value=self.sources) as load, \
+                    contextlib.redirect_stdout(output):
+                self.assertEqual(0, docs.main(['refs', *args]))
+            return output.getvalue(), load.called
+        self.assertEqual((f'civil_ref={"a" * 40}\nin_repo=false\n', True), refs(in_repo=False))
+        self.assertEqual(('civil_ref=\nin_repo=false\n', True), refs('--refresh', in_repo=False))
+        self.assertEqual(('civil_ref=\nin_repo=true\n', False), refs(in_repo=True))
+        self.assertEqual(('civil_ref=\nin_repo=true\n', False), refs('--refresh', in_repo=True))
+
+    def test_in_repo_definitions_are_inputs_only_with_the_toggle(self):
+        for path in ('ccd-definition/civil/CaseEvent/User/x.json',
+                     'ccd-definition/generalapplication/CaseEvent/x.json'):
+            with self.subTest(path=path):
+                self.assertEqual('skip', docs.classify([path]))
+                self.assertEqual('report', docs.classify([path], in_repo=True))
+        self.assertEqual('skip', docs.classify(['ccd-definition/test/utils/x.js'], in_repo=True))
+        self.assertEqual('sync', docs.classify([docs.TOGGLE]))
+        with patch.object(docs, 'in_repo_definitions', return_value=True), \
+                patch.object(docs, 'git', side_effect=['commit', 'ccd-definition/civil/CaseEvent/x.json\0']):
+            self.assertEqual('report', docs.classify_commits('a' * 40, 'b' * 40))
 
     def test_change_policy_covers_templates_and_combined_source_document_changes(self):
         self.assertEqual('skip', docs.classify(['README.md', 'build.gradle']))
