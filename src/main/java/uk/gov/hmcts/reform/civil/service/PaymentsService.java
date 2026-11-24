@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
@@ -46,6 +47,7 @@ public class PaymentsService {
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
     private final HearingFeesService hearingFeesService;
+    private final ServiceRequestLookupService serviceRequestLookupService;
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
@@ -177,14 +179,35 @@ public class PaymentsService {
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
         CreateServiceRequestDTO paymentRequest = buildServiceRequest(caseData);
+        Optional<PaymentServiceResponse> existing = findUnpaidServiceRequest(paymentRequest, authToken);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
         log.info("Calling payment service request for case {} and callbackUrl {} ", caseData.getCcdCaseReference(), paymentRequest.getCallBackUrl());
         return paymentsClient.createServiceRequest(authToken, paymentRequest);
     }
 
     public PaymentServiceResponse createServiceRequestGa(GeneralApplicationCaseData caseData, String authToken) {
         CreateServiceRequestDTO paymentRequest = buildServiceRequest(caseData);
+        Optional<PaymentServiceResponse> existing = findUnpaidServiceRequest(paymentRequest, authToken);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
         log.info("Calling payment service request for general application case {} and callbackUrl {} ", caseData.getCcdCaseReference(), paymentRequest.getCallBackUrl());
         return paymentsClient.createServiceRequest(authToken, paymentRequest);
+    }
+
+    /**
+     * A retry after a payments call that succeeded but whose CCD event was not saved must not raise a second
+     * service request for the same fee (DTSCCI-7095), so an unpaid one with exactly these fees is reused.
+     */
+    private Optional<PaymentServiceResponse> findUnpaidServiceRequest(CreateServiceRequestDTO paymentRequest, String authToken) {
+        return serviceRequestLookupService.findUnpaidServiceRequest(paymentRequest, authToken)
+            .map(reference -> {
+                log.info("Reusing unpaid service request {} for case {} instead of creating another",
+                         reference, paymentRequest.getCcdCaseNumber());
+                return PaymentServiceResponse.builder().serviceRequestReference(reference).build();
+            });
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
