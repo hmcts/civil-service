@@ -7,24 +7,19 @@ import feign.Retryer;
 import feign.Target;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
-import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -41,9 +36,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * interface (this service's own clients and the library clients on the classpath) and fails when
  * one has not been classified here, so the decision is made when the endpoint is added rather
  * than discovered in production. It also checks that each classification agrees with the allowlist
- * set in {@code application.yaml}, the only place it is configured and the value the application
- * loads. Each endpoint is checked as a request from its own {@code @FeignClient} name, because
- * the allowlist matches on client name and path suffix.</p>
+ * {@link HttpClientFeignConfiguration#DEFAULT_REPLAY_ON_READ_TIMEOUT}, the only place it is defined.
+ * Each endpoint is checked as a request from its own {@code @FeignClient} name, because the
+ * allowlist matches on client name and path suffix.</p>
  *
  * <p>Only endpoints declared with Spring MVC mapping annotations on a {@code @FeignClient}
  * interface, including methods it inherits, are found. Feign-native {@code @RequestLine}
@@ -194,15 +189,6 @@ class FeignWriteEndpointReplayPolicyTest {
         return configuration.feignRetryer(null);
     }
 
-    private static String applicationYamlAllowlist() throws IOException {
-        List<PropertySource<?>> documents = new YamlPropertySourceLoader()
-            .load("application.yaml", new ClassPathResource("application.yaml"));
-        StandardEnvironment environment = new StandardEnvironment();
-        // the first document is the one with no profile, which every environment loads
-        environment.getPropertySources().addLast(documents.get(0));
-        return environment.getProperty(REPLAY_PROPERTY);
-    }
-
     private static Map<String, Boolean> mismatchesWithClassification(String allowlist) {
         Retryer retryer = retryerWithAllowlist(allowlist);
         Map<String, Endpoint> endpoints = discoverWriteEndpoints();
@@ -223,7 +209,7 @@ class FeignWriteEndpointReplayPolicyTest {
 
         assertThat(unclassified)
             .as("New POST/PUT/PATCH Feign endpoint(s). Decide whether each is read-only (add true here AND "
-                    + "add <feign-client-name>:<path-suffix> to http.client.retry.replay-on-read-timeout in application.yaml "
+                    + "add <feign-client-name>:<path-suffix> to HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT "
                     + "so a read timeout is still replayed) or a write "
                     + "(add false here: it is never replayed after a read timeout).")
             .isEmpty();
@@ -240,25 +226,31 @@ class FeignWriteEndpointReplayPolicyTest {
     }
 
     @Test
-    void applicationYamlAllowlistMatchesTheClassification() throws IOException {
-        String allowlist = applicationYamlAllowlist();
-        assertThat(allowlist).as(REPLAY_PROPERTY + " in application.yaml").isNotBlank();
+    void codeDefaultIsUsedWhenThePropertyIsMissing() {
+        // the expression HttpClientFeignConfiguration passes to @Value; the entries contain colons
+        String resolved = new StandardEnvironment().resolvePlaceholders(
+            "${" + REPLAY_PROPERTY + ":" + HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT + "}");
 
-        assertThat(mismatchesWithClassification(allowlist))
-            .as("endpoints whose replay after a read timeout under application.yaml differs from the classification"
+        assertThat(resolved).isEqualTo(HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT);
+    }
+
+    @Test
+    void allowlistMatchesTheClassification() {
+        assertThat(mismatchesWithClassification(HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT))
+            .as("endpoints whose replay after a read timeout under the allowlist differs from the classification"
                     + " (value shown is whether it was replayed)")
             .isEmpty();
     }
 
     @Test
-    void allowlistEntriesAreScopedToAFeignClient() throws IOException {
+    void allowlistEntriesAreScopedToAFeignClient() {
         Set<String> clientNames = new TreeSet<>();
         discoverWriteEndpoints().values().forEach(endpoint -> clientNames.add(endpoint.feignClientName()));
 
-        for (String entry : applicationYamlAllowlist().split(",")) {
+        for (String entry : HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT.split(",")) {
             ReadTimeoutAwareRetryer.AllowlistEntry parsed = ReadTimeoutAwareRetryer.AllowlistEntry.parse(entry);
             assertThat(parsed.clientName())
-                .as("allowlist entry '%s' in application.yaml must name the @FeignClient it applies to", entry.trim())
+                .as("allowlist entry '%s' must name the @FeignClient it applies to", entry.trim())
                 .isIn(clientNames);
         }
     }
