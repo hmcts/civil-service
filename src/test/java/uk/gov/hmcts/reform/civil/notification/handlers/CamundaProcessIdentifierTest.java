@@ -10,7 +10,7 @@ class CamundaProcessIdentifierTest {
     @Test
     void shouldContainAllExpectedEnumValues() {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
-        assertThat(values).hasSize(80)
+        assertThat(values).hasSize(82)
             .contains(
                 CamundaProcessIdentifier.ClaimDismissedNotifyParties,
                 CamundaProcessIdentifier.ClaimantConfirmProceedNotifyParties,
@@ -91,7 +91,9 @@ class CamundaProcessIdentifierTest {
                 CamundaProcessIdentifier.StayCaseNotifyParties,
                 CamundaProcessIdentifier.StayLiftedNotifyParties,
                 CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties,
-                CamundaProcessIdentifier.StayUpdateRequestedNotifyParties
+                CamundaProcessIdentifier.StayUpdateRequestedNotifyParties,
+                CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties,
+                CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties
         );
     }
 
@@ -121,11 +123,12 @@ class CamundaProcessIdentifierTest {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
 
         assertThat(values)
-            .satisfies(v -> assertThat(v[0]).isEqualTo(CamundaProcessIdentifier.ClaimDismissedNotifyParties))
-            .satisfies(v -> assertThat(v[75]).isEqualTo(CamundaProcessIdentifier.RequestJudgementByAdmissionNotifyParties))
-            .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayCaseNotifyParties))
-            .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))
-            .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))
-            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties));
+              .satisfies(v -> assertThat(v[75]).isEqualTo(CamundaProcessIdentifier.RequestJudgementByAdmissionNotifyParties))                                                                                                                                                                             
+              .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayCaseNotifyParties))                                                                                                                                                                                                
+              .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))                                                                                                                                                                                              
+              .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))                                                                                                                                                                             
+              .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties))                                                                                                                                                                                     
+              .satisfies(v -> assertThat(v[80]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties))                                                                                                                                                                                     
+              .satisfies(v -> assertThat(v[81]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties));    
     }
 }

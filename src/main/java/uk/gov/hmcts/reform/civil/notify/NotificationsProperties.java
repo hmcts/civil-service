@@ -428,10 +428,16 @@ public class NotificationsProperties {
     private String notifyApplicant1EnteredBreathingSpaceLip;
 
     @NotEmpty
+    private String notifyApplicant1EnteredBreathingSpaceLipWelsh;
+
+    @NotEmpty
     private String notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate;
 
     @NotEmpty
     private String notifyEnteredBreathingSpaceForDefendantLip;
+
+    @NotEmpty
+    private String notifyEnteredBreathingSpaceForDefendantLipWelsh;
 
     @NotEmpty
     private String notifyDefendantLrTemplate;
@@ -443,7 +449,13 @@ public class NotificationsProperties {
     private String notifyLiPApplicantBreathingSpaceLifted;
 
     @NotEmpty
+    private String notifyLiPApplicantBreathingSpaceLiftedWelsh;
+
+    @NotEmpty
     private String notifyLiPRespondentBreathingSpaceLifted;
+
+    @NotEmpty
+    private String notifyLiPRespondentBreathingSpaceLiftedWelsh;
 
     @NotEmpty
     private String claimantLipDeadlineExtension;
