@@ -45,7 +45,7 @@ public class JudgmentAmountsCalculator {
                         caseData.getFixedCosts().getFixedCostAmount()))));
             }
         }
-        return claimFeePounds.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : claimFeePounds.setScale(2);
+        return claimFeePounds.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : claimFeePounds.setScale(2);
     }
 
     public BigDecimal getDebtAmount(CaseData caseData) {

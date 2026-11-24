@@ -210,7 +210,7 @@ public class SubmitClaimTask {
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
             caseData.setSdtRequestId(stdRequestIdList);
             BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
-            if (!bulkInterest.equals(BigDecimal.ZERO)) {
+            if (bulkInterest.compareTo(BigDecimal.ZERO) != 0) {
                 caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
             }
             caseData.setClaimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));

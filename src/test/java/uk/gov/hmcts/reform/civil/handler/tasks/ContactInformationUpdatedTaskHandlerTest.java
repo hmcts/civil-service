@@ -71,10 +71,6 @@ class ContactInformationUpdatedTaskHandlerTest {
             caseDetailsConverter,
             objectMapper
         );
-    }
-
-    @BeforeEach
-    void init() {
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
             "caseEvent", CONTACT_INFORMATION_UPDATED.name()

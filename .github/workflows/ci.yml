@@ -50,7 +50,7 @@ jobs:
         env:
           POSTGRES_DB: cmc
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         ports:
           - 5432:5432
         options: >-
@@ -91,7 +91,7 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_JDBC_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         run: ./gradlew integration
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
