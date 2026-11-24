@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -45,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_STATE_TO_AWAIT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_DEADLINE_CHECK;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESPONSE;
+import uk.gov.hmcts.reform.civil.scheduler.garesponsedeadline.GAResponseDeadlineScheduler;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @ExtendWith(MockitoExtension.class)
 class GAResponseDeadlineTaskHandlerTest {
@@ -60,6 +63,9 @@ class GAResponseDeadlineTaskHandlerTest {
 
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
@@ -89,8 +95,10 @@ class GAResponseDeadlineTaskHandlerTest {
             eventProperties,
             caseSearchService,
             coreCaseDataService,
-            caseDetailsConverter
+            caseDetailsConverter,
+            featureToggleService
         );
+        lenient().when(featureToggleService.isSpringSchedulerEnabled(GAResponseDeadlineScheduler.SCHEDULER_NAME)).thenReturn(false);
 
         caseDetails1 = CaseDetails.builder().id(1L).data(
             Map.of("generalAppNotificationDeadlineDate", deadlineCrossed.toString())).build();
@@ -192,6 +200,17 @@ class GAResponseDeadlineTaskHandlerTest {
             body,
             Map.of()
         );
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(GAResponseDeadlineScheduler.SCHEDULER_NAME)).thenReturn(true);
+
+        gaResponseDeadlineTaskHandler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(caseSearchService);
+        verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
     }
 
     @Test

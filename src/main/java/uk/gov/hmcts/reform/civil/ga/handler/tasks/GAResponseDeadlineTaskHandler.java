@@ -23,7 +23,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_D
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESPONSE;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.scheduler.garesponsedeadline.GAResponseDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 @Component
@@ -36,21 +38,27 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
 
     private final CaseDetailsConverter caseDetailsConverter;
 
+    private final FeatureToggleService featureToggleService;
+
     public GAResponseDeadlineTaskHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseStateSearchService caseSearchService,
         GaCoreCaseDataService coreCaseDataService,
-        CaseDetailsConverter caseDetailsConverter
+        CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(GAResponseDeadlineScheduler.SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
         Set<CaseDetails> cases = getAwaitingResponseCasesThatArePastDueDate();
         List<Long> ids = cases.stream().map(CaseDetails::getId).toList();
         log.info("GAResponseDeadlineTaskHandler Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);

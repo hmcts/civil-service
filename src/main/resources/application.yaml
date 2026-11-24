@@ -147,6 +147,8 @@ scheduler:
     cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
   manage-stay-wa-task:
     cronExpression: ${CRON_EXPRESSION_MANAGE_STAY_WA_TASK:0 20 1 * * ?}
+  ga-response-deadline:
+    cronExpression: ${CRON_EXPRESSION_GA_RESPONSE_DEADLINE:0 15 17 * * ?}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
