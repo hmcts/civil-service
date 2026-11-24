@@ -13,7 +13,5 @@ public class BreathingSpaceLiftInfo {
 
     private LocalDate expectedEnd;
 
-    private String event;
-
-    private String eventDescription;
+    private String reasonToLift;
 }

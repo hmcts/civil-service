@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -197,6 +198,7 @@ public class GaCoreCaseDataService {
     }
 
     public SearchResult searchGeneralApplication(Query query, String userToken) {
+        Objects.requireNonNull(query, "query");
         return coreCaseDataApi.searchCases(
                 userToken,
                 authTokenGenerator.generate(),
