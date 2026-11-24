@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * {@code -parameters} or qualifies its injection points.
  */
 @Configuration
-@SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
+@SuppressWarnings({"HideUtilityClassConstructor", "java:S1118"}) // Spring needs a constructor, its not a utility class
 public class AuthCheckerHttpClientConfiguration {
 
     private static final String USER_TOKEN_PARSER_HTTP_CLIENT = "userTokenParserHttpClient";

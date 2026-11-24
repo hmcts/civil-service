@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +64,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         if (caseData.getBreathing().getEnter().getStart() != null
-            && caseData.getBreathing().getEnter().getStart().isAfter(LocalDate.now())) {
+            && caseData.getBreathing().getEnter().getStart().isAfter(LocalDate.now(LOCAL_ZONE))) {
             errors.add("Start date must be today or before.");
         }
 
@@ -93,7 +94,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         if (caseData.getBreathing() != null
             && caseData.getBreathing().getEnter() != null
             && caseData.getBreathing().getEnter().getStart() == null) {
-            caseData.getBreathing().getEnter().setStart(LocalDate.now());
+            caseData.getBreathing().getEnter().setStart(LocalDate.now(LOCAL_ZONE));
         }
 
         BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
