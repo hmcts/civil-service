@@ -3,7 +3,7 @@ ARG APP_INSIGHTS_AGENT_VERSION=3.7.10
 
 # Application image
 
-FROM hmctsprod.azurecr.io/base/java:25-distroless
+FROM 'hmctsprod.azurecr.io/base/java${PLATFORM}:21-debian13-distroless'
 
 # Change to non-root privilege
 USER hmcts
