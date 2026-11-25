@@ -356,6 +356,25 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertEquals(hearingDate, updatedData.getHearingDate());
                 assertEquals("1030", updatedData.getHearingTimeHourMinute());
             }
+
+            @Test
+            void shouldLeaveNextHearingDetailsUnset_whenThereIsNoHearing() {
+                CaseData caseData = CaseDataBuilder.builder().build();
+                when(hearingService.getHearings(any(), any(), any()))
+                    .thenReturn(new HearingsResponse().setCaseHearings(List.of()));
+
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
+                    ABOUT_TO_SUBMIT
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertNull(updatedData.getNextHearingDetails());
+            }
         }
 
         @Nested

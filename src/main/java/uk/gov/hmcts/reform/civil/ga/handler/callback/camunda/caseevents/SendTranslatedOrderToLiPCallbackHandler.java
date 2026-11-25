@@ -83,6 +83,10 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler imp
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         if (printServiceEnabled && isDocumentCorrectType(caseData)) {
+            if (caseData.getOriginalDocumentsBulkPrint() == null || caseData.getOriginalDocumentsBulkPrint().isEmpty()) {
+                throw new IllegalStateException("No original order available for bulk print for GA case "
+                                                      + caseData.getCcdCaseReference());
+            }
             CaseDocument originalCaseDocument = caseData.getOriginalDocumentsBulkPrint().get(caseData.getOriginalDocumentsBulkPrint().size() - 1).getValue();
             TranslatedDocument translatedCaseDocument = caseData.getTranslatedDocumentsBulkPrint().get(caseData.getTranslatedDocumentsBulkPrint().size() - 1)
                 .getValue();

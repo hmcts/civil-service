@@ -217,9 +217,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     ) {
         log.info("Retrying {} incidents across process instances", incidents.size());
         int poolSize = Math.min(MAX_THREADS, incidents.size());
-        ForkJoinPool customThreadPool = new ForkJoinPool(poolSize);
 
-        try {
+        try (ForkJoinPool customThreadPool = new ForkJoinPool(poolSize)) {
             customThreadPool.submit(() ->
                                         incidents.parallelStream().forEach(incident ->
                                                                                handleIncidentRetry(incident, retryContext))
@@ -229,8 +228,6 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             log.error("Incident retry execution was interrupted", ie);
         } catch (ExecutionException ee) {
             log.error("Error during parallel incident retries", ee.getCause());
-        } finally {
-            customThreadPool.shutdown();
         }
     }
 
