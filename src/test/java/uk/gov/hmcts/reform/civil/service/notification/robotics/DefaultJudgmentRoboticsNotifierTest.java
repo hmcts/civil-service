@@ -66,7 +66,7 @@ class DefaultJudgmentRoboticsNotifierTest {
     }
 
     @Test
-    void shouldOmitBreathingSpace_whenNotifyRobotics() throws Exception {
+    void shouldOmitBreathingSpace_whenNotifyRobotics() {
         CaseData data = CaseDataBuilder.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .respondent1Represented(YesOrNo.YES)

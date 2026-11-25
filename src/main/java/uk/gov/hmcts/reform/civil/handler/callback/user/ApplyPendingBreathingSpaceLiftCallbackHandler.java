@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_PENDING_BREATHI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +68,7 @@ public class ApplyPendingBreathingSpaceLiftCallbackHandler extends CallbackHandl
         // All three: still active, lift was requested, and the end date is today or earlier.
         boolean breathingSpaceStillActive = breathing.getActive() == YES;
         boolean liftIsPending = breathing.getLiftPending() == YES;
-        boolean endDateReached = !breathing.getLift().getExpectedEnd().isAfter(LocalDate.now());
+        boolean endDateReached = !breathing.getLift().getExpectedEnd().isAfter(LocalDate.now(LOCAL_ZONE));
 
         return breathingSpaceStillActive && liftIsPending && endDateReached;
     }

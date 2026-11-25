@@ -113,7 +113,7 @@ class FeignFailureHandlingTest {
             if (responseDelayMs > 0) {
                 try {
                     delayResponse();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException _) {
                     Thread.currentThread().interrupt();
                 }
             }

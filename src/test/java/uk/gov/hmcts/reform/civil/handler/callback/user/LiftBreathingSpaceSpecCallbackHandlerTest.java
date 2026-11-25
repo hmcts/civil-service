@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -87,7 +88,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         @Test
         public void prePopulateEndDateToToday_WhenMentalHealthBSType() {
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
 
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
@@ -99,16 +100,15 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-            LocalDate expectedEndDate = LocalDate.now();
+            callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now(LOCAL_ZONE);
             assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
         }
 
         @Test
         public void prePopulateEndDateToStartDatePlus60_WhenStandardBSType() {
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
 
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
@@ -120,9 +120,8 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-            LocalDate expectedEndDate = LocalDate.now().plusDays(60);
+            callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now(LOCAL_ZONE).plusDays(60);
             assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
         }
     }
@@ -134,11 +133,11 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateExceeds60DaysForStandardBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE).plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -156,11 +155,11 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateExceeds60DaysForMentalHealthBS_thenReturnNoError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE).plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -178,10 +177,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateIsNotAfterStartDate_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now().minusDays(30));
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE).minusDays(30));
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(31));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE).minusDays(31));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -199,11 +198,11 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateIsSameDateAsStartDateForStandardBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -221,11 +220,11 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateIsSameDateAsStartDateForMentalHealthBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -243,10 +242,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void whenEndDateIsAfterStartDate_thenReturnNoError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setStart(LocalDate.now(LOCAL_ZONE));
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE).plusDays(1));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -287,9 +286,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         @Test
         public void shouldStoreLiftOnOpenBreathingSpaceItem_whenInvoked() {
             BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-            enterInfo.setStart(LocalDate.now().minusDays(2));
+            enterInfo.setStart(LocalDate.now(LOCAL_ZONE).minusDays(2));
             BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
-            liftInfo.setExpectedEnd(LocalDate.now());
+            liftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE));
             liftInfo.setReasonToLift("reason");
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             breathingSpaceInfo.setEnter(enterInfo);
@@ -321,9 +320,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         public void shouldKeepBreathingSpaceActive_whenExpectedEndIsAfterToday() {
-            LocalDate expectedEnd = LocalDate.now().plusDays(10);
+            LocalDate expectedEnd = LocalDate.now(LOCAL_ZONE).plusDays(10);
             BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-            enterInfo.setStart(LocalDate.now().minusDays(1));
+            enterInfo.setStart(LocalDate.now(LOCAL_ZONE).minusDays(1));
             BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
             liftInfo.setExpectedEnd(expectedEnd);
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
@@ -376,7 +375,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         @Test
         public void whenExpectedEndIsAfterToday_thenConfirmItWillLiftOnThatDate() {
             String claimNumber = "claim number";
-            LocalDate expectedEnd = LocalDate.now().plusDays(10);
+            LocalDate expectedEnd = LocalDate.now(LOCAL_ZONE).plusDays(10);
             BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
             liftInfo.setExpectedEnd(expectedEnd);
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
