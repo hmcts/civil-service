@@ -18,9 +18,18 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = '.github/email-docs-sources.json'
-REPOSITORIES = ('civil-ccd-definition', 'civil-general-apps-ccd-definition')
+REPOSITORIES = ('civil-ccd-definition',)
+# ccd-definition/SOURCE_OF_TRUTH in this checkout means civil-service is the source of truth for the CCD
+# definitions (see ccd-definition/README.md; bin/shared/pull-ccd-definitions.sh checks the same path).
+# Generation then reads the in-repo copy, and nothing is checked out, pinned or recorded. Otherwise both
+# roots come from the civil-ccd-definition checkout at the recorded revision. Its ccd-definition/ already
+# holds generalapplication/, so the GA root adds no labels the Civil root lacks.
+TOGGLE = 'ccd-definition/SOURCE_OF_TRUTH'
+IN_REPO_DEFINITIONS = ('ccd-definition/civil', 'ccd-definition/generalapplication')
+IN_REPO_PREFIXES = tuple(f'{path}/' for path in IN_REPO_DEFINITIONS)
 DOCUMENTS = ('docs/email-notifications.md', 'docs/email-notifications.html')
-STRICT_FILES = {*DOCUMENTS, MANIFEST, 'scripts/generate_email_notifications_table.py', 'scripts/email_docs.py'}
+STRICT_FILES = {*DOCUMENTS, MANIFEST, TOGGLE,
+                'scripts/generate_email_notifications_table.py', 'scripts/email_docs.py'}
 STRICT_PREFIXES = ('.github/actions/email-docs/',)
 WORKFLOWS = {f'.github/workflows/{name}.yml' for name in (
     'update-email-docs', 'email-notifications', 'deploy-email-docs')}
@@ -39,11 +48,22 @@ def load_sources(root: Path = REPO_ROOT) -> dict:
     return {name: revision(sources[name]) for name in REPOSITORIES}
 
 
+def in_repo_definitions(root: Path = REPO_ROOT) -> bool:
+    return (root / TOGGLE).is_file()
+
+
+def definition_roots(root: Path = REPO_ROOT) -> tuple[Path, Path]:
+    if in_repo_definitions(root):
+        return tuple(root / path for path in IN_REPO_DEFINITIONS)
+    checkout = root / REPOSITORIES[0] / 'ccd-definition'
+    return checkout, checkout / 'generalapplication'
+
+
 def git(*args: str, cwd: Path = REPO_ROOT, input: str | None = None) -> str:
     return subprocess.check_output(['git', *args], cwd=cwd, input=input, text=True).strip()
 
 
-def classify(paths) -> str:
+def classify(paths, in_repo: bool = False) -> str:
     paths = set(paths)
     if any(path in STRICT_FILES or path in WORKFLOWS or path.startswith(STRICT_PREFIXES)
            or (path.startswith('scripts/tests/') and 'email' in path)
@@ -51,7 +71,9 @@ def classify(paths) -> str:
         return 'sync'
     if any(path.startswith(('src/main/java/', 'src/main/resources/camunda/',
                             'src/main/resources/notification-templates/'))
-           or path == 'src/main/resources/application.yaml' for path in paths):
+           or path == 'src/main/resources/application.yaml'
+           or (in_repo and path.startswith(IN_REPO_PREFIXES))
+           for path in paths):
         return 'report'
     return 'skip'
 
@@ -70,17 +92,23 @@ def classify_commits(base: str, head: str) -> str:
     if kind != 'commit':
         raise ValueError(f'Unexpected Git object probe result: {kind!r}')
     paths = git('diff', '--no-renames', '--name-only', '-z', base, head, '--').split('\0')
-    return classify(paths)
+    # The policy follows this checkout, which is the head being verified and generated from.
+    return classify(paths, in_repo_definitions())
 
 
-def record_sources(civil_checkout: Path, ga_checkout: Path, root: Path = REPO_ROOT) -> None:
-    sources = {name: revision(git('rev-parse', 'HEAD', cwd=checkout))
-               for name, checkout in zip(REPOSITORIES, (civil_checkout, ga_checkout))}
+def record_sources(civil_checkout: Path, root: Path = REPO_ROOT) -> None:
+    if in_repo_definitions(root):
+        raise ValueError(f'{TOGGLE} is present: CCD definitions are read from this repository, not recorded')
+    sources = {REPOSITORIES[0]: revision(git('rev-parse', 'HEAD', cwd=civil_checkout))}
     (root / MANIFEST).write_text(json.dumps(sources, indent=2) + '\n', encoding='utf-8')
 
 
-def generate(mode: str, civil_root: Path, ga_root: Path, root: Path = REPO_ROOT) -> int:
-    sources = load_sources(root)
+def generate(mode: str, civil_root: Path | None = None, ga_root: Path | None = None,
+             root: Path = REPO_ROOT) -> int:
+    in_repo = in_repo_definitions(root)
+    sources = {} if in_repo else load_sources(root)
+    default_civil_root, default_ga_root = definition_roots(root)
+    civil_root, ga_root = civil_root or default_civil_root, ga_root or default_ga_root
     with tempfile.TemporaryDirectory(prefix='email-docs-') as temporary:
         outputs = [Path(temporary) / Path(name).name for name in DOCUMENTS]
         command = [sys.executable, '-B', str(root / 'scripts/generate_email_notifications_table.py'),
@@ -104,7 +132,8 @@ def generate(mode: str, civil_root: Path, ga_root: Path, root: Path = REPO_ROOT)
         summary = '\n'.join([
             f'### Email notification documentation: {status}', '',
             f'- civil-service revision: `{git("rev-parse", "HEAD", cwd=root)}`',
-            *[f'- {name}: `{sha}`' for name, sha in sources.items()],
+            *([f'- CCD definitions: in-repo `ccd-definition/` ({TOGGLE} is present)'] if in_repo else
+              [f'- {name}: `{sha}`' for name, sha in sources.items()]),
             f'- Generated data rows: {rows}', f'- Generated HTML SHA-256: `{checksum}`',
             f'- Changed outputs: {", ".join(differences) or "none"}', '',
         ])
@@ -130,24 +159,26 @@ def main(argv=None) -> int:
     refs.add_argument('--refresh', action='store_true', help='Select repository default branches for the updater')
     record = commands.add_parser('record', help='Record local checkout revisions; does not fetch')
     record.add_argument('--civil-checkout', type=Path, default=REPO_ROOT / REPOSITORIES[0])
-    record.add_argument('--ga-checkout', type=Path, default=REPO_ROOT / REPOSITORIES[1])
     changes = commands.add_parser('classify')
     changes.add_argument('--base', required=True)
     changes.add_argument('--head', required=True)
     generate_parser = commands.add_parser('generate')
     generate_parser.add_argument('--mode', choices=('write', 'sync', 'report'), default='sync')
     generate_parser.add_argument('--civil-root', type=Path,
-                                 default=REPO_ROOT / REPOSITORIES[0] / 'ccd-definition')
+                                 help='Default: ccd-definition/civil if the toggle is present, '
+                                      'else civil-ccd-definition/ccd-definition')
     generate_parser.add_argument('--ga-root', type=Path,
-                                 default=REPO_ROOT / REPOSITORIES[1] / 'ga-ccd-definition')
+                                 help='Default: ccd-definition/generalapplication if the toggle is present, '
+                                      'else civil-ccd-definition/ccd-definition/generalapplication')
     args = parser.parse_args(argv)
     try:
         if args.command == 'refs':
-            sources = load_sources()
-            print(f'civil_ref={sources[REPOSITORIES[0]] if not args.refresh else ""}')
-            print(f'ga_ref={sources[REPOSITORIES[1]] if not args.refresh else ""}')
+            in_repo = in_repo_definitions()
+            sources = {} if in_repo else load_sources()
+            print(f'civil_ref={sources[REPOSITORIES[0]] if sources and not args.refresh else ""}')
+            print(f'in_repo={str(in_repo).lower()}')
         elif args.command == 'record':
-            record_sources(args.civil_checkout, args.ga_checkout)
+            record_sources(args.civil_checkout)
         elif args.command == 'classify':
             print(f'mode={classify_commits(args.base, args.head)}')
         else:

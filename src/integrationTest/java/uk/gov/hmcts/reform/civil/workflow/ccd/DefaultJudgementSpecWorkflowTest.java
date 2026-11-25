@@ -42,6 +42,7 @@ class DefaultJudgementSpecWorkflowTest extends WorkflowIntegrationTest {
         when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(anyInt(), any()))
             .thenReturn(LocalDateTime.now().plusMonths(36));
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+        when(featureToggleService.isBreathingSpaceEnabled()).thenReturn(true);
     }
 
     @Test
@@ -138,6 +139,20 @@ class DefaultJudgementSpecWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getErrors()).contains(
                     "Default judgment cannot be applied for while claim is in breathing space"
                 );
+            });
+    }
+
+    @Test
+    void shouldNotReturnErrorOnAboutToStartWhenInBreathingSpaceButFlagDisabled() throws Exception {
+        when(featureToggleService.isBreathingSpaceEnabled()).thenReturn(false);
+
+        CaseData fixture = DefaultJudgementSpecFixtures.specDjInBreathingSpace();
+
+        startWorkflow(fixture)
+            .eventId(DEFAULT_JUDGEMENT_SPEC)
+            .aboutToStart()
+            .then(result -> {
+                assertThat(result.response().getErrors()).isNull();
             });
     }
 }

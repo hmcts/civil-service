@@ -1,0 +1,3 @@
+# Jenkins expands the tracked templates into these files for deployment.
+/values.aat.yaml
+/values.preview.yaml

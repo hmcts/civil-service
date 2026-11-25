@@ -35,11 +35,11 @@
       <bpmn:incoming>Flow_07n1ssi</bpmn:incoming>
       <bpmn:outgoing>Flow_152d168</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_152d168" sourceRef="AddDraftDocToMainCaseID" targetRef="GeneralApplicationNotifying" />
-    <bpmn:serviceTask id="GeneralApplicationNotifying" name="Notifying respondents" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
+    <bpmn:sequenceFlow id="Flow_152d168" sourceRef="AddDraftDocToMainCaseID" targetRef="NotifyGaApplicationCreated" />
+    <bpmn:serviceTask id="NotifyGaApplicationCreated" name="Notifying respondents" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_GENERAL_APPLICATION_RESPONDENT</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_152d168</bpmn:incoming>
@@ -62,7 +62,7 @@
       <bpmn:outgoing>Flow_12hy528</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_12hy528" sourceRef="Activity_0eo8p2p" targetRef="Event_07ek9xj" />
-    <bpmn:sequenceFlow id="Flow_1uafcbh" sourceRef="GeneralApplicationNotifying" targetRef="GenerateDashboardNotificationsGaApplicationSubmitted" />
+    <bpmn:sequenceFlow id="Flow_1uafcbh" sourceRef="NotifyGaApplicationCreated" targetRef="GenerateDashboardNotificationsGaApplicationSubmitted" />
     <bpmn:sequenceFlow id="Flow_1kc5nl3" sourceRef="GenerateDashboardNotificationsGaApplicationSubmitted" targetRef="Activity_0eo8p2p" />
   </bpmn:process>
   <bpmn:message id="Message_0ttrrz3" name="UPLOAD_TRANSLATED_DOCUMENT_GA_SUMMARY_DOC" />
@@ -85,7 +85,7 @@
         <dc:Bounds x="390" y="173" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1rnrlhi" bpmnElement="GeneralApplicationNotifying">
+      <bpmndi:BPMNShape id="BPMNShape_1rnrlhi" bpmnElement="NotifyGaApplicationCreated">
         <dc:Bounds x="530" y="173" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0qt8tph" bpmnElement="GenerateDashboardNotificationsGaApplicationSubmitted">

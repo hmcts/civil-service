@@ -52,18 +52,23 @@ there is a freshness gap until it is merged. Civil maintainers should monitor th
 <details>
 <summary>Regeneration, verification, and automation setup</summary>
 
-Use Python 3.12. The generator and its tests use only the standard library. Place local checkouts of
-`civil-ccd-definition` and `civil-general-apps-ccd-definition` alongside this repository. For reproducible
-results, use the exact revisions recorded in `.github/email-docs-sources.json` (which can be inspected with
+Use Python 3.12. The generator and its tests use only the standard library. Place a local checkout of
+`civil-ccd-definition` alongside this repository. It holds both the Civil and the General Application
+definitions (`ccd-definition/generalapplication`). For reproducible results, use the exact revision
+recorded in `.github/email-docs-sources.json` (which can be inspected with
 `python3 -B scripts/email_docs.py refs`). Do not change a checkout containing unrelated work; a separate
 local snapshot of the recorded definition revision can also be supplied.
+
+Once `ccd-definition/SOURCE_OF_TRUTH` is in this repository, the definitions are read from the in-repo
+`ccd-definition/civil` and `ccd-definition/generalapplication` instead: no checkout is needed, the
+manifest is no longer read or recorded, and changes to those folders count as documentation inputs.
 
 Regenerate both committed documents with explicit local roots:
 
 ```bash
 python3 -B scripts/email_docs.py generate --mode write \
   --civil-root ../civil-ccd-definition/ccd-definition \
-  --ga-root ../civil-general-apps-ccd-definition/ga-ccd-definition
+  --ga-root ../civil-ccd-definition/ccd-definition/generalapplication
 ```
 
 Use `--mode sync` with the same arguments to check the files without modifying them. `--mode report`
@@ -73,8 +78,8 @@ still fail in every mode.
 The helper always uses `src/main/resources/camunda`, explicit CCD roots, and the catalogue's Notify service ID.
 It does not fetch inputs: ensure the supplied directories contain the recorded revisions and no local definition edits.
 
-To intentionally refresh the CCD revisions, first prepare the desired local checkouts, then run
-`python3 -B scripts/email_docs.py record --civil-checkout ../civil-ccd-definition --ga-checkout ../civil-general-apps-ccd-definition`
+To intentionally refresh the CCD revisions, first prepare the desired local checkout, then run
+`python3 -B scripts/email_docs.py record --civil-checkout ../civil-ccd-definition`
 and regenerate. Include the manifest and both documents together in the PR. This command deliberately records
 the selected revisions; the automated updater retains existing pins when unchanged documents still reproduce.
 
@@ -85,7 +90,7 @@ CCD event column contains the provided substring, e.g.
 python3 -B scripts/generate_email_notifications_table.py \
   --bpmn-root src/main/resources/camunda \
   --ccd-definition-root ../civil-ccd-definition/ccd-definition \
-  --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition \
+  --ga-ccd-definition-root ../civil-ccd-definition/ccd-definition/generalapplication \
   --ccd-event DEFENDANT_RESPONSE_SPEC \
   --output /tmp/email-notifications-filtered.md \
   --html-output /tmp/email-notifications-filtered.html
@@ -191,6 +196,7 @@ The project defines a set of timer-driven Camunda and Spring schedulers that kee
 <!-- SCHEDULED_JOBS_TABLE_START -->
 | Job | Purpose | Scheduler Name | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- | --- |
+| Breathing space lift pending scheduler | Lifts breathing space when a saved end date has been reached. |  | `BREATHING_SPACE_LIFT_PENDING` | `0 5 0 * * ?` | Daily at 00:05 |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | BundleCreation | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
 | Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | DecisionOutcome | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | DefendantResponseDeadline | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
