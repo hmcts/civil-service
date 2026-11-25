@@ -33,6 +33,13 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "/^com\\.github\\.hmcts:/"
+      ],
+      "allowedVersions": "!/[-_][A-Z]{2,}-\\d+/",
+      "description": "Skip HMCTS feature-branch builds published with a ticket suffix (e.g. 4.1.0-CCD-8220, 9.2.12_CCD-8388). Maven versioning ranks unknown qualifiers above the release, so Renovate otherwise treats them as the newest stable version. Kept first so the package-specific allowedVersions rules below still override it"
+    },
+    {
+      "matchPackageNames": [
         "com.github.hmcts:core-case-data-store-client"
       ],
       "allowedVersions": "<5.4.0",
