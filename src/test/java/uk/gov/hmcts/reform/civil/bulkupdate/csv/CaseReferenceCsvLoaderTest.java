@@ -68,6 +68,15 @@ class CaseReferenceCsvLoaderTest {
     }
 
     @Test
+    void shouldRejectEncryptedPayloadWithoutASeparator() throws Exception {
+        SecretKey key = CaseReferenceCsvLoader.getKeyFromString("mySecretKey");
+
+        Assertions.assertThatThrownBy(() -> CaseReferenceCsvLoader.decrypt("not-a-payload", key))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Invalid encrypted payload format");
+    }
+
+    @Test
     void shouldLoadEncryptedCaseRefsCsvFile() {
         String secret = "DUMMY_SECRET";
         String fileName = "caserefs-test-encrypted.csv";

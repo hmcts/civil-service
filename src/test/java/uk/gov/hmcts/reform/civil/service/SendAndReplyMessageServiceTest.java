@@ -913,6 +913,11 @@ class SendAndReplyMessageServiceTest {
                 "Message details", "This is the base message."
             ));
         }
+
+        @Test
+        void shouldReturnEmptyString_whenMessageIsMissing() {
+            assertEquals("", messageService.renderMessageTableList(null));
+        }
     }
 
     private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(List<RoleAssignmentResponse> roleAssignments) {

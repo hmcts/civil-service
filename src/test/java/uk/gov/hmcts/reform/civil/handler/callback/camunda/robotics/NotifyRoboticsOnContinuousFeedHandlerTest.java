@@ -5,15 +5,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -46,6 +47,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -69,7 +72,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
     RoboticsCaseDataSupport.class,
     RoboticsPartyLookup.class,
     RoboticsSequenceGenerator.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
@@ -79,25 +82,25 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 @ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private RoboticsNotificationService roboticsNotificationService;
 
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
     @Autowired
     private NotifyRoboticsOnContinuousFeedHandler handler;
 
-    @MockBean
+    @MockitoBean
     private JsonSchemaValidationService validationService;
 
     @Nested
@@ -133,6 +136,25 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                 params.getParams().get(BEARER_TOKEN).toString()
+            );
+        }
+
+        @Test
+        void shouldOmitBreathingSpace_whenCaseHasBreathingSpace() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineAdmissionOrCounterClaim()
+                .build()
+                .toBuilder()
+                .breathing(new BreathingSpaceInfo())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(
+                argThat(data -> data.getBreathing() == null),
+                eq(false),
+                eq(params.getParams().get(BEARER_TOKEN).toString())
             );
         }
 

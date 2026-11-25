@@ -11,6 +11,32 @@ The [CCD definition mirror](../.github/workflows/ccd-definition-mirror.yml) work
 which `civil/` or `generalapplication/` stop matching civil-ccd-definition at `.source-sha`, or in which
 `.source-sha` is not a commit on civil-ccd-definition master. This changes at the cutover to this repo.
 
+## The source-of-truth toggle
+
+The cutover is a file: `SOURCE_OF_TRUTH` in this folder. It is not there yet.
+
+- **Absent:** civil-ccd-definition is the source of truth, and everything below applies.
+- **Present:** this repo is. `bin/pull-latest-civil-ccd-files.sh` and
+  `bin/dev-setup/start-devuser-preview-environment.sh` use this folder as it is, and only copy the test
+  code from civil-ccd-definition. A civil-ccd-definition branch passed to them, or set by a PR's CCD
+  definition branch label, then changes only the test code. The pull script prints a warning when that
+  happens.
+
+Other repos decide the same way with
+[`bin/shared/pull-ccd-definitions.sh`](../bin/shared/pull-ccd-definitions.sh)
+`<civil-service ref> [civil-ccd-definition ref] [target dir]`. It checks for the file at the civil-service
+ref they would pull from (master, or `pr-N`/`prN`), then copies `civil/` and `generalapplication/` from
+civil-service if it is there, or from civil-ccd-definition if not, and prints which. It fails on any
+fetch error instead of falling back to the other repo. A civil-service PR that adds the file therefore
+rehearses the switch: its own preview, and any consumer build pointed at `pr-N`, take the new path while
+nothing else changes.
+
+`pr-N` is the head of the pull request, not the result of merging it into master, as in the other
+scripts that pull from civil-service. A civil-service PR's own Jenkins build uses the merge result, so
+the two can disagree. For example, a PR branched before the file reached master builds from this repo
+itself, but a consumer pointed at its `pr-N` still copies from civil-ccd-definition until the PR is
+rebased.
+
 To re-sync, copy civil-ccd-definition's `ccd-definition/civil` and `ccd-definition/generalapplication`
 at a newer master commit over these folders, and put that commit's full SHA in `.source-sha`.
 
@@ -51,6 +77,14 @@ npm run test:definitions
 
 `--ignore-scripts` stops puppeteer, which the BPMN rendering tooling uses, from downloading Chrome.
 The specs don't need it.
+
+`bin/run-ccd-definition-specs.sh` does the same without touching `./node_modules`: it installs into a
+temporary folder. Jenkins runs it in a `CCD definition specs` stage at the start of the Build stage, so a
+broken definition fails in about a minute. It runs there because the preview import later replaces
+`civil/` and `generalapplication/` with civil-ccd-definition's copy (see above). When the specs run, the folder
+is still the checkout: this mirror until the switch, the live definitions after it. The
+[CCD definition mirror](../.github/workflows/ccd-definition-mirror.yml) workflow also runs them, on PRs
+that touch this folder.
 
 Use Node 20.19+ or 22.12+ (`.nvmrc` has the version CI uses). chai 6 is published only as an ES
 module, and older Node versions can't `require` it.

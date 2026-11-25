@@ -57,12 +57,12 @@ public class FeePaymentOutcomeHWFCallBackHandler extends CallbackHandler {
             && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForClaimIssue() == YesOrNo.YES
             && Objects.nonNull(caseData.getClaimIssuedHwfDetails())
             && Objects.nonNull(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds())
-            && !Objects.equals(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds(), BigDecimal.ZERO))
+            && caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds().compareTo(BigDecimal.ZERO) != 0)
             || (caseData.isHWFTypeHearing()
             && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee() == YesOrNo.YES
             && Objects.nonNull(caseData.getHearingHwfDetails())
             && Objects.nonNull(caseData.getHearingHwfDetails().getOutstandingFeeInPounds())
-            && !Objects.equals(caseData.getHearingHwfDetails().getOutstandingFeeInPounds(), BigDecimal.ZERO))) {
+            && caseData.getHearingHwfDetails().getOutstandingFeeInPounds().compareTo(BigDecimal.ZERO) != 0)) {
             errors.add(WRONG_REMISSION_TYPE_SELECTED);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

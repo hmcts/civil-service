@@ -50,7 +50,7 @@ jobs:
         env:
           POSTGRES_DB: cmc
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         ports:
           - 5432:5432
         options: >-
@@ -72,11 +72,11 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 21.0.13+9.0.LTS
+          java-version: 25.0.4+101.0.LTS
       - name: Run checks
         run: |
           # Jenkins owns PR unit execution and Sonar coverage. Keep every other check here.
@@ -91,7 +91,7 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_JDBC_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         run: ./gradlew integration
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
