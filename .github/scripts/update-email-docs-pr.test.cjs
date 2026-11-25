@@ -6,6 +6,7 @@ const BASE = 'a'.repeat(40);
 const PREVIOUS = 'b'.repeat(40);
 const BRANCH = 'automation/email-notification-docs';
 const FILES = ['docs/email-notifications.md', 'docs/email-notifications.html', '.github/email-docs-sources.json'];
+const TOGGLE = 'ccd-definition/SOURCE_OF_TRUTH';
 const PR = { number: 42, html_url: 'https://example.invalid/pull/42', state: 'open', title: 'Old title', body: 'Old provenance' };
 
 function success(stdout = '') {
@@ -110,12 +111,10 @@ function fixture(options = {}) {
     masterDocs: options.masterDocs ?? Boolean(options.noDrift),
     history: options.history,
   };
-  const manifest = (civil, ga) => JSON.stringify({
-    'civil-ccd-definition': civil.repeat(40), 'civil-general-apps-ccd-definition': ga.repeat(40),
-  }) + '\n';
-  state.masterManifest = manifest('a', 'b');
-  state.branchManifest = manifest('c', 'd');
-  let initialManifest = manifest('e', 'f');
+  const manifest = civil => JSON.stringify({ 'civil-ccd-definition': civil.repeat(40) }) + '\n';
+  state.masterManifest = manifest('a');
+  state.branchManifest = manifest('c');
+  let initialManifest = manifest('e');
   if (options.noDrift) initialManifest = state.masterManifest;
   else if (options.same) initialManifest = state.branchManifest;
   const contents = new Map([
@@ -127,6 +126,7 @@ function fixture(options = {}) {
     recordedInSync: options.recordedInSync ?? true,
     files: {
       readFileSync(path) { assert.ok(contents.has(path)); return contents.get(path); },
+      existsSync(path) { assert.equal(path, TOGGLE); return Boolean(options.inRepo); },
       writeFileSync(path, value) { assert.equal(path, FILES[2]); contents.set(path, value); },
     },
     context: { repo: { owner: 'hmcts', repo: 'civil-service' }, serverUrl: 'https://example.invalid', runId: 123 },
@@ -192,6 +192,14 @@ test('new drift commits only permitted files and pushes only the automation bran
   assert.match(creation.body, /Data rows: \d+/);
   assert.match(creation.body, /HTML SHA-256: `[0-9a-f]{64}`/);
   assert.ok(creation.body.includes(BASE));
+});
+
+test('with the toggle present the PR names the in-repo definitions, not the stale manifest pins', async () => {
+  const { clients, requests } = fixture({ inRepo: true });
+  await update(clients);
+  const { body } = requests.find(([method]) => method === 'create')[1];
+  assert.match(body, /CCD definitions: `ccd-definition\/`/);
+  assert.ok(!body.includes('civil-ccd-definition:'));
 });
 
 test('identical generation and metadata produce no further commit, push, or PR update', async () => {
@@ -263,7 +271,6 @@ test('retry repairs PR metadata after a successful push and failed API update wi
   assert.equal(requests.filter(([method]) => method === 'update').length, 2);
   assert.ok(state.pr.body.includes(BASE));
   assert.match(state.pr.body, /civil-ccd-definition: `[0-9a-f]{40}`/);
-  assert.match(state.pr.body, /civil-general-apps-ccd-definition: `[0-9a-f]{40}`/);
   assert.match(state.pr.body, /HTML SHA-256: `[0-9a-f]{64}`/);
   assert.ok(!state.pr.body.includes('/actions/runs/'));
 });
@@ -333,9 +340,7 @@ test('a pending PR retains its pins across unrelated CCD commits and new workflo
   const { clients, requests, state } = fixture();
   await update(clients);
   const manifest = state.branchManifest;
-  clients.files.writeFileSync(FILES[2], JSON.stringify({
-    'civil-ccd-definition': '9'.repeat(40), 'civil-general-apps-ccd-definition': '8'.repeat(40),
-  }));
+  clients.files.writeFileSync(FILES[2], JSON.stringify({ 'civil-ccd-definition': '9'.repeat(40) }));
   clients.context.runId++;
   requests.length = 0;
   await update(clients);
