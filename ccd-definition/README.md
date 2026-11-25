@@ -78,6 +78,14 @@ npm run test:definitions
 `--ignore-scripts` stops puppeteer, which the BPMN rendering tooling uses, from downloading Chrome.
 The specs don't need it.
 
+`bin/run-ccd-definition-specs.sh` does the same without touching `./node_modules`: it installs into a
+temporary folder. Jenkins runs it in a `CCD definition specs` stage at the start of the Build stage, so a
+broken definition fails in about a minute. It runs there because the preview import later replaces
+`civil/` and `generalapplication/` with civil-ccd-definition's copy (see above). When the specs run, the folder
+is still the checkout: this mirror until the switch, the live definitions after it. The
+[CCD definition mirror](../.github/workflows/ccd-definition-mirror.yml) workflow also runs them, on PRs
+that touch this folder.
+
 Use Node 20.19+ or 22.12+ (`.nvmrc` has the version CI uses). chai 6 is published only as an ES
 module, and older Node versions can't `require` it.
 
