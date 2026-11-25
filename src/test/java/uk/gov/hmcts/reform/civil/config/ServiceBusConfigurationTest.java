@@ -58,7 +58,7 @@ class ServiceBusConfigurationTest {
         ReflectionTestUtils.setField(configuration, "topicName", "test-topic");
         ReflectionTestUtils.setField(configuration, "subscriptionName", "test-subscription");
 
-        try (MockedConstruction<ServiceBusClientBuilder> ignored = mockConstruction(
+        try (MockedConstruction<ServiceBusClientBuilder> _ = mockConstruction(
             ServiceBusClientBuilder.class, (builder, constructionContext) -> {
                 when(builder.connectionString(anyString())).thenReturn(builder);
                 when(builder.processor()).thenReturn(processorBuilder);

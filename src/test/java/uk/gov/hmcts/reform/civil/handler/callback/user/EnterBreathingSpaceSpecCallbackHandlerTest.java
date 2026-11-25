@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils.ALL_DEFENDANTS_LEFT;
 import static uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils.ALREADY_IN_BREATHING_SPACE;
@@ -101,7 +102,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenStartDateIsNotPast_thenReturnError() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setStart(LocalDate.now().plusDays(1));
+        enterInfo.setStart(LocalDate.now(LOCAL_ZONE).plusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
@@ -119,7 +120,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenStartDateIsPast_thenReturnNoError() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setStart(LocalDate.now());
+        enterInfo.setStart(LocalDate.now(LOCAL_ZONE));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
@@ -150,13 +151,13 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("enterBreathing")
             .extracting("start")
-            .isEqualTo(LocalDate.now().toString());
+            .isEqualTo(LocalDate.now(LOCAL_ZONE).toString());
     }
 
     @Test
     public void whenStartDateFieldIsPresent_thenDontDefaultToToday() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setStart(LocalDate.now().minusDays(1));
+        enterInfo.setStart(LocalDate.now(LOCAL_ZONE).minusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
@@ -170,7 +171,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("enterBreathing")
             .extracting("start")
-            .isEqualTo(LocalDate.now().minusDays(1).toString());
+            .isEqualTo(LocalDate.now(LOCAL_ZONE).minusDays(1).toString());
     }
 
     @Test
@@ -205,7 +206,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     void aboutToSubmitStoresEnterDetailsAndClearsLift() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setStart(LocalDate.now().minusDays(1));
+        enterInfo.setStart(LocalDate.now(LOCAL_ZONE).minusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         breathingInfo.setLift(new BreathingSpaceLiftInfo());
@@ -226,7 +227,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         assertThat(stored.get(0).getValue().getDefendantLabel())
             .isEqualTo("Breathing space for Defendant 1 details");
         assertThat(stored.get(0).getValue().getEnter().getStart())
-            .isEqualTo(LocalDate.now().minusDays(1));
+            .isEqualTo(LocalDate.now(LOCAL_ZONE).minusDays(1));
         assertThat(stored.get(0).getValue().getLift()).isNull();
         assertThat(response.getData().get("liftBreathing")).isNull();
     }
