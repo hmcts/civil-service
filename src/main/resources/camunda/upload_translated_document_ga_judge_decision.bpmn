@@ -29,22 +29,13 @@
       <bpmn:incoming>Flow_1qchrvw</bpmn:incoming>
       <bpmn:outgoing>Flow_1dvy97c</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="StartApplicantNotificationProcessMakeDecision" name="Start Applicant Notification Process Make Decision" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
+    <bpmn:serviceTask id="NotifyGaJudicialDecision" name="Notify decision parties" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1dvy97c</bpmn:incoming>
-      <bpmn:outgoing>Flow_1qwcdun</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="StartRespondentNotificationProcessMakeDecision" name="Start Respondent Notification Process Make Decision" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1qwcdun</bpmn:incoming>
       <bpmn:outgoing>Flow_0y9mjen</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="GenerateDashboardNotificationsGaMakeDecision" name="Create Dashboard notification" camunda:type="external" camunda:topic="gaDashboardNotifications">
@@ -102,9 +93,8 @@
     <bpmn:sequenceFlow id="Flow_1karrfz" sourceRef="Event_0ks94xn" targetRef="Activity_0vuxatn" />
     <bpmn:sequenceFlow id="Flow_1qchrvw" sourceRef="Activity_0vuxatn" targetRef="AddPDFDocumentToMainCase" />
     <bpmn:sequenceFlow id="Flow_1u4hj3q" sourceRef="Activity_0vuxatn" targetRef="Event_1s3ugpj" />
-    <bpmn:sequenceFlow id="Flow_1dvy97c" sourceRef="AddPDFDocumentToMainCase" targetRef="StartApplicantNotificationProcessMakeDecision" />
-    <bpmn:sequenceFlow id="Flow_1qwcdun" sourceRef="StartApplicantNotificationProcessMakeDecision" targetRef="StartRespondentNotificationProcessMakeDecision" />
-    <bpmn:sequenceFlow id="Flow_0y9mjen" sourceRef="StartRespondentNotificationProcessMakeDecision" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
+    <bpmn:sequenceFlow id="Flow_1dvy97c" sourceRef="AddPDFDocumentToMainCase" targetRef="NotifyGaJudicialDecision" />
+    <bpmn:sequenceFlow id="Flow_0y9mjen" sourceRef="NotifyGaJudicialDecision" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
     <bpmn:sequenceFlow id="Flow_04uop06" sourceRef="GenerateDashboardNotificationsGaMakeDecision" targetRef="Gateway_1ql2fsf" />
     <bpmn:sequenceFlow id="Flow_015e0c5" name="No" sourceRef="Gateway_1ql2fsf" targetRef="Gateway_0kugwes">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.LIP_APPLICANT || !flowFlags.LIP_APPLICANT)}</bpmn:conditionExpression>
@@ -142,12 +132,8 @@
       <bpmndi:BPMNShape id="Activity_0gedw0q_di" bpmnElement="AddPDFDocumentToMainCase">
         <dc:Bounds x="490" y="208" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0d7dqyf_di" bpmnElement="StartApplicantNotificationProcessMakeDecision">
+      <bpmndi:BPMNShape id="Activity_0d7dqyf_di" bpmnElement="NotifyGaJudicialDecision">
         <dc:Bounds x="630" y="208" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1iw3i8y" bpmnElement="StartRespondentNotificationProcessMakeDecision">
-        <dc:Bounds x="770" y="208" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vqp3lv_di" bpmnElement="GenerateDashboardNotificationsGaMakeDecision">
@@ -228,12 +214,8 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0y9mjen_di" bpmnElement="Flow_0y9mjen">
-        <di:waypoint x="870" y="248" />
-        <di:waypoint x="910" y="248" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qwcdun_di" bpmnElement="Flow_1qwcdun">
         <di:waypoint x="730" y="248" />
-        <di:waypoint x="770" y="248" />
+        <di:waypoint x="910" y="248" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1karrfz_di" bpmnElement="Flow_1karrfz">
         <di:waypoint x="248" y="248" />
