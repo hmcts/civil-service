@@ -1,0 +1,263 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "claimantRepresentation",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ClaimantRepresentationType",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "claimantPartyName",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "claimantRepresentation=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantOnePartyName",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "claimantRepresentation=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantTwoPartyName",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "FieldShowCondition": "claimantRepresentation=\"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "claimantRepresentationLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Claimant: ${claimantPartyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "counselForClaimant",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${claimantPartyName}, the claimant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "claimantRepresentation=\"COUNSEL_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "solicitorForClaimant",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${claimantPartyName}, the claimant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "claimantRepresentation=\"SOLICITOR_FOR_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "costDraftsman",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${claimantPartyName}, the claimant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "claimantRepresentation=\"COST_DRAFTSMAN_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "claimantInPerson",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${claimantPartyName}, the claimant, in person.",
+    "FieldType": "Label",
+    "FieldShowCondition": "claimantRepresentation=\"THE_CLAIMANT_IN_PERSON\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "layRepresentativeforClaimant",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "A lay representative for ${claimantPartyName}, the claimant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "claimantRepresentation=\"LAY_REPRESENTATIVE_FOR_THE_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "heardFromClaimantNotAttend",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "claimantRepresentation=\"CLAIMANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantRepresentationLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Defendant: ${defendantOnePartyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantRepresentation",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "DefendantRepresentationType",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "CounselForDefendant",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${defendantOnePartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantRepresentation=\"COUNSEL_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "solicitorForDefendant",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${defendantOnePartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantRepresentation=\"SOLICITOR_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "costDraftsmanDef",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${defendantOnePartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantRepresentation=\"COST_DRAFTSMAN_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantInPerson",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${defendantOnePartyName}, the defendant, in person.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantRepresentation=\"THE_DEFENDANT_IN_PERSON\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "layRepresentativeDef",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Lay representative for ${defendantOnePartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantRepresentation=\"LAY_REPRESENTATIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "heardFromDefendantNotAttend",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "defendantRepresentation=\"DEFENDANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantTwoRepresentationLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Defendant: ${defendantTwoPartyName}",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoPartyName=\"*\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantTwoRepresentation",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "DefendantRepresentationType",
+    "FieldShowCondition": "defendantTwoPartyName=\"*\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "CounselForDefendantTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Counsel for ${defendantTwoPartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoRepresentation=\"COUNSEL_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "solicitorForDefendantTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Solicitor for ${defendantTwoPartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoRepresentation=\"SOLICITOR_FOR_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "costDraftsmanDefTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "Costs draftsman for ${defendantTwoPartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoRepresentation=\"COST_DRAFTSMAN_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "defendantTwoInPerson",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "${defendantTwoPartyName}, the defendant, in person.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoRepresentation=\"THE_DEFENDANT_IN_PERSON\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "layRepresentativeDefTwo",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "A lay representative for ${defendantTwoPartyName}, the defendant.",
+    "FieldType": "Label",
+    "FieldShowCondition": "defendantTwoRepresentation=\"LAY_REPRESENTATIVE_FOR_THE_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "heardFromDefTwoNotAttend",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "FieldType": "TrialNoticeProcedure",
+    "FieldShowCondition": "defendantTwoRepresentation=\"DEFENDANT_NOT_ATTENDING\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "detailsRepresentationLabel",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": "### Enter details of representation",
+    "HintText": "For example, the Judge heard from Mr Smith, a director of the claimant company and Miss Smith as lay representative for the defendant",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  }
+,
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "detailsRepresentationText",
+    "ID": "ClaimantAndDefendantHeard",
+    "ElementLabel": " ",
+    "HintText": "For example, the Judge heard from Mr Smith, a director of the claimant company and Miss Smith as lay representative for the defendant",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

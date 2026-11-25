@@ -1,0 +1,80 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "GENERAL_ORDER",
+    "ListElement": "General order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DISMISSAL_ORDER",
+    "ListElement": "Dismissal order",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DIRECTION_ORDER",
+    "ListElement": "Directions order",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_FOR_INFORMATION",
+    "ListElement": "Request for information",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "HEARING_ORDER",
+    "ListElement": "Hearing order",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_SEQUENTIAL",
+    "ListElement": "Written representation sequential",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_CONCURRENT",
+    "ListElement": "Written representation concurrent",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "HEARING_FORM",
+    "ListElement": "Hearing Form",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "HEARING_NOTICE",
+    "ListElement": "Hearing Notice",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "FREE_FORM_ORDER",
+    "ListElement": "Free Form Order",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CONSENT_ORDER",
+    "ListElement": "Consent Order",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "GENERAL_APPLICATION_DRAFT",
+    "ListElement": "Draft Application",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SEND_APP_TO_OTHER_PARTY",
+    "ListElement": "Send Application to other party",
+    "DisplayOrder": 13
+  }
+]

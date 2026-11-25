@@ -1,0 +1,1521 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType.types",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement.hasAgreed",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppInformOtherParty",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.urgentAppConsiderationDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.generalAppUrgency",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.reasonsForUrgency",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.ConsentAgreementCheckBox",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "id",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "email",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "forename",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "surname",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "organisationIdentifier",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "id",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "email",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "forename",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "surname",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "id",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "email",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "surname",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "forename",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel119",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel303",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "fee",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentDetails",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "additionalPaymentDetails",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentSuccessfulDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "RU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "additionalPaymentServiceRef",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "serviceRequestReference",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.name",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.role",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDetailsOfOrder",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppReasonsOfOrder",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingYesorNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeRequiredYesOrNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialRequiredYesOrNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateFrom",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateTo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferencesPreferredType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.TelephoneHearingPreferredType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.ReasonForPreferredHearingType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferredLocation",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsTelephoneNumber",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsEmailID",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDuration",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingDays",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingHours",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingMinutes",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.unavailableTrialRequiredYesOrNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateFrom",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateTo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestionsYesOrNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestion",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirement",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementSignLanguage",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementLanguageInterpreter",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementOther",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppEvidenceDocument",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaApplicantLip",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentOneLip",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentTwoLip",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isMultiParty",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantPartyName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant1PartyName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant2PartyName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant1PartyName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant2PartyName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isCcmccLocation",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementCategory",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppParentCaseLink",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSuperClaimType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "locationName",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDateDeadline",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantSolicitors",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendantSolicitors",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "respondentsResponses",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "generalAppRespondent1Representative",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentDetails",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentResponseReason",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaHearingDetails",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "makeAnOrder",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDateForUnlessOrder",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDoc",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDateForUnlessOrder",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDoc",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "dismissalOrderText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsResponseByDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "showReasonForDecision",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "reasonForDecisionText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judicialByCourtsInitiative",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "requestMoreInfoOption",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "deadlineForMoreInfoSubmission",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "isWithNotice",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoByDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRecitalText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "makeAnOrderForWrittenRepresentations",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenSequentailRepresentationsBy",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "sequentialApplicantMustRespondWithin",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenConcurrentRepresentationsBy",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "directionInRelationToHearingText",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "CaseAccessCategory",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppVaryJudgementType",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppN245FormUpload",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNo",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDateLabel",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNoLabel",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "respondentDebtorOffer",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "debtorOfferAccept",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "paymentPlan",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "monthlyInstalment",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "paymentSetDate",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "ListElementCode": "debtorObjections",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppResponseStatementOfTruth",
+    "ListElementCode": "name",
+    "UserRoles": [
+      "citizen-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppResponseStatementOfTruth",
+    "ListElementCode": "role",
+    "UserRoles": [
+      "citizen-profile"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseNameGaInternal",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "R"
+  }
+]
+

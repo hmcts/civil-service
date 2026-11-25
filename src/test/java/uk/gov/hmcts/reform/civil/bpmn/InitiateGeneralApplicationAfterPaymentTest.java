@@ -5,6 +5,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -26,8 +27,8 @@ class InitiateGeneralApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentT
 
     //Notifying respondents
     public static final String PROCESS_EXTERNAL_CASE_EVENT = "processExternalCaseEventGASpec";
-    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_GENERAL_APPLICATION_RESPONDENT";
-    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "GeneralApplicationNotifying";
+    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_EVENT";
+    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "NotifyGaApplicationCreated";
     private static final String ASSIGNIN_OF_ROLES_EVENT = "ASSIGN_GA_ROLES";
     private static final String ASSIGNIN_OF_ROLES_ID = "AssigningOfRoles";
     private static final String LIP_APPLICANT = "LIP_APPLICANT";
@@ -42,9 +43,6 @@ class InitiateGeneralApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentT
     private static final String APPLICATION_EVENT_GASPEC = "applicationEventGASpec";
     private static final String GENERAL_APPLICATION_CLAIMANT_TASK_LIST_ID = "GeneralApplicationClaimantTaskList";
     private static final String GENERAL_APPLICATION_RESPONDENT_TASK_LIST_ID = "GeneralApplicationRespondentTaskList";
-
-    private static final String CREATE_DASHBOARD_NOTIFICATION_APPLICATION_SUBMITTED_ACTIVITY_ID
-        = "GenerateDashboardNotificationsGaApplicationSubmitted";
 
     public InitiateGeneralApplicationAfterPaymentTest() {
         super("initiate_general_application_after_payment.bpmn",
@@ -118,12 +116,12 @@ class InitiateGeneralApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentT
         );
 
         //update dashboard
-        ExternalTask updateCuiDashboard = assertNextExternalTask(APPLICATION_PROCESS_EVENT_GASPEC);
+        ExternalTask updateCuiDashboard = assertNextExternalTask(GA_DASHBOARD_NOTIFICATION_TOPIC);
         assertCompleteExternalTask(
             updateCuiDashboard,
-            APPLICATION_PROCESS_EVENT_GASPEC,
+            GA_DASHBOARD_NOTIFICATION_TOPIC,
             DASHBOARD_NOTIFICATION_EVENT,
-            CREATE_DASHBOARD_NOTIFICATION_APPLICATION_SUBMITTED_ACTIVITY_ID,
+            DashboardTaskIds.GA_APPLICATION_SUBMITTED,
             variables
         );
 

@@ -1,0 +1,114 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1DQFixedRecoverableCostsIntermediate",
+    "TabFieldDisplayOrder": 38,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent2DQFixedRecoverableCostsIntermediate",
+    "TabFieldDisplayOrder": 39,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 40,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent2DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 41,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 42,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent2DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 43,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1DQDisclosureReport",
+    "TabFieldDisplayOrder": 44,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent2DQDisclosureReport",
+    "TabFieldDisplayOrder": 45,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "TabFieldDisplayOrder": 74,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant2DQFixedRecoverableCostsIntermediate",
+    "TabFieldDisplayOrder": 75,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 76,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant2DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 77,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 78,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant2DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 79,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1DQDisclosureReport",
+    "TabFieldDisplayOrder": 80,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant2DQDisclosureReport",
+    "TabFieldDisplayOrder": 81,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  }
+]

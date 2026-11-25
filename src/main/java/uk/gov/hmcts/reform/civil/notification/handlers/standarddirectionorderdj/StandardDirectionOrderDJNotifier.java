@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.standarddirectionorderdj;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -8,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES;
 
 @Component
-public class StandardDirectionOrderDJNotifier extends Notifier {
+public class StandardDirectionOrderDJNotifier extends Notifier<CaseData> {
 
     private static final String TASK_ID = STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES.toString();
 

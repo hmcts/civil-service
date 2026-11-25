@@ -50,7 +50,7 @@ jobs:
         env:
           POSTGRES_DB: cmc
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         ports:
           - 5432:5432
         options: >-
@@ -58,28 +58,40 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --name postgres
     steps:
       - uses: actions/checkout@v7
+      - name: Increase PostgreSQL Max Connections
+        run: |
+          docker exec -i postgres bash -c 'sed -i "s/max_connections = 100/max_connections = 300/" "$PGDATA/postgresql.conf"'
+          docker restart --time 0 postgres
+          sleep 5
       - name: Set up Cache
         uses: actions/cache@v6
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 21.0.12+101.0.LTS
+          java-version: 25.0.4+101.0.LTS
       - name: Run checks
-        run: ./gradlew check
+        run: |
+          # Jenkins owns PR unit execution and Sonar coverage. Keep every other check here.
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            ./gradlew check -x test
+          else
+            ./gradlew check
+          fi
       - name: Run integration tests
         env:
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_JDBC_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres # Ephemeral CI database password, not a service credential. NOSONAR
         run: ./gradlew integration
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7

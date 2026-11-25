@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -67,11 +67,11 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private static final String HEARING_PAYMENT_RETURN_URL =
         "http://localhost:3001/hearing-payment-confirmation/" + CASE_REFERENCE;
 
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService gaCoreCaseDataService;
 
     @BeforeEach
@@ -218,6 +218,21 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
                 )).build();
 
             when(gaCoreCaseDataService.getCase(GA_CASE_REFERENCE)).thenReturn(expectedCaseDetails);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        @SneakyThrows
+        void shouldReturnConflictWhenGaPaymentIsNotReady(boolean hasPbaDetails) {
+            Map<String, Object> data = hasPbaDetails
+                ? Map.of("generalAppPBADetails", new GAPbaDetails()) : Map.of();
+            when(gaCoreCaseDataService.getCase(GA_CASE_REFERENCE))
+                .thenReturn(CaseDetails.builder().id(GA_CASE_REFERENCE).data(data).build());
+
+            doPost(BEARER_TOKEN, "", GA_FEES_PAYMENT_REQUEST_URL, GA_CASE_REFERENCE)
+                .andExpect(status().isConflict());
+
+            verifyNoInteractions(paymentsClient);
         }
 
         @Test

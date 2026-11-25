@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.unspec.offline.otherresponses;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -9,7 +10,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 
 @Component
 public class DefRespCaseOfflineUnspecNotifier
-    extends Notifier {
+    extends Notifier<CaseData> {
 
     public DefRespCaseOfflineUnspecNotifier(NotificationService notificationService,
                                             CaseTaskTrackingService caseTaskTrackingService,

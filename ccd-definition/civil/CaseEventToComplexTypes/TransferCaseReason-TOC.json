@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "TransferCaseReason",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "tocTransferCaseReason",
+    "ListElementCode": "txtTransferCaseReason",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "TransferCaseReason",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "tocTransferCaseReason",
+    "ListElementCode": "reasonForCaseTransferJudgeTxt",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  }
+]

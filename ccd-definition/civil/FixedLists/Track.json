@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "Track",
+    "ListElementCode": "SMALL_CLAIM",
+    "ListElement": "Small claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "Track",
+    "ListElementCode": "FAST_CLAIM",
+    "ListElement": "Fast claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "Track",
+    "ListElementCode": "MULTI_CLAIM",
+    "ListElement": "Multi claim",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "Track",
+    "ListElementCode": "INTERMEDIATE_CLAIM",
+    "ListElement": "Intermediate claim",
+    "DisplayOrder": 4
+  }
+]

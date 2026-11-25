@@ -13,6 +13,7 @@ public class InterceptorContext<T> {
     private final T item;
     private final Map<String, Object> attributes = new HashMap<>();
     private final Map<String, Long> metrics = new HashMap<>();
+    private final Map<String, String> properties = new HashMap<>();
 
     public InterceptorContext(String schedulerName, T item) {
         this.schedulerName = schedulerName;
@@ -27,6 +28,18 @@ public class InterceptorContext<T> {
      */
     public void recordMetric(String name, long durationMillis) {
         metrics.put(name, durationMillis);
+    }
+
+    /**
+     * Records a contextual property in the context.
+     *
+     * @param name  the property name
+     * @param value the property value
+     */
+    public void recordProperty(String name, String value) {
+        if (value != null && !value.isBlank()) {
+            properties.put(name, value);
+        }
     }
 
     /**

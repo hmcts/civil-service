@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.civil.bpmn.BpmnBaseTest.DASHBOARD_NOTIFICATION_EVENT;
+import static uk.gov.hmcts.reform.civil.notification.handlers.gahwfapplicant.GaHwfApplicantNotifier.TASK_ID;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +14,14 @@ public class GaHwfNotifyTest extends BpmnBaseGASpecTest {
     private static final String FILE_NAME = "notify_ga_applicant_hwf_outcome.bpmn";
     private static final String MESSAGE_NAME = "NOTIFY_APPLICANT_LIP_HWF";
     private static final String PROCESS_ID = "GA_NOTIFY_HWF";
-    private static final String ACTIVITY_ID = "Notify_App_Lip_Hwf";
+    // taken from the notifier rather than repeated, so a rename cannot leave the BPMN and
+    // NotifierFactory disagreeing while both tests still pass
+    private static final String ACTIVITY_ID = TASK_ID;
     private static final String START_BUSINESS_TOPIC = "START_GA_BUSINESS_PROCESS";
-    public static final String NOTIFY_EVENT = "applicationProcessCaseEventGASpec";
+    // the external task topic, not the case event. Kept distinct deliberately: the two were
+    // conflated before this migration, which is what made the assertion below wrong.
+    public static final String NOTIFY_TOPIC = "applicationProcessCaseEventGASpec";
+    private static final String NOTIFY_CASE_EVENT = "NOTIFY_EVENT";
     public static final String NOTIFY_EVENT_DASHBOARD = "processExternalCaseEventGASpec";
     private static final String CREATE_DASHBOARD_NOTIFICATION_HWF_OUTCOME_ACTIVITY_ID
         = "GenerateDashboardNotificationsGaHwfOutcome";
@@ -59,11 +65,11 @@ public class GaHwfNotifyTest extends BpmnBaseGASpecTest {
                 START_GA_BUSINESS_EVENT,
                 START_GA_BUSINESS_ACTIVITY
         );
-        ExternalTask notifyTask = assertNextExternalTask(NOTIFY_EVENT);
+        ExternalTask notifyTask = assertNextExternalTask(NOTIFY_TOPIC);
         assertCompleteExternalTask(
                 notifyTask,
-                NOTIFY_EVENT,
-                MESSAGE_NAME,
+                NOTIFY_TOPIC,
+                NOTIFY_CASE_EVENT,
                 ACTIVITY_ID
         );
         ExternalTask notifyTaskDashboard = assertNextExternalTask(NOTIFY_EVENT_DASHBOARD);

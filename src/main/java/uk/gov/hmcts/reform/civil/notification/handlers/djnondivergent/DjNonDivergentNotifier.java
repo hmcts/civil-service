@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.djnondivergent;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
@@ -9,7 +10,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 @Component
 @Slf4j
-public class DjNonDivergentNotifier extends Notifier {
+public class DjNonDivergentNotifier extends Notifier<CaseData> {
 
     public DjNonDivergentNotifier(NotificationService notificationService,
                                    CaseTaskTrackingService caseTaskTrackingService,

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
@@ -119,10 +120,10 @@ public class ScheduledTaskProcessor<T, I> {
                 Duration duration = Duration.ofNanos(chain.getTotalTimeNanos());
                 handleSuccess(eventConfig, itemId, duration, backPressure, context, interceptorContext);
             } else {
-                handleAbortion(eventConfig, itemId, "Silent abortion", interceptorContext, context);
+                handleAbortion(eventConfig, itemId, AbortCategory.SILENT_ABORTION, "Silent abortion", interceptorContext, context);
             }
         } catch (TaskAbortedException e) {
-            handleAbortion(eventConfig, itemId, e.getReason(), interceptorContext, context);
+            handleAbortion(eventConfig, itemId, e.getCategory(), e.getReason(), interceptorContext, context);
         } catch (Exception e) {
             return handleFailure(eventConfig, itemId, e, backPressure, context, interceptorContext);
         }
@@ -136,19 +137,20 @@ public class ScheduledTaskProcessor<T, I> {
                                ProcessingContext context,
                                InterceptorContext<T> interceptorContext) {
         backPressure.afterSuccess(duration);
-        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics());
+        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics(), interceptorContext.getProperties());
         context.succeededItems.add(itemId);
         context.consecutiveFailures.set(0);
     }
 
     private void handleAbortion(ScheduledTaskEventConfiguration eventConfig,
                                 I itemId,
+                                AbortCategory category,
                                 String reason,
                                 InterceptorContext<T> interceptorContext,
                                 ProcessingContext context) {
         log.info("Scheduled task: {}, ItemId: {}, Aborted: {}",
                  eventConfig.getSchedulerName(), itemId, reason);
-        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), reason, interceptorContext.getMetrics());
+        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), category, reason, interceptorContext.getMetrics(), interceptorContext.getProperties());
         context.abortedItems.add(itemId);
     }
 
@@ -160,7 +162,7 @@ public class ScheduledTaskProcessor<T, I> {
                                   InterceptorContext<T> interceptorContext) {
         backPressure.afterFailure();
         context.failedItems.add(itemId);
-        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics());
+        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics(), interceptorContext.getProperties());
         log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
         int failures = context.consecutiveFailures.incrementAndGet();
 

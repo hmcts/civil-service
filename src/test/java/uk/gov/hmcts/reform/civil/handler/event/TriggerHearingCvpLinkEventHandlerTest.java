@@ -47,7 +47,7 @@ class TriggerHearingCvpLinkEventHandlerTest {
     private TriggerHearingCvpLinkEventHandler handler;
 
     @BeforeEach
-    private void setup() {
+    void setup() {
         when(userService.getAccessToken(anyString(), anyString())).thenReturn("auth");
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("test-id").build());
         when(userConfig.getUserName()).thenReturn("");

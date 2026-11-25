@@ -36,6 +36,19 @@ class CaseReferenceCsvLoaderTest {
     }
 
     @Test
+    void shouldLoadDraftReferenceColumnsWithoutTreatingDraftUuidAsCsvColumn() {
+        List<DraftClaimReference> references = caseReferenceCsvLoader.loadCaseReferenceList(
+            DraftClaimReference.class,
+            "draft-claim-references-test.csv"
+        );
+
+        assertEquals(1, references.size());
+        assertEquals("case-1", references.get(0).getCaseReference());
+        assertEquals("user-1", references.get(0).getUserId());
+        assertEquals("123e4567-e89b-12d3-a456-426614174000", references.get(0).getDraftId());
+    }
+
+    @Test
     void shouldReturnEmptyCollectionWhenFileNotFound() {
         List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "caserefs-test-file-does-not-exist.csv");
 
@@ -52,6 +65,15 @@ class CaseReferenceCsvLoaderTest {
         String decryptedString = CaseReferenceCsvLoader.decrypt(encryptedString, key);
 
         assertEquals(originalString, decryptedString);
+    }
+
+    @Test
+    void shouldRejectEncryptedPayloadWithoutASeparator() throws Exception {
+        SecretKey key = CaseReferenceCsvLoader.getKeyFromString("mySecretKey");
+
+        Assertions.assertThatThrownBy(() -> CaseReferenceCsvLoader.decrypt("not-a-payload", key))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Invalid encrypted payload format");
     }
 
     @Test

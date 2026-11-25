@@ -4,27 +4,43 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.util.Set;
+
 import static java.util.Collections.emptyList;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_ORDER;
 
 @Service
 public class CaseStateSearchService extends GaElasticSearchService {
 
+    private static final String STATE_FIELD = "state";
+
     public CaseStateSearchService(GaCoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
+    }
+
+    public Set<CaseDetails> getUncheckedResponseDeadlineApplications(CaseState caseState) {
+        return searchGeneralApplications(startIndex -> new Query(
+            boolQuery()
+                .must(matchQuery(STATE_FIELD, caseState.toString()))
+                .mustNot(matchQuery("data.respondentResponseDeadlineChecked", "Yes")),
+            emptyList(),
+            startIndex
+        ));
     }
 
     @Override
     public Query query(int startIndex, CaseState caseState) {
 
         return new Query(
-            matchQuery("state", caseState.toString()),
+            matchQuery(STATE_FIELD, caseState.toString()),
             emptyList(),
             startIndex
         );
@@ -32,7 +48,7 @@ public class CaseStateSearchService extends GaElasticSearchService {
 
     @Override
     Query queryForOrderMade(int startIndex, CaseState caseState, GeneralApplicationTypes gaType) {
-        MatchQueryBuilder queryCaseState = QueryBuilders.matchQuery("state", caseState.toString());
+        MatchQueryBuilder queryCaseState = QueryBuilders.matchQuery(STATE_FIELD, caseState.toString());
         MatchQueryBuilder queryGaType = QueryBuilders.matchQuery("data.generalAppType.types", gaType);
         MatchQueryBuilder consentOrder = QueryBuilders
             .matchQuery("data.approveConsentOrder.isOrderProcessedByStayScheduler", "No");

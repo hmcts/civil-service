@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "ccjJudgmentLipInterest",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  }
+]

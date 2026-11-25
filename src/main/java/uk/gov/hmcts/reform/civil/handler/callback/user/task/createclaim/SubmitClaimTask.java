@@ -94,6 +94,12 @@ public class SubmitClaimTask {
 
     public CallbackResponse submitClaim(CaseData caseData, String eventId, String authorisationToken, YesOrNo isFlightDelayClaim,
                                         FlightDelayDetails flightDelayDetails) {
+        if (caseData.getRespondent1() == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("The defendant's details are missing. Start the claim again."))
+                .build();
+        }
+
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         setSharedData(caseData, authorisationToken, eventId);
 
@@ -204,7 +210,7 @@ public class SubmitClaimTask {
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
             caseData.setSdtRequestId(stdRequestIdList);
             BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
-            if (!bulkInterest.equals(BigDecimal.ZERO)) {
+            if (bulkInterest.compareTo(BigDecimal.ZERO) != 0) {
                 caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
             }
             caseData.setClaimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));

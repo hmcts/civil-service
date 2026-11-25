@@ -287,4 +287,18 @@ class FeatureToggleServiceTest {
         givenToggle("hmcts-access-migration", toggleStat);
         assertThat(featureToggleService.isHmctsAccessMigrationEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenDraftClaimDatabaseEnabled(Boolean toggleStat) {
+        givenToggle("cui-draft-claim-database", toggleStat);
+        assertThat(featureToggleService.isDraftClaimDatabaseEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenBreathingSpaceEnabled(Boolean toggleStat) {
+        givenToggle("cui-breathing-space", toggleStat);
+        assertThat(featureToggleService.isBreathingSpaceEnabled()).isEqualTo(toggleStat);
+    }
 }

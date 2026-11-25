@@ -24,7 +24,8 @@ public class PaymentStatusService {
 
     private final PaymentsClient paymentsClient;
 
-    @Retryable(value = RetryablePaymentException.class, backoff = @Backoff(delay = 500))
+    @Retryable(value = RetryablePaymentException.class,
+        backoff = @Backoff(delayExpression = "${payments.retry.delay-ms:500}"))
     public CardPaymentServiceRequestResponse createGovPayCardPaymentRequest(
         String serviceRequestReference, String authorization, CardPaymentServiceRequestDTO requestDto) {
         try {
@@ -55,7 +56,8 @@ public class PaymentStatusService {
             && ex.contentUTF8().contains(SERVICE_REQUEST_ALREADY_PAID));
     }
 
-    @Retryable(value = RetryablePaymentException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))
+    @Retryable(value = RetryablePaymentException.class, maxAttempts = 5,
+        backoff = @Backoff(delayExpression = "${payments.retry.delay-ms:500}"))
     public PaymentDto getCardPaymentDetails(String paymentReference, String authorization) {
         try {
             PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);

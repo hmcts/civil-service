@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntFunction;
 
 import static java.math.RoundingMode.UP;
 
@@ -27,13 +28,17 @@ public abstract class GaElasticSearchService {
     protected static final int ES_DEFAULT_SEARCH_LIMIT = 10;
 
     public Set<CaseDetails> getGeneralApplications(CaseState caseState) {
-        SearchResult searchResult = coreCaseDataService.searchGeneralApplication(query(START_INDEX, caseState));
+        return searchGeneralApplications(startIndex -> query(startIndex, caseState));
+    }
+
+    protected Set<CaseDetails> searchGeneralApplications(IntFunction<Query> queryFactory) {
+        SearchResult searchResult = coreCaseDataService.searchGeneralApplication(queryFactory.apply(START_INDEX));
         int pages = calculatePages(searchResult);
         Set<CaseDetails> caseDetails = new HashSet<>(searchResult.getCases());
 
         for (int i = 1; i < pages; i++) {
             SearchResult result = coreCaseDataService
-                .searchGeneralApplication(query(i * ES_DEFAULT_SEARCH_LIMIT, caseState));
+                .searchGeneralApplication(queryFactory.apply(i * ES_DEFAULT_SEARCH_LIMIT));
             caseDetails.addAll(result.getCases());
         }
 

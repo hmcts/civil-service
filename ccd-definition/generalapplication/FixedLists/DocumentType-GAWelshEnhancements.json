@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_APPLICANT_TRANSLATED",
+    "ListElement": "Request More Info Applicant Translated",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_RESPONDENT_TRANSLATED",
+    "ListElement": "Request More Info Applicant Translated",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_APPLICANT_TRANSLATED",
+    "ListElement": "Written Reps Respondent Translated",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_RESPONDENT_TRANSLATED",
+    "ListElement": "Written Reps Respondent Translated",
+    "DisplayOrder": 17
+  }
+]

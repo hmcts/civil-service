@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,12 +22,15 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,6 +76,9 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+
     private UUID draftId;
     private String submissionId;
 
@@ -80,12 +86,13 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
     void setUp() {
         draftStoreRepository.deleteAll();
         draftId = UUID.randomUUID();
-        OffsetDateTime createdAt = OffsetDateTime.parse("2026-10-12T10:00:00Z");
+        OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
         submissionId = USER_ID + ":" + draftId + ":" + createdAt;
 
         given(userService.getUserInfo(anyString()))
             .willReturn(UserInfo.builder().uid(USER_ID).sub("lip@test.com").build());
         given(authTokenGenerator.generate()).willReturn(SERVICE_TOKEN);
+        given(featureToggleService.isDraftClaimDatabaseEnabled()).willReturn(true);
 
         CaseDetails createdCase = CaseDetails.builder()
             .id(CREATED_CASE_ID)

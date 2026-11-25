@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "noRemissionDetails",
+    "ElementLabel": "Details",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "noRemissionDetailsSummary",
+    "ElementLabel": "Summary",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "HWFFeesSummaryType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "remissionAmount",
+    "ElementLabel": "Remission Amount",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "hwfReferenceNumber",
+    "ElementLabel": "HwF reference number",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "outstandingFeeInPounds",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "hwfCaseEvent",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

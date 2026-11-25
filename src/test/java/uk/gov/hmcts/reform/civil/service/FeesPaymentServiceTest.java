@@ -12,10 +12,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FeesPaymentService.class, CoreCaseDataService.class, PaymentStatusService.class,
     PaymentsClient.class, CaseDetailsConverter.class, PinInPostConfiguration.class, ObjectMapper.class})
+@TestPropertySource(properties = "payments.retry.delay-ms=0")
 @EnableRetry
 class FeesPaymentServiceTest {
 
@@ -82,15 +84,15 @@ class FeesPaymentServiceTest {
 
     @Autowired
     private FeesPaymentService feesPaymentService;
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private PinInPostConfiguration pinInPostConfiguration;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private PaymentStatusRetryService paymentStatusRetryService;
 
     @BeforeEach

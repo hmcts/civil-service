@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -78,7 +78,7 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {
-            JacksonAutoConfiguration.class,
+            Jackson2AutoConfiguration.class,
             CaseDetailsConverter.class,
             GeneralApplicationDraftGenerator.class
         })
@@ -91,17 +91,50 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private static final Long PARENT_CCD_REF = 1645779506193000L;
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
     private static final String DUMMY_TELEPHONE_NUM = "234345435435";
-    @MockBean private SecuredDocumentManagementService documentManagementService;
-    @MockBean private DocumentGeneratorService documentGeneratorService;
-    @MockBean ListGeneratorService listGeneratorService;
-    @MockBean private CoreCaseDataService coreCaseDataService;
-    @MockBean private GaForLipService gaForLipService;
+    @MockitoBean private SecuredDocumentManagementService documentManagementService;
+    @MockitoBean private DocumentGeneratorService documentGeneratorService;
+    @MockitoBean ListGeneratorService listGeneratorService;
+    @MockitoBean private CoreCaseDataService coreCaseDataService;
+    @MockitoBean private GaForLipService gaForLipService;
     @Autowired ObjectMapper objectMapper;
 
     @Autowired GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
     List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
     DynamicListElement location1 =
             new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
+
+    @Test
+    void shouldGenerateLipDraftWithoutHearingDetails() {
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
+        caseData.setGeneralAppHearingDetails(null);
+        caseData.setIsGaApplicantLip(YES);
+        when(coreCaseDataService.getCase(PARENT_CCD_REF))
+            .thenReturn(CaseDetails.builder().data(new HashMap<>()).build());
+        when(documentGeneratorService.generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT)))
+            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+
+        var captor = org.mockito.ArgumentCaptor.forClass(GADraftForm.class);
+        verify(documentGeneratorService).generateDocmosisDocument(captor.capture(), eq(GENERAL_APPLICATION_DRAFT));
+        GADraftForm templateData = captor.getValue();
+        assertThat(templateData.getHearingPreferencesPreferredType()).isNull();
+        assertThat(templateData.getReasonForPreferredHearingType()).isNull();
+        assertThat(templateData.getHearingPreferredLocation()).isNull();
+        assertThat(templateData.getHearingDetailsTelephoneNumber()).isNull();
+        assertThat(templateData.getHearingDetailsEmailId()).isNull();
+        assertThat(templateData.getUnavailableTrialRequiredYesOrNo()).isNull();
+        assertThat(templateData.getUnavailableTrialDates()).isEmpty();
+        assertThat(templateData.getVulnerabilityQuestionsYesOrNo()).isNull();
+        assertThat(templateData.getSupportRequirement()).isNull();
+        assertThat(templateData.getSupportRequirementSignLanguage()).isNull();
+        assertThat(templateData.getSupportRequirementLanguageInterpreter()).isNull();
+        assertThat(templateData.getSupportRequirementOther()).isNull();
+        assertThat(templateData.getIsSignLanguageExists()).isFalse();
+        assertThat(templateData.getIsLanguageInterpreterExists()).isFalse();
+        assertThat(templateData.getIsOtherSupportExists()).isFalse();
+        verify(documentManagementService).uploadDocument(eq(BEARER_TOKEN), any(PDF.class));
+    }
 
     @Test
     void shouldNotGenerateApplicationDraftDocument() {

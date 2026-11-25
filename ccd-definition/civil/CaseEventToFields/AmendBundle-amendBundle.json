@@ -1,0 +1,22 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_RESTITCH_BUNDLE",
+    "CaseFieldID": "bundleText",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "RestitchBundle",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_RESTITCH_BUNDLE",
+    "CaseFieldID": "bundleWarning",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "RestitchBundle",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

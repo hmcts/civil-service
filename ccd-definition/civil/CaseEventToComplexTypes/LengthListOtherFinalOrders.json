@@ -1,0 +1,66 @@
+[
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherDays",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherHours",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherMinutes",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherDays",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherHours",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "CaseHearingLengthElement",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthListOther.lengthListOtherMinutes",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX"
+  }
+]

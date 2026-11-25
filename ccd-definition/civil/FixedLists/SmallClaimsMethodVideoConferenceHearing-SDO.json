@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "SmallClaimsMethodVideoConferenceHearing",
+    "ListElementCode": "videoTheClaimant",
+    "ListElement": "The claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallClaimsMethodVideoConferenceHearing",
+    "ListElementCode": "videoTheDefendant",
+    "ListElement": "The defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SmallClaimsMethodVideoConferenceHearing",
+    "ListElementCode": "videoTheCourt",
+    "ListElement": "The court",
+    "DisplayOrder": 3
+  }
+]

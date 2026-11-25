@@ -1,0 +1,61 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 6,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "QueryManagementComponentLauncher",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 1,
+    "TabShowCondition": "queries.partyName = \"*\" OR qmApplicantSolicitorQueries.partyName = \"*\" OR qmRespondentSolicitor1Queries.partyName = \"*\" OR qmRespondentSolicitor2Queries.partyName = \"*\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  }
+]

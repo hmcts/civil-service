@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,10 +75,6 @@ class ConfirmOrderReviewTaskHandlerTest {
             caseDetailsConverter,
             objectMapper
         );
-    }
-
-    @BeforeEach
-    void init() {
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
             "caseEvent", UPDATE_CONFIRM_REVIEW_ORDER_EVENT.name()
@@ -149,7 +146,7 @@ class ConfirmOrderReviewTaskHandlerTest {
         caseEventTaskHandler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, times(1))
-            .handleFailure(eq(mockTask), eq("Mapper conversion failed due to incompatible types"),
+            .handleFailure(eq(mockTask), startsWith("Mapper conversion failed due to incompatible types: "),
                            anyString(), anyInt(), anyLong()
             );
     }

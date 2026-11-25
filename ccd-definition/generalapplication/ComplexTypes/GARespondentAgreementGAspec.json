@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "GARespondentAgreementGAspec",
+    "ListElementCode": "hasAgreedLabel",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GARespondentAgreementGAspec",
+    "ListElementCode": "hasAgreed",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Application by consent",
+    "SecurityClassification": "Public"
+  }
+]

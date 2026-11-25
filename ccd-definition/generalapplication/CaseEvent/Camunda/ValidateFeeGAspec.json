@@ -1,0 +1,15 @@
+[
+    {
+      "CaseTypeID": "GENERALAPPLICATION",
+      "ID": "VALIDATE_FEE_GASPEC",
+      "Name": "Validate Fee",
+      "Description": "Validate Fee",
+      "PreConditionState(s)": "*",
+      "PostConditionState": "*",
+      "SecurityClassification": "Public",
+      "ShowSummary": "N",
+      "ShowEventNotes": "N",
+      "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+      "RetriesTimeoutURLAboutToSubmitEvent": 0
+    }
+  ]
