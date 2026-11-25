@@ -66,7 +66,7 @@ def versions = [
   plexusUtils       : '4.1.0',
   postgresql        : '42.7.14',
   protonJ           : '0.35.0',
-  tika              : '3.3.3',
+  tika              : '4.2.0',
   tomcat            : '11.0.27',
   applicationInsights: '3.7.9',
   commonsLang3      : '3.21.0'
@@ -794,7 +794,7 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-to-slf4j:${versions.log4j}"
   implementation "org.apache.commons:commons-text:1.15.0"
   implementation "org.elasticsearch:elasticsearch:${versions.elasticsearch}"
-  implementation "com.networknt:json-schema-validator:1.5.9"
+  implementation "com.networknt:json-schema-validator:3.0.9"
   implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
@@ -854,9 +854,9 @@ dependencies {
   testImplementation "org.testcontainers:testcontainers-postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:testcontainers-junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.5.252"
-  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.5'
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.7'
   contractTestImplementation "org.hamcrest:java-hamcrest:2.0.0.0"
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.3')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.3')
