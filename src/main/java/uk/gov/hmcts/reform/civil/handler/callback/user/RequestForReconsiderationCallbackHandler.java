@@ -156,6 +156,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
      * or calculated as 7 days (RECONSIDERATION_DEADLINE_DAYS) from the most recent SDO order creation date.
      */
     private void validateDeadline(CaseData caseData, List<String> errors) {
+        if (caseData.getRequestForReconsiderationDeadlineChecked() == YES) {
+            errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+            return;
+        }
         LocalDateTime deadline = Optional.ofNullable(caseData.getRequestForReconsiderationDeadline())
             .orElseGet(() -> caseData.getSystemGeneratedCaseDocuments().stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))

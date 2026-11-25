@@ -182,6 +182,23 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
+        @Test
+        void shouldSendErrorMessageIfDeadlineCheckedIsYes() {
+            //Given : Casedata with requestForReconsiderationDeadlineChecked set to YES
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
+                .build().toBuilder()
+                .requestForReconsiderationDeadlineChecked(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: The error should be displayed
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
+        }
+
         @ParameterizedTest
         @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO", "CLAIMANT", "DEFENDANT"})
         void shouldGetSelectedUserRole(String userRole) {
