@@ -58,6 +58,25 @@ class ExternalTaskListenerConfigurationTest {
     }
 
     /**
+     * The lifecycle has to stop the clients itself, before singletons are destroyed, so this stops only
+     * the lifecycle beans and leaves the context open.
+     */
+    @Test
+    void shouldStopEveryClientInTheLifecycleBeforeBeansAreDestroyed() {
+        context.run(it -> {
+            List<ExternalTaskClient> clients = new ArrayList<>(
+                it.getBean(CaseDrivenExternalTaskClients.class).clients());
+            clients.add(it.getBean("schedulerExternalTaskClient", ExternalTaskClient.class));
+            assertThat(clients).hasSize(3).allMatch(ExternalTaskClient::isActive);
+
+            it.getSourceApplicationContext().stop();
+
+            assertThat(clients).noneMatch(ExternalTaskClient::isActive);
+            assertThat(it.getSourceApplicationContext().isActive()).isTrue();
+        });
+    }
+
+    /**
      * Only the router and the scheduler client may be resolvable as an {@code ExternalTaskClient}.
      * All 39 listeners take a bare {@code ExternalTaskClient}, so the case driven clients are
      * deliberately held inside {@link CaseDrivenExternalTaskClients}: were they beans of that type,
@@ -234,7 +253,7 @@ class ExternalTaskListenerConfigurationTest {
         @Bean
         public EventProperties eventProperties() {
             EventProperties props = new EventProperties();
-            props.setResponseTimeout(29500);
+            props.setResponseTimeout(20000);
             props.setLockDuration(1980000);
             props.setClientBackoffInitial(500);
             props.setClientBackoffFactor(2);
@@ -286,7 +305,7 @@ class ExternalTaskListenerConfigurationTest {
 
     private static EventProperties eventProperties() {
         EventProperties props = new EventProperties();
-        props.setResponseTimeout(29500);
+        props.setResponseTimeout(20000);
         props.setLockDuration(1980000);
         props.setClientBackoffInitial(500);
         props.setClientBackoffFactor(2);
