@@ -162,8 +162,6 @@ allprojects {
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
       dependency 'org.bouncycastle:bcprov-jdk18on:1.87'
-      dependency 'io.projectreactor:reactor-core:3.9.0'
-      dependency 'io.micrometer:micrometer-core:1.18.0'
       dependency 'ch.qos.logback:logback-core:1.6.8'
     }
     imports {
@@ -173,6 +171,10 @@ allprojects {
       mavenBom "tools.jackson:jackson-bom:${versions.jackson3}"
       mavenBom "org.jetbrains.kotlin:kotlin-bom:${versions.kotlin}"
       mavenBom "org.apache.logging.log4j:log4j-bom:${versions.log4j}"
+      // CVE floors (DTSCCI-6473). Import the whole release train so reactor-core and reactor-netty,
+      // and all Micrometer modules, stay on matching versions; pinning one module splits the family.
+      mavenBom 'io.projectreactor:reactor-bom:2025.0.9'
+      mavenBom 'io.micrometer:micrometer-bom:1.17.3'
     }
   }
 
