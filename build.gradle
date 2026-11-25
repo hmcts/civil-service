@@ -54,7 +54,7 @@ def versions = [
   azureJson         : '1.5.1',
   azureServiceBus   : '7.18.0',
   cucumber          : '8.0.4',
-  elasticsearch     : '9.5.5',
+  elasticsearch     : '9.5.7',
   httpclient5       : '5.6.5',
   httpcore5         : '5.4.4',
   jackson           : '2.22.4',
@@ -625,7 +625,12 @@ def sonarExclusions = [
   "**/notification/handlers/staycase/StayCaseEmailDTOGenerator.java",
   "**/notification/handlers/staylifted/StayLiftedEmailDTOGenerator.java",
   "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantEmailDTOGenerator.java",
-  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantTwoEmailDTOGenerator.java"
+  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantTwoEmailDTOGenerator.java",
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceLiftedAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolTwoEmailDTOGenerator.java"
 ]
 
 def sonarCoverageExclusions = [
@@ -968,8 +973,8 @@ tasks.withType(Test).configureEach { t ->
   }
 
   // Common configuration for all test tasks
-  // Gradle caps this at org.gradle.workers.max, which Jenkins sets in Jenkinsfile_CNP, so that is the
-  // real fork count in CI
+  // Gradle caps this at org.gradle.workers.max, set in gradle.properties, so that is the real fork
+  // count in CI
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
