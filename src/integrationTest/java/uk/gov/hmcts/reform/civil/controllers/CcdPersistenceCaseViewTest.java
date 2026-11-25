@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Data-store loads decentralised CIVIL and GENERALAPPLICATION cases as this service stored them.
+ * Data-store loads decentralised CIVIL and GENERALAPPLICATION cases as this service stored them, with the global
+ * search criteria the runtime derives from them, as data-store would have stored them.
  */
 @TestPropertySource(properties = "civil.decentralised.enabled=true")
 public class CcdPersistenceCaseViewTest extends BaseIntegrationTest {
@@ -57,8 +59,17 @@ public class CcdPersistenceCaseViewTest extends BaseIntegrationTest {
 
         JsonNode cases = objectMapper.readTree(body);
         assertThat(cases).hasSize(2);
-        assertThat(caseData(cases, CIVIL_CASE)).isEqualTo(objectMapper.readTree(CIVIL_DATA));
-        assertThat(caseData(cases, GA_CASE)).isEqualTo(objectMapper.readTree(GA_DATA));
+        JsonNode civilCase = caseData(cases, CIVIL_CASE);
+        assertThat(civilCase.path("SearchCriteria").path("OtherCaseReferences").path(0).path("value").asText())
+            .isEqualTo("000MC001");
+        assertThat(withoutSearchCriteria(civilCase)).isEqualTo(objectMapper.readTree(CIVIL_DATA));
+        assertThat(withoutSearchCriteria(caseData(cases, GA_CASE))).isEqualTo(objectMapper.readTree(GA_DATA));
+    }
+
+    private static JsonNode withoutSearchCriteria(JsonNode caseData) {
+        ObjectNode stored = caseData.deepCopy();
+        stored.remove("SearchCriteria");
+        return stored;
     }
 
     private void store(long id, long reference, String caseType, String state, String data) {
