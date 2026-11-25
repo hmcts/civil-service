@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
+import uk.gov.hmcts.reform.civil.model.robotics.RPABreathingSpace;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
@@ -533,11 +534,11 @@ class RoboticsDataMapperForUnspecTest {
 
         assertThat(mapped.getBreathingSpace())
             .extracting(
-                breathingSpace -> breathingSpace.getReference(),
-                breathingSpace -> breathingSpace.getStartDate(),
-                breathingSpace -> breathingSpace.getType(),
-                breathingSpace -> breathingSpace.getEndDate(),
-                breathingSpace -> breathingSpace.getReasonForLifting()
+                RPABreathingSpace::getReference,
+                RPABreathingSpace::getStartDate,
+                RPABreathingSpace::getType,
+                RPABreathingSpace::getEndDate,
+                RPABreathingSpace::getReasonForLifting
             )
             .containsExactly("BS-12345", startDate, BreathingSpaceType.STANDARD, endDate, "reason to lift");
     }
