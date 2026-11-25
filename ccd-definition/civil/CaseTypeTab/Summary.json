@@ -181,5 +181,23 @@
     "CaseFieldID": "otherRemedyFee",
     "TabFieldDisplayOrder": 8,
     "FieldShowCondition": "isClaimDeclarationAdded = \"Yes\" AND (claimType = \"HOUSING_DISREPAIR\" OR claimType = \"DAMAGES_AND_OTHER_REMEDY\")"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "breathingSpaceDefendant1Details",
+    "TabFieldDisplayOrder": 21,
+    "FieldShowCondition": "breathingSpaceDefendant1Details=\"*\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "breathingSpaceDefendant2Details",
+    "TabFieldDisplayOrder": 22,
+    "FieldShowCondition": "breathingSpaceDefendant2Details=\"*\""
   }
 ]

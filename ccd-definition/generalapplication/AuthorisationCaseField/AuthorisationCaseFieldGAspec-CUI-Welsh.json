@@ -1658,6 +1658,20 @@
           "RES-SOL-ONE-SPEC-PROFILE"
         ],
         "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-staff",
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "ga-basic-access",
+          "caseworker-civil-solicitor",
+          "APP-SOL-UNSPEC-PROFILE",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-TWO-UNSPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
       }
     ]
   },
@@ -1743,6 +1757,38 @@
           "wlu-admin",
           "judge-profile",
           "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDocumentTranslationInProgressLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser",
+          "wlu-admin",
+          "caseworker-civil-admin",
+          "caseworker-civil-staff",
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "ga-basic-access",
+          "caseworker-civil-solicitor",
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-UNSPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
         ],
         "CRUD": "R"
       }

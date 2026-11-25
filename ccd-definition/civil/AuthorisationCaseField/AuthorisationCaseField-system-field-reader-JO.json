@@ -1,6 +1,12 @@
 [
   {
     "CaseTypeID": "CIVIL",
+    "CaseFieldID": "isJoRequested",
+    "UserRole": "caseworker-civil-system-field-reader",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
     "CaseFieldID": "joJudgmentPaidInFull",
     "UserRole": "caseworker-civil-system-field-reader",
     "CRUD": "R"

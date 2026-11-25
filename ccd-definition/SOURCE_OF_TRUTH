@@ -1,0 +1,4 @@
+civil-service is the source of truth for the Civil CCD definitions.
+
+This file is the switch: while it is here, every build and consumer takes the definitions from this
+folder, and civil-service's pipeline imports them. See README.md.

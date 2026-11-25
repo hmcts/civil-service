@@ -1873,18 +1873,6 @@
   },
   {
     "CaseTypeID": "CIVIL",
-    "CaseFieldID": "breathingSpaceLabel",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-civil-solicitor"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeID": "CIVIL",
     "CaseFieldID": "applicantStatementOfTruthLabel",
     "AccessControl": [
       {
@@ -4186,46 +4174,6 @@
         "UserRoles": [
           "caseworker-civil-admin",
           "APP-SOL-SPEC-PROFILE"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeID": "CIVIL",
-    "CaseFieldID": "enterBreathing",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "APP-SOL-SPEC-PROFILE"
-        ],
-        "CRUD": "CRU"
-      },
-      {
-        "UserRoles": [
-          "caseworker-civil-admin",
-          "RES-SOL-ONE-SPEC-PROFILE",
-          "RES-SOL-TWO-SPEC-PROFILE"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeID": "CIVIL",
-    "CaseFieldID": "liftBreathing",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "APP-SOL-SPEC-PROFILE"
-        ],
-        "CRUD": "CRU"
-      },
-      {
-        "UserRoles": [
-          "caseworker-civil-admin",
-          "RES-SOL-ONE-SPEC-PROFILE",
-          "RES-SOL-TWO-SPEC-PROFILE"
         ],
         "CRUD": "R"
       }
