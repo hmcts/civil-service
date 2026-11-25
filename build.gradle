@@ -17,8 +17,8 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '8.8.0'
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.2520'
+  id 'hmcts.ccd.sdk' version 'civil-cc-4'
+  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-13'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
@@ -165,6 +165,16 @@ allprojects {
       dependency 'io.projectreactor:reactor-core:3.8.7'
       dependency 'io.micrometer:micrometer-core:1.17.1'
       dependency 'ch.qos.logback:logback-core:1.6.5'
+
+      // The decentralised runtime's Spring Boot BOM would hold elasticsearch-java's OpenTelemetry at 1.62.0, and
+      // its REST client at 9.4.5 (CVE-2026-133981 and others), below the versions elasticsearch-java asks for.
+      // GHSA-ccrj-gw8r-854m, GHSA-rcgg-9c38-7xpx
+      dependencySet(group: 'io.opentelemetry', version: '1.67.0') {
+        entry 'opentelemetry-api'
+        entry 'opentelemetry-common'
+        entry 'opentelemetry-context'
+      }
+      dependency "co.elastic.clients:elasticsearch-rest5-client:${versions.elasticsearch}"
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.3'
@@ -220,6 +230,24 @@ sourceSets {
     }
     resources.srcDir file('src/contractTest/resources')
   }
+}
+
+// The decentralised runtime reads the CIVIL and GENERALAPPLICATION JSON definitions, and exclusions.json for which
+// files each environment leaves out, from the classpath. They come from ccd-definition, which the pipeline refreshes
+// from the definitions' source of truth before it builds, or from a local checkout named by CIVIL_CCD_DEFINITIONS_DIR.
+def civilCcdDefinitionsDir = layout.buildDirectory.dir('generated/civil-ccd-definitions')
+def packageCivilCcdDefinitions = tasks.register('packageCivilCcdDefinitions', Sync) {
+  description = 'Packages the CCD definitions the decentralised runtime reads.'
+  from(System.getenv('CIVIL_CCD_DEFINITIONS_DIR') ?: file('ccd-definition')) {
+    include 'civil/**', 'generalapplication/**'
+  }
+  from(file('ccd-definition/exclusions.json'))
+  into civilCcdDefinitionsDir.map { it.dir('ccd-definitions') }
+}
+sourceSets.main.resources.srcDir(files(civilCcdDefinitionsDir).builtBy(packageCivilCcdDefinitions))
+// The SDK's guard scans every source set's directories, including these packaged definitions.
+tasks.named('jackson2CompatibilityGuard') {
+  dependsOn packageCivilCcdDefinitions
 }
 
 tasks.register('preparePatchedMigrations', Copy) {
@@ -749,6 +777,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-validation"
   implementation "org.springframework.boot:spring-boot-starter-jdbc"
   implementation 'com.github.hmcts:ccd-data-migration-support'
+  implementation 'com.github.hmcts:decentralised-runtime'
   implementation "org.springframework.statemachine:spring-statemachine-core:$versions.springStatemachine"
   implementation "commons-beanutils:commons-beanutils:1.11.0"
   implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1"

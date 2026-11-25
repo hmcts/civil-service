@@ -64,4 +64,13 @@
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-stdlib@2\.4\.10$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        False positive: CVE-2026-54285 affects opentelemetry-js before 2.8.0 (@opentelemetry/core's
+        W3CBaggagePropagator). NVD's CPE is opentelemetry:opentelemetry for node.js, which dependency-check
+        matches to the Java API jars.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.opentelemetry/opentelemetry-(api|common|context)@1\.67\.0$</packageUrl>
+        <cve>CVE-2026-54285</cve>
+    </suppress>
 </suppressions>

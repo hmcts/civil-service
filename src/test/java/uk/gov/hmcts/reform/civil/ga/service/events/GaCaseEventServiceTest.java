@@ -16,6 +16,10 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.helpers.CaseDataDateNormaliser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +39,10 @@ public class GaCaseEventServiceTest {
 
     @Mock
     private GaCoreCaseDataService gaCoreCaseDataService;
+
+    @Spy
+    private CaseDataDateNormaliser dateNormaliser =
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()), true);
 
     @InjectMocks
     private GaCaseEventService gaCaseEventService;
