@@ -76,6 +76,11 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         HearingsResponse hearingsResponse = getHearings(caseId);
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
+        if (latestHearing == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
         log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
                  caseId, latestHearing.getHearingId(), latestHearing.getHmcStatus());
 
