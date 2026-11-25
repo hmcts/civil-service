@@ -138,6 +138,32 @@ endpoints are added or removed.
 Legacy `/v2/api-docs` entries (rules 10010, 10054, 90033, 10096, 90022) were
 removed in the June 2026 review because the application uses springdoc
 OpenAPI v3 (`/v3/api-docs`) and no longer serves the v2 endpoint.
+
+### Nightly ZAP scan
+
+The nightly pipeline (`Jenkinsfile_nightly`) runs a ZAP API scan of
+civil-service on AAT with `enableSecurityScan()`, except on a rerun of failed
+tests. The HMCTS pipeline library runs `.ci/security.sh` in its ZAP container,
+in place of its default backend script, which this follows with three
+changes:
+
+- it scans the springdoc spec at `/v3/api-docs` (the default scans
+  `/v2/api-docs`, which civil-service no longer serves)
+- it requests the spec until it is ready before ZAP starts, as springdoc
+  builds it on the first request, which can take longer than the gateway's
+  30 second timeout (504)
+- it passes `--hook=zap_hooks.py`, so the rule suppressions above apply
+
+The scan target is `TEST_URL` (the nightly's `CIVIL_SERVICE_URL`, by default
+`http://civil-service-aat.service.core-compute-aat.internal`, the address the
+`audit.json` entries use) and the rules are `SecurityRules` (the nightly's
+`SECURITY_RULES` parameter). The library then checks the findings against
+`audit.json`. A failing scan marks the nightly build unstable rather than
+failing it; the HTML and JSON reports are archived from `functional-output/`.
+
+When a new finding appears, decide it here first: fix it, or record the
+decision in this file and suppress it in `zap_hooks.py` (a whole rule) or
+`audit.json` (one endpoint and rule).
 ## Further Reading
 
 - https://www.ncsc.gov.uk/information/vulnerability-reporting

@@ -267,7 +267,9 @@ withNightlyPipeline(type, product, component) {
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
-  env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
+  // The ZAP security scan (enableSecurityScan below, run by .ci/security.sh) scans TEST_URL with the rules in SecurityRules
+  env.TEST_URL = civilServiceUrl
+  env.SecurityRules = params.SECURITY_RULES
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
   env.AAC_API_URL = aacApiUrl
@@ -391,6 +393,13 @@ withNightlyPipeline(type, product, component) {
           }
         }
       }
+    }
+
+    // ZAP scan of civil-service's API, as described in security.md, left out of a rerun of failed tests. The pipeline
+    // library runs .ci/security.sh in its ZAP container and checks the findings against audit.json; a failing scan
+    // marks the build unstable, not failed.
+    if(!runFailedTests) {
+      enableSecurityScan()
     }
 
     // if(!runFailedTests && !forceGreenBuild) {
