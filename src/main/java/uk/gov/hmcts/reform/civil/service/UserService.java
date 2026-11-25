@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.utils.MaskHelper;
@@ -17,6 +18,11 @@ public class UserService {
     private static final long IDAM_USER_DETAILS_RETRY_DELAY_MILLIS = 250L;
 
     private final IdamClient idamClient;
+    private final RetryTemplate accessTokenRetry = RetryTemplate.builder()
+        .maxAttempts(3)
+        .fixedBackoff(250L)
+        .retryOn(this::isTransientTokenFailure)
+        .build();
 
     @Autowired
     public UserService(IdamClient idamClient) {
@@ -30,7 +36,12 @@ public class UserService {
 
     @Cacheable(value = "accessTokenCache")
     public String getAccessToken(String username, String password) {
-        return idamClient.getAccessToken(username, password);
+        return fetchAccessToken(username, password);
+    }
+
+    protected String fetchAccessToken(String username, String password) {
+        // Retry inside the cache boundary; the bundle service calls this without caching.
+        return accessTokenRetry.execute(context -> idamClient.getAccessToken(username, password));
     }
 
     public UserDetails getUserDetails(String authorisation) {
@@ -52,6 +63,11 @@ public class UserService {
             }
         }
         throw new UpstreamIdamException("IDAM temporarily unavailable");
+    }
+
+    private boolean isTransientTokenFailure(Throwable failure) {
+        // Feign already retries transport failures; repeating them here multiplies its attempts.
+        return failure instanceof FeignException feignException && isServerError(feignException);
     }
 
     private boolean isServerError(FeignException exception) {
