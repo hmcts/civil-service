@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -38,6 +40,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,8 +48,10 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService.CASE_ID;
@@ -400,6 +405,33 @@ class GaCoreCaseDataServiceTest {
                 query.toString()
             );
             verify(userService).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        }
+
+        @Nested
+        @MockitoSettings(strictness = Strictness.LENIENT)
+        class NullQuery {
+
+            @Test
+            void shouldThrowNullPointerExceptionWithoutCallingCcd_whenQueryIsNull() {
+                assertThatThrownBy(() -> service.searchGeneralApplication(null, USER_AUTH_TOKEN))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessage("query");
+
+                verify(authTokenGenerator, never()).generate();
+                verifyNoInteractions(coreCaseDataApi);
+            }
+
+            @Test
+            void shouldRetryOnceAndThenThrowNullPointerException_whenQueryIsNull() {
+                when(userService.getAccessToken(any(), any())).thenReturn(USER_AUTH_TOKEN);
+
+                assertThatThrownBy(() -> service.searchGeneralApplication(null))
+                    .isInstanceOf(NullPointerException.class);
+
+                verify(userService, times(2)).getAccessToken(any(), any());
+                verify(authTokenGenerator, never()).generate();
+                verifyNoInteractions(coreCaseDataApi);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.bulkupdate.csv;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -141,6 +142,40 @@ class CaseReferenceCsvLoaderTest {
             assertEquals(1, list.size());
             assertEquals("12345", list.get(0).caseId);
             assertEquals("Test Case", list.get(0).description);
+        }
+    }
+
+    @Nested
+    class DecryptFormat {
+
+        private static final String SECRET = "mySecretKey";
+        private static final String ORIGINAL = "This is a test string";
+
+        @Test
+        void shouldThrowWhenCipherTextIsMissingAfterSeparator() throws Exception {
+            SecretKey key = CaseReferenceCsvLoader.getKeyFromString(SECRET);
+            String ivOnly = CaseReferenceCsvLoader.encrypt(ORIGINAL, key).split(":")[0] + ":";
+
+            Assertions.assertThatThrownBy(() -> CaseReferenceCsvLoader.decrypt(ivOnly, key))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void shouldThrowWhenThereAreMoreThanTwoParts() throws Exception {
+            SecretKey key = CaseReferenceCsvLoader.getKeyFromString(SECRET);
+            String encryptedWithExtraPart = CaseReferenceCsvLoader.encrypt(ORIGINAL, key) + ":ignored";
+
+            Assertions.assertThatThrownBy(() -> CaseReferenceCsvLoader.decrypt(encryptedWithExtraPart, key))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid encrypted payload format");
+        }
+
+        @Test
+        void shouldReturnEmptyListWhenEncryptedFileIsMalformed() {
+            List<CaseReference> result = caseReferenceCsvLoader.loadCaseReferenceList(
+                CaseReference.class, "caserefs-test-encrypted-malformed.csv", "DUMMY_SECRET");
+
+            Assertions.assertThat(result).isEmpty();
         }
     }
 }

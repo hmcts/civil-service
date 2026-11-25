@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -256,6 +257,63 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest
             // Then
             Assertions.assertThat(response.getErrors())
                     .containsExactly("Incorrect remission type selected");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "0.00"})
+        void shouldNotReturnError_whenGaFullRemissionAndOutstandingFeeIsZero(String outstandingFee) {
+            GeneralApplicationCaseData caseData = gaFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "0.00"})
+        void shouldNotReturnError_whenAdditionalFullRemissionAndOutstandingFeeIsZero(String outstandingFee) {
+            GeneralApplicationCaseData caseData = additionalFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0.01", "100.00"})
+        void shouldStillReturnError_whenGaFullRemissionAndOutstandingFeeIsNotZero(String outstandingFee) {
+            GeneralApplicationCaseData caseData = gaFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors())
+                .containsExactly("Incorrect remission type selected");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0.01", "100.00"})
+        void shouldStillReturnError_whenAdditionalFullRemissionAndOutstandingFeeIsNotZero(String outstandingFee) {
+            GeneralApplicationCaseData caseData = additionalFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors())
+                .containsExactly("Incorrect remission type selected");
+        }
+
+        private AboutToStartOrSubmitCallbackResponse validateRemissionType(GeneralApplicationCaseData caseData) {
+            CallbackParams params = callbackParamsOf(caseData, MID, "remission-type");
+            return (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        }
+
+        private GeneralApplicationCaseData gaFullRemissionCase(BigDecimal outstandingFee) {
+            return new GeneralApplicationCaseData()
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
+                .hwfFeeType(FeeType.APPLICATION)
+                .gaHwfDetails(new HelpWithFeesDetails().setOutstandingFee(outstandingFee))
+                .build();
+        }
+
+        private GeneralApplicationCaseData additionalFullRemissionCase(BigDecimal outstandingFee) {
+            return new GeneralApplicationCaseData()
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForAdditionalFee(YesOrNo.YES))
+                .hwfFeeType(FeeType.ADDITIONAL)
+                .additionalHwfDetails(new HelpWithFeesDetails().setOutstandingFee(outstandingFee))
+                .build();
         }
     }
 
