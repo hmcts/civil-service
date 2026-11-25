@@ -7,7 +7,6 @@ import com.networknt.schema.SpecificationVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.JacksonException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 
@@ -53,7 +52,7 @@ public class JsonSchemaValidationService {
         var jsonSchema = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_7).getSchema(jsonSchemaContents);
         try {
             return jsonSchema.validate(body, InputFormat.JSON);
-        } catch (JacksonException e) {
+        } catch (RuntimeException e) {
             throw new JsonSchemaValidationException(e.getMessage(), e);
         }
     }
