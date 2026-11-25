@@ -14,7 +14,7 @@ plugins {
   id 'org.sonarqube' version '7.5.0.8588'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "9.8.3"
-  id "org.flywaydb.flyway" version "10.22.0"
+  id "org.flywaydb.flyway" version "13.13.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '8.8.0'
