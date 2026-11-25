@@ -166,12 +166,15 @@ allprojects {
       dependency 'io.micrometer:micrometer-core:1.17.1'
       dependency 'ch.qos.logback:logback-core:1.6.5'
 
-      // The decentralised runtime's Spring Boot BOM would hold elasticsearch-java's OpenTelemetry at 1.49.0.
+      // The decentralised runtime's Spring Boot BOM would hold elasticsearch-java's OpenTelemetry at 1.62.0, and
+      // its REST client at 9.4.5 (CVE-2026-133981 and others), below the versions elasticsearch-java asks for.
       // GHSA-ccrj-gw8r-854m, GHSA-rcgg-9c38-7xpx
       dependencySet(group: 'io.opentelemetry', version: '1.67.0') {
         entry 'opentelemetry-api'
+        entry 'opentelemetry-common'
         entry 'opentelemetry-context'
       }
+      dependency "co.elastic.clients:elasticsearch-rest5-client:${versions.elasticsearch}"
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.3'
@@ -242,6 +245,10 @@ def packageCivilCcdDefinitions = tasks.register('packageCivilCcdDefinitions', Sy
   into civilCcdDefinitionsDir.map { it.dir('ccd-definitions') }
 }
 sourceSets.main.resources.srcDir(files(civilCcdDefinitionsDir).builtBy(packageCivilCcdDefinitions))
+// The SDK's guard scans every source set's directories, including these packaged definitions.
+tasks.named('jackson2CompatibilityGuard') {
+  dependsOn packageCivilCcdDefinitions
+}
 
 tasks.register('preparePatchedMigrations', Copy) {
   from 'src/main/resources/db/migration'
