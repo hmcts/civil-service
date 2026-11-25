@@ -176,7 +176,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         private LocalDateTime localDateTime;
 
         @BeforeEach
-        private void setup() {
+        void setup() {
             when(time.now()).thenReturn(LocalDateTime.now());
         }
 

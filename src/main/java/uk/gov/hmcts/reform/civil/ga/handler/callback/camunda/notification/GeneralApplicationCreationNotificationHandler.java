@@ -22,6 +22,13 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_GENERAL_APPLICATION_RESPONDENT;
 
+/**
+ * Handles application-creation notifications from pre-migration process definitions.
+ *
+ * @deprecated Retained until all pre-migration instances have drained. New definitions use
+ *     {@link uk.gov.hmcts.reform.civil.notification.handlers.ga.gaapplicationcreated.GaApplicationCreatedNotifier}.
+ */
+@Deprecated(forRemoval = true)
 @Slf4j
 @Service
 @RequiredArgsConstructor

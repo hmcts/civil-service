@@ -151,6 +151,9 @@ public class SendAndReplyMessageService {
     }
 
     public String renderMessageTableList(Element<Message> message) {
+        if (message == null) {
+            return "";
+        }
         StringBuilder builder = new StringBuilder();
         retrieveFullMessageHistory(message)
             .forEach(messageItem -> builder.append(renderMessageTable(messageItem)));
