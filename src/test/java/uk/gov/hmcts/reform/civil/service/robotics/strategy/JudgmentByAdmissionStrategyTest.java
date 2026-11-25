@@ -447,7 +447,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void usesCcjFixedCostAndClaimFeeForLegalRepClaimEvenWithoutClaimFee() {
+    void defaultsAmountOfCostsToZeroForLipOneVOneWhenClaimFeeIsMissing() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         LocalDateTime responseDate = LocalDateTime.of(2024, 5, 1, 9, 0);
@@ -462,12 +462,15 @@ class JudgmentByAdmissionStrategyTest {
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(responseDate);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setClaimFee(null);
 
         EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
         assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfCosts())
-            .isEqualByComparingTo("130.00");
+            .isEqualByComparingTo("0.00");
     }
 }
