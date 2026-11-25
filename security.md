@@ -159,7 +159,9 @@ The scan target is `TEST_URL` (the nightly's `CIVIL_SERVICE_URL`, by default
 `audit.json` entries use) and the rules are `SecurityRules` (the nightly's
 `SECURITY_RULES` parameter). The library then checks the findings against
 `audit.json`. A failing scan marks the nightly build unstable rather than
-failing it; the HTML and JSON reports are archived from `functional-output/`.
+failing it. The HTML report is linked as **ZAP Security Report** in the
+build's sidebar, and the HTML and JSON reports are also archived from
+`functional-output/`.
 
 When a new finding appears, decide it here first: fix it, or record the
 decision in this file and suppress it in `zap_hooks.py` (a whole rule) or
