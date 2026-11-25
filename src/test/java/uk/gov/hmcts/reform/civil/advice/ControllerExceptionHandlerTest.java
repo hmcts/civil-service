@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimantResponseNotFoundException;
 
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
@@ -70,6 +71,16 @@ class ControllerExceptionHandlerTest {
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
         assertEquals("CCD case-users is currently unavailable", response.getBody());
         assertEquals("10", response.getHeaders().getFirst(RETRY_AFTER));
+    }
+
+    @Test
+    void draftClaimantResponseNotFound_returnsNotFound() {
+        ResponseEntity<Object> response = controllerExceptionHandler.draftClaimantResponseNotFound(
+            new DraftClaimantResponseNotFoundException("1234567890123456")
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Draft claimant response was not found", response.getBody());
     }
 
     @Test

@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum DraftType {
-    DRAFT_CLAIM(30, 7);
+    DRAFT_CLAIM(30, 7),
+    DRAFT_CLAIMANT_RESPONSE(30, 0);
 
     private final long retentionDays;
     private final long paymentRetentionDays;
