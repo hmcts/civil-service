@@ -400,6 +400,18 @@ withNightlyPipeline(type, product, component) {
     // marks the build unstable, not failed.
     if(!runFailedTests) {
       enableSecurityScan()
+
+      // Link ZAP's HTML report in the build's sidebar, whether the scan passed or failed
+      afterAlways('securityScan') {
+        publishHTML([
+          allowMissing: true,
+          alwaysLinkToLastBuild: true,
+          keepAll: true,
+          reportDir: 'functional-output',
+          reportFiles: 'api-report.html',
+          reportName: 'ZAP Security Report'
+        ])
+      }
     }
 
     // if(!runFailedTests && !forceGreenBuild) {
