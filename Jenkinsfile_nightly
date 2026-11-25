@@ -268,7 +268,9 @@ withNightlyPipeline(type, product, component) {
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
-  env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
+  // The ZAP security scan (enableSecurityScan below, run by .ci/security.sh) scans TEST_URL with the rules in SecurityRules
+  env.TEST_URL = civilServiceUrl
+  env.SecurityRules = params.SECURITY_RULES
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
   env.AAC_API_URL = aacApiUrl
@@ -394,8 +396,14 @@ withNightlyPipeline(type, product, component) {
       }
     }
 
+    // Run ZAP security scan except when rerunning failed tests.
+    if(!runFailedTests) {
+      enableSecurityScan()
+    }
+
+    // Preserve existing Fortify security scanning.
     if(!runFailedTests && !forceGreenBuild) {
-       enableFortifyScan()
+      enableFortifyScan()
 
        afterAlways('fortify-scan') {
          steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
