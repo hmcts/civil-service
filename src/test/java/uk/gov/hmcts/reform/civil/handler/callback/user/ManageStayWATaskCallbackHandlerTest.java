@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(classes = {
     ManageStayWATaskCallbackHandler.class,
     Jackson2AutoConfiguration.class

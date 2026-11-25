@@ -73,6 +73,8 @@ import static org.mockito.Mockito.when;
  * retries without a tenant on the engine's 400, never on a timeout or 5xx, because the
  * first request may already have started the process.</p>
  */
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(classes = FeignFailureHandlingTest.Config.class)
 @ActiveProfiles(FeignFailureHandlingTest.PROFILE)
 class FeignFailureHandlingTest {

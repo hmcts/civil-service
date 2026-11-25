@@ -71,6 +71,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
     Jackson2AutoConfiguration.class
 })
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 class HearingNoticeHmcGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";

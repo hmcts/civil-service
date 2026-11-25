@@ -83,6 +83,8 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitn
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.WITNESS_SUMMARY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     EvidenceUploadRespondentHandler.class,

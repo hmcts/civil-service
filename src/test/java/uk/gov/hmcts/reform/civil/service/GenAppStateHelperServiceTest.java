@@ -40,6 +40,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_CLOSED;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenAppStateHelperService.class,
