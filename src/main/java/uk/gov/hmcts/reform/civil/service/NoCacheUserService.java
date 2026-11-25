@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -8,11 +9,8 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 @Slf4j
 public class NoCacheUserService extends UserService {
 
-    private final IdamClient idamClient;
-
     public NoCacheUserService(IdamClient idamClient) {
         super(idamClient);
-        this.idamClient = idamClient;
     }
 
     /**
@@ -24,7 +22,8 @@ public class NoCacheUserService extends UserService {
      * @return The access token.
      */
     @Override
+    @Cacheable(value = "accessTokenCache", condition = "false")
     public String getAccessToken(String username, String password) {
-        return this.idamClient.getAccessToken(username, password);
+        return fetchAccessToken(username, password);
     }
 }

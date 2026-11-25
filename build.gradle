@@ -14,7 +14,7 @@ plugins {
   id 'org.sonarqube' version '7.5.0.8588'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "9.8.3"
-  id "org.flywaydb.flyway" version "10.22.0"
+  id "org.flywaydb.flyway" version "13.13.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '8.8.0'
@@ -66,7 +66,7 @@ def versions = [
   plexusUtils       : '4.1.0',
   postgresql        : '42.7.14',
   protonJ           : '0.35.0',
-  tika              : '3.3.3',
+  tika              : '4.2.0',
   tomcat            : '11.0.27',
   applicationInsights: '3.7.9',
   commonsLang3      : '3.21.0'
@@ -854,9 +854,9 @@ dependencies {
   testImplementation "org.testcontainers:testcontainers-postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:testcontainers-junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.5.252"
-  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.5'
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.7'
   contractTestImplementation "org.hamcrest:java-hamcrest:2.0.0.0"
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.3')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.3')
