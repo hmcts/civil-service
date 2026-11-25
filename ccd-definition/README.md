@@ -59,6 +59,13 @@ which the specs below also read, so the specs check exactly what each environmen
 passed to `json2xlsx -e`: `*` matches any characters, matching ignores case, and a pattern that matches any
 folder or file name in a path leaves that file out.
 
+To shutter Civil, build the shuttered prod spreadsheets with `bin/build-definitions-prod-shuttered.sh` and
+import them by hand. `bin/build-definitions-demo.sh` builds the demo pair the same way. Both set the
+environment's callback URL, and both refuse to run until `SOURCE_OF_TRUTH` is here. Until then, use the
+scripts of the same name in civil-ccd-definition. Once civil-service owns the definitions, every
+civil-service master build imports the unshuttered definitions into prod, so don't merge to master while
+Civil is shuttered.
+
 Until the cutover, civil-ccd-definition's `bin/build-release-ccd-definition.sh` is still the build that
 imports. `bin/compare-ccd-definition-builds.sh` builds every environment, and the shuttered prod variant,
 with both scripts from the definitions at `.source-sha`, and fails unless the spreadsheets are identical.
