@@ -67,6 +67,24 @@
       "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
     },
     {
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "allowedVersions": "!/^1\\.18\\.17(-|$)/",
+      "description": "Byte Buddy 1.18.17 stops Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
+    },
+    {
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchDepNames": [
+        "python"
+      ],
+      "allowedVersions": "<3.15",
+      "description": "Hold actions/setup-python below 3.15: semgrep 1.177.0 needs ruamel.yaml.clib 0.2.15, which has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15"
+    },
+    {
       "enabled": false,
       "matchPackageNames": [
         "/pact/"
