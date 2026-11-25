@@ -13,7 +13,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.66.0'
   id 'org.sonarqube' version '7.5.0.8588'
   id 'au.com.dius.pact' version '4.6.17'
-  id "io.freefair.lombok" version "9.5.0"
+  id "io.freefair.lombok" version "9.8.3"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
@@ -45,7 +45,7 @@ def versions = [
   springStatemachine: '4.0.2',
   lombok            : '1.18.48',
   camunda           : '7.24.0',
-  swaggerAnnotations: '2.2.55',
+  swaggerAnnotations: '3.0.0',
   testcontainers    : '2.0.5',
   assertj           : '3.27.7',
   azureCore         : '1.59.1',
@@ -625,7 +625,12 @@ def sonarExclusions = [
   "**/notification/handlers/staycase/StayCaseEmailDTOGenerator.java",
   "**/notification/handlers/staylifted/StayLiftedEmailDTOGenerator.java",
   "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantEmailDTOGenerator.java",
-  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantTwoEmailDTOGenerator.java"
+  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantTwoEmailDTOGenerator.java",
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceLiftedAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolTwoEmailDTOGenerator.java"
 ]
 
 def sonarCoverageExclusions = [
@@ -968,8 +973,8 @@ tasks.withType(Test).configureEach { t ->
   }
 
   // Common configuration for all test tasks
-  // Gradle caps this at org.gradle.workers.max, which Jenkins sets in Jenkinsfile_CNP, so that is the
-  // real fork count in CI
+  // Gradle caps this at org.gradle.workers.max, set in gradle.properties, so that is the real fork
+  // count in CI
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
