@@ -13,6 +13,10 @@ ccd:
       # Until hmcts/ccd-data-store-api#3077 is released: it passes Client-Context through decentralised submissions.
       image: hmctsprod.azurecr.io/ccd/data-store-api:pr-3077-8a4a4d7-20261116124731
       environment:
+        # A decentralised event holds a connection while civil-service runs it, then takes a second to record the
+        # result, so concurrent events can each hold one and wait for another. The chart's 10 ran out in the full
+        # functional run; this only raises how many events that takes.
+        DATA_STORE_DB_MAX_POOL_SIZE: 30
         SPRING_APPLICATION_JSON: |
           {
             "ccd": {
