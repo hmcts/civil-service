@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -68,10 +69,15 @@ public class ShowWarningTask {
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
             Party partyDetails = getPartyDetails(partyChosen, caseData);
-            if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
-                errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+            Party previousPartyDetails = getPartyDetails(partyChosen, oldCaseData);
+            boolean addressUnchanged = partyDetails != null && previousPartyDetails != null
+                && Objects.equals(partyDetails.getPrimaryAddress(), previousPartyDetails.getPrimaryAddress());
+            if (!addressUnchanged) {
+                errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
+                if (partyDetails != null && partyDetails.getPrimaryAddress() != null) {
+                    errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+                }
             }
             if (partyDetails != null && partyDetails.getPartyName() != null) {
                 errors = partyValidator.validateName(partyDetails.getPartyName(), errors);

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinform
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,6 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -148,6 +152,7 @@ class ShowWarningTaskTest {
             .updateDetailsForm(updateDetailsForm)
             .applicant1(applicant1)
             .build();
+        applicant1.getPrimaryAddress().setPostCode("CM14 5NB");
         CaseData oldCaseData = CaseDataBuilder.builder().build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
 
@@ -221,7 +226,7 @@ class ShowWarningTaskTest {
             .updateDetailsForm(updateDetailsForm)
             .build();
         CaseData oldCaseData = CaseDataBuilder.builder()
-            .applicant1(applicant1)
+            .applicant1(new PartyBuilder().individual().build())
             .build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
         List<String> errorList = List.of("exceeds maximum length 35");
@@ -235,6 +240,55 @@ class ShowWarningTaskTest {
 
         assertThat(response.getErrors()).isNotEmpty();
         assertThat(response.getErrors()).contains("exceeds maximum length 35");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "CLAIMANT_1, false", "CLAIMANT_2, false", "DEFENDANT_1, false", "DEFENDANT_2, false",
+        "CLAIMANT_1, true", "CLAIMANT_2, true", "DEFENDANT_1, true", "DEFENDANT_2, true"
+    })
+    void shouldValidateAddressOnlyWhenChanged(String partyId, boolean addressChanged) {
+        Party previousParty = new PartyBuilder().individual().build();
+        previousParty.getPrimaryAddress().setPostCode("CM14 5NB");
+        Party updatedParty = mapper.convertValue(previousParty, Party.class);
+        updatedParty.setIndividualFirstName("Updated");
+        if (addressChanged) {
+            updatedParty.getPrimaryAddress().setAddressLine1("New street");
+        }
+        final CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(previousParty).applicant2(previousParty)
+            .respondent1(previousParty).respondent2(previousParty).build();
+        final CaseData caseData = CaseDataBuilder.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1(updatedParty).applicant2(updatedParty)
+            .respondent1(updatedParty).respondent2(updatedParty).build();
+        DynamicListElement selectedParty = new DynamicListElement();
+        selectedParty.setCode(partyId);
+        DynamicList parties = new DynamicList();
+        parties.setValue(selectedParty);
+        UpdateDetailsForm form = new UpdateDetailsForm();
+        form.setPartyChosen(parties);
+        caseData.setUpdateDetailsForm(form);
+        CaseDetails before = CaseDetails.builder().build();
+        when(caseDetailsConverter.toCaseData(before)).thenReturn(oldCaseData);
+        when(partyValidator.validateName(any(), anyList())).thenAnswer(invocation -> invocation.getArgument(1));
+        if (addressChanged) {
+            when(postcodeValidator.validate("CM14 5NB")).thenReturn(List.of("Postcode error"));
+            when(partyValidator.validateAddress(any(), anyList())).thenAnswer(invocation -> invocation.getArgument(1));
+        }
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.showWarning(caseData, before);
+
+        if (addressChanged) {
+            assertThat(response.getErrors()).containsExactly("Postcode error");
+            verify(partyValidator).validateAddress(updatedParty.getPrimaryAddress(), List.of("Postcode error"));
+        } else {
+            assertThat(response.getErrors()).isEmpty();
+            verifyNoInteractions(postcodeValidator);
+            verify(partyValidator, org.mockito.Mockito.never()).validateAddress(any(), anyList());
+        }
+        verify(partyValidator).validateName(org.mockito.ArgumentMatchers.eq(updatedParty.getPartyName()), anyList());
     }
 
     @Test

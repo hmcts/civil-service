@@ -48,9 +48,16 @@ public class PostcodeLookupService {
         try {
 
             Map<String, String> params = new HashMap<>();
-            String postcodeQueryParam = StringUtils.deleteWhitespace(postcode) + "+localtype=postcode";
+            String compactPostcode = StringUtils.deleteWhitespace(postcode);
+            String postcodeQueryParam = compactPostcode;
+            if (compactPostcode.length() > 3) {
+                int inwardCodeStart = compactPostcode.length() - 3;
+                postcodeQueryParam = compactPostcode.substring(0, inwardCodeStart)
+                    + " " + compactPostcode.substring(inwardCodeStart);
+            }
             params.put("query", postcodeQueryParam);
             params.put("maxresults", "1");
+            params.put("fq", "LOCAL_TYPE:Postcode");
             String url = configuration.getUrl();
             String key = configuration.getAccessKey();
             params.put("key", key);
@@ -69,7 +76,7 @@ public class PostcodeLookupService {
             headers.set("Accept", "application/json");
 
             response = restTemplate.exchange(
-                builder.toUriString(),
+                builder.build().encode().toUri(),
                 HttpMethod.GET,
                 new HttpEntity(headers),
                 String.class
