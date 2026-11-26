@@ -252,7 +252,7 @@ public class TestingSupportController {
         ExternalTaskImpl externalTask = new ExternalTaskImpl();
         try {
             claimDetailsNotificationDeadlineHandler.handleTask(externalTask);
-        } catch (Exception e) {
+        } catch (Exception _) {
             responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);

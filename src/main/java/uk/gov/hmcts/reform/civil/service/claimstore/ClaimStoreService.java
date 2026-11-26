@@ -33,7 +33,7 @@ public class ClaimStoreService {
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
-        } catch (FeignException.Unauthorized e) {
+        } catch (FeignException.Unauthorized _) {
             logUnauthorized("claimant", claimantId);
             return Collections.emptyList();
         } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
@@ -48,7 +48,7 @@ public class ClaimStoreService {
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForDefendant(authorisation, defendantId));
-        } catch (FeignException.Unauthorized e) {
+        } catch (FeignException.Unauthorized _) {
             logUnauthorized("defendant", defendantId);
             return Collections.emptyList();
         } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
