@@ -336,7 +336,7 @@ public class DraftStoreService {
         );
         try {
             return Optional.of(draftStoreTransactionService.saveInNewTransaction(claimRow));
-        } catch (DataIntegrityViolationException ex) {
+        } catch (DataIntegrityViolationException _) {
             return reuseBlankDraftForLegacySubmission(userId, submissionId, draftType)
                 .or(() -> {
                     log.info(
@@ -453,7 +453,7 @@ public class DraftStoreService {
         if (value instanceof String text) {
             try {
                 return Long.parseLong(text.trim());
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 return null;
             }
         }

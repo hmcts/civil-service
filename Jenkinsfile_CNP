@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.14.0")
+@Library("Infrastructure@2.15.0")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -107,6 +107,26 @@ def createBpmnGithubRelease() {
   """
 }
 
+// The CCD definition specs (ccd-definition/test) check this checkout's ccd-definition/: the mirror until
+// ccd-definition/SOURCE_OF_TRUTH is added, then the live definitions. They run at the start of the Build
+// stage, because the preview import later replaces ccd-definition/ with civil-ccd-definition's copy until
+// the switch.
+// Node comes from .nvmrc through nvm, as the library's YarnBuilder sets it up.
+def runCcdDefinitionSpecs() {
+  stage('CCD definition specs') {
+    timeout(time: 10, unit: 'MINUTES') {
+      sh '''
+        set +ex
+        export NVM_DIR='/home/jenkinsssh/.nvm'
+        . /opt/nvm/nvm.sh
+        nvm install || exit 1
+        set -ex
+        ./bin/run-ccd-definition-specs.sh
+      '''
+    }
+  }
+}
+
 withPipeline(type, product, component) {
   pipelineConf = config
   disableLegacyDeployment()
@@ -157,7 +177,13 @@ withPipeline(type, product, component) {
     setPreviewUrls(product, component)
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
-    before('build') {
+  }
+
+  // Every branch's before('build') steps go here. The library keeps one closure per hook, so a second
+  // before('build'), for example inside onPR, would replace this one.
+  before('build') {
+    runCcdDefinitionSpecs()
+    onPR {
       stage('Check chart size') {
         // Reuse Jenkins registry access; GitHub-hosted runners cannot pull these private charts.
         withAcrClient('nonprod') {

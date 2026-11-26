@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.gajudicialdecision.GaJudicialDecisionNotifier;
 
 import java.util.Map;
 
@@ -107,23 +108,13 @@ class JudgeMakesDecisionGeneralApplicationTest extends BpmnBaseJudgeGASpecTest {
             variables
         );
 
-        //Complete Applicant Notification event
+        //Notify decision parties
         ExternalTask judicialApplicantNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
             judicialApplicantNotificationProcess,
             PROCESS_EXTERNAL_CASE_EVENT,
-            START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_APPLICANT_NOTIFICATION_PROCESS_ID,
-            variables
-        );
-
-        //Complete Respondent Notification event
-        ExternalTask judicialRespondentNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            judicialRespondentNotificationProcess,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_RESPONDENT_NOTIFICATION_PROCESS_ID,
+            "NOTIFY_EVENT",
+            GaJudicialDecisionNotifier.TASK_ID,
             variables
         );
 
@@ -224,23 +215,13 @@ class JudgeMakesDecisionGeneralApplicationTest extends BpmnBaseJudgeGASpecTest {
             variables
         );
 
-        //Complete Applicant Notification event
+        //Notify decision parties
         ExternalTask judicialApplicantNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
             judicialApplicantNotificationProcess,
             PROCESS_EXTERNAL_CASE_EVENT,
-            START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_APPLICANT_NOTIFICATION_PROCESS_ID,
-            variables
-        );
-
-        //Complete Respondent Notification event
-        ExternalTask judicialRespondentNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            judicialRespondentNotificationProcess,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_RESPONDENT_NOTIFICATION_PROCESS_ID,
+            "NOTIFY_EVENT",
+            GaJudicialDecisionNotifier.TASK_ID,
             variables
         );
 
@@ -341,23 +322,13 @@ class JudgeMakesDecisionGeneralApplicationTest extends BpmnBaseJudgeGASpecTest {
             variables
         );
 
-        //Complete Applicant Notification event
+        //Notify decision parties
         ExternalTask judicialApplicantNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
             judicialApplicantNotificationProcess,
             PROCESS_EXTERNAL_CASE_EVENT,
-            START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_APPLICANT_NOTIFICATION_PROCESS_ID,
-            variables
-        );
-
-        //Complete Respondent Notification event
-        ExternalTask judicialRespondentNotificationProcess = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            judicialRespondentNotificationProcess,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION,
-            START_RESPONDENT_NOTIFICATION_PROCESS_ID,
+            "NOTIFY_EVENT",
+            GaJudicialDecisionNotifier.TASK_ID,
             variables
         );
 

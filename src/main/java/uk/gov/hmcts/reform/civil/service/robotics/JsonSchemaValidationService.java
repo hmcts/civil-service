@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.robotics;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
+import com.networknt.schema.InputFormat;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.SpecificationVersion;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 
-import java.util.Set;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -21,6 +20,7 @@ public class JsonSchemaValidationService {
 
     private String jsonSchemaFile;
 
+    @Autowired
     public JsonSchemaValidationService() {
         this.jsonSchemaFile = "schema/rpa-json-schema.json";
     }
@@ -34,7 +34,7 @@ public class JsonSchemaValidationService {
     }
 
     public boolean isValid(String body, String jsonSchemaFileName) {
-        Set<ValidationMessage> errors = validate(body, jsonSchemaFileName);
+        List<Error> errors = validate(body, jsonSchemaFileName);
         if (!errors.isEmpty()) {
             log.error("Schema validation errors count: {}", errors.size());
             log.error("Schema validation errors: {}", errors);
@@ -43,20 +43,16 @@ public class JsonSchemaValidationService {
         return true;
     }
 
-    public Set<ValidationMessage> validate(String payload) {
+    public List<Error> validate(String payload) {
         return validate(payload, jsonSchemaFile);
     }
 
-    public Set<ValidationMessage> validate(String body, String jsonSchemaFileName) {
+    public List<Error> validate(String body, String jsonSchemaFileName) {
         String jsonSchemaContents = readJsonSchema(jsonSchemaFileName);
-        var jsonSchema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(jsonSchemaContents);
-        return jsonSchema.validate(getJsonNodeFromStringContent(body));
-    }
-
-    private JsonNode getJsonNodeFromStringContent(String content) {
+        var jsonSchema = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_7).getSchema(jsonSchemaContents);
         try {
-            return new ObjectMapper().readTree(content);
-        } catch (JsonProcessingException e) {
+            return jsonSchema.validate(body, InputFormat.JSON);
+        } catch (RuntimeException e) {
             throw new JsonSchemaValidationException(e.getMessage(), e);
         }
     }

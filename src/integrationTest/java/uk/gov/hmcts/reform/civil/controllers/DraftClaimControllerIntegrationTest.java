@@ -180,6 +180,10 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         doDraftPut(BEARER_TOKEN, new DraftClaimRequest("12345", PAYLOAD), draftId)
             .andExpect(status().isOk());
 
+        // A submitted draft is no longer the users active draft
+        doGet(BEARER_TOKEN, ACTIVE_DRAFT_CLAIM_URL)
+            .andExpect(status().isNoContent());
+
         // The user starts another claim while the first is unpaid
         doPost(BEARER_TOKEN, new DraftClaimRequest(null, PAYLOAD), DRAFT_CLAIMS_URL)
             .andExpectAll(
@@ -198,13 +202,21 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenNoDraftExistsForCase() throws Exception {
-        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
-            .andExpect(status().isNotFound());
+    void shouldReturnNoContentWhenUserHasNoDraft() throws Exception {
+        draftStoreRepository.deleteAll();
+
+        doGet(BEARER_TOKEN, ACTIVE_DRAFT_CLAIM_URL)
+            .andExpect(status().isNoContent());
     }
 
     @Test
-    void shouldReturnNotFoundWhenCaseDraftIsExpired() throws Exception {
+    void shouldReturnNoContentWhenNoDraftExistsForCase() throws Exception {
+        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldReturnNoContentWhenCaseDraftIsExpired() throws Exception {
         draftStoreRepository.deleteAll();
         OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
         draftStoreRepository.save(draftClaim(
@@ -216,13 +228,13 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         ));
 
         doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
-            .andExpect(status().isNotFound());
+            .andExpect(status().isNoContent());
 
         assertThat(draftStoreRepository.findById(draftId)).isPresent();
     }
 
     @Test
-    void shouldReturnNotFoundWhenDifferentUserRequestsDraftForCase() throws Exception {
+    void shouldReturnNoContentWhenDifferentUserRequestsDraftForCase() throws Exception {
         draftStoreRepository.deleteAll();
         OffsetDateTime now = OffsetDateTime.now();
         draftStoreRepository.save(draftClaim(draftId, now, now.plusDays(RETENTION_DAYS), "payment-step", "12345"));
@@ -231,7 +243,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .willReturn(UserInfo.builder().uid("user2").build());
 
         doGet(otherUserToken, DRAFT_CLAIM_BY_CASE_URL, "12345")
-            .andExpect(status().isNotFound());
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -375,7 +387,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenDraftIsExpired() throws Exception {
+    void shouldNotReturnExpiredDraftByIdOrAsActive() throws Exception {
         draftStoreRepository.deleteById(draftId);
         OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
 
@@ -389,7 +401,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(status().isNotFound());
 
         doGet(BEARER_TOKEN, ACTIVE_DRAFT_CLAIM_URL)
-            .andExpect(status().isNotFound());
+            .andExpect(status().isNoContent());
     }
 
     @Test

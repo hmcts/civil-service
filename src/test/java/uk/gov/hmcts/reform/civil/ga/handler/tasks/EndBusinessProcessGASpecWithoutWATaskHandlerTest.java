@@ -6,6 +6,10 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -105,32 +110,38 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
         verify(externalTaskService).complete(any(), any());
     }
 
-    @Test
-    void shouldTriggerEndGADocUploadProcessCCDEventAfterSuccessful() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = "5678")
+    void shouldFinishGaProcessUsingApplicationIdWhenPresentElseCaseId(String generalApplicationCaseId) {
+        String targetCaseId = generalApplicationCaseId == null ? CASE_ID : generalApplicationCaseId;
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent("INITIATE_GENERAL_APPLICATION")
+                                 .setActivityId("GeneralApplicationRespondentTaskList")
+                                 .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED))
             .build();
-
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
-
-        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
-            .setCaseId(CASE_ID);
-
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
-        when(coreCaseDataService.startGaUpdate(
-            CASE_ID,
-            END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK
-        )).thenReturn(startEventResponse);
-        when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
-
-        CaseDataContent caseDataContentWithFinishedStatus = getCaseDataContent(caseDetails, startEventResponse);
+        ExternalTaskInput input = new ExternalTaskInput()
+            .setCaseId(CASE_ID)
+            .setGeneralApplicationCaseId(generalApplicationCaseId);
+        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(input);
+        when(coreCaseDataService.startGaUpdate(targetCaseId, END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK))
+            .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
 
         handler.execute(mockExternalTask, externalTaskService);
 
-        verify(coreCaseDataService).startGaUpdate(CASE_ID, END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK);
-        verify(coreCaseDataService).submitGaUpdate(CASE_ID, caseDataContentWithFinishedStatus);
+        ArgumentCaptor<CaseDataContent> content = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).startGaUpdate(targetCaseId, END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK);
+        verify(coreCaseDataService).submitGaUpdate(eq(targetCaseId), content.capture());
+        BusinessProcess businessProcess = (BusinessProcess) ((Map<?, ?>) content.getValue().getData()).get("businessProcess");
+        assertThat(businessProcess.getStatus()).isEqualTo(BusinessProcessStatus.FINISHED);
+        assertThat(businessProcess.getActivityId()).isNull();
+        assertThat(businessProcess.getProcessInstanceId()).isNull();
+        assertThat(content.getValue().getData()).isSameAs(caseDetails.getData());
         verify(externalTaskService).complete(any(), any());
     }
 
