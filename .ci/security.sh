@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The ZAP scan the nightly pipeline runs (enableSecurityScan in Jenkinsfile_nightly), in place of the pipeline library's
+# The ZAP scan the nightly pipeline runs (the 'Security scan' stage in Jenkinsfile_nightly), in place of the pipeline library's
 # default backend script (cnp-jenkins-library resources/uk/gov/hmcts/pipeline/security/backend/security.sh), which this
 # follows with three changes:
 #  - civil-service publishes its OpenAPI spec with springdoc at /v3/api-docs, not /v2/api-docs
