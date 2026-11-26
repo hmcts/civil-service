@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -23,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 public abstract class CcdDashboardClaimMatcher implements Claim {
@@ -67,6 +70,12 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.isSettlementAgreementDeadlineExpired()
             && !isSettled()
             && !caseData.isCcjRequestJudgmentByAdmission();
+    }
+
+    @Override
+    public boolean hasClaimEnded() {
+        return NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+            && caseData.isRespondentResponseFullDefence();
     }
 
     public boolean isSettled() {
@@ -142,7 +151,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     public boolean isSDOOrderCreatedPreCP() {
         String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
-            .map(location -> location.getBaseLocation())
+            .map(CaseLocationCivil::getBaseLocation)
             .orElse(null);
 
         boolean isCaseProgression = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
@@ -167,7 +176,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
-            .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled()
+            .anyMatch(DocumentType.DECISION_MADE_ON_APPLICATIONS::equals)) && !isSettled()
             && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 
@@ -176,14 +185,14 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
-            .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
+            .map(CaseDocument::getDocumentType).anyMatch(DocumentType.SDO_ORDER::equals)
             && !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
     }
 
     @Override
     public boolean isSDOOrderCreatedCP() {
         String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
-            .map(location -> location.getBaseLocation())
+            .map(CaseLocationCivil::getBaseLocation)
             .orElse(null);
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
@@ -229,7 +238,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isHearingLessThanDaysAway(int days) {
         return caseData.getHearingDate() != null
-            && LocalDate.now().plusDays(days + 1L).isAfter(caseData.getHearingDate());
+            && LocalDate.now(LOCAL_ZONE).plusDays(days + 1L).isAfter(caseData.getHearingDate());
     }
 
     @Override
