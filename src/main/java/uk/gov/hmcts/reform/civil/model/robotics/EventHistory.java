@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import net.minidev.json.annotate.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -13,27 +14,27 @@ import java.util.Objects;
 @Accessors(chain = true)
 public class EventHistory {
 
-    private List<Event> miscellaneous;
-    private List<Event> acknowledgementOfServiceReceived;
-    private List<Event> consentExtensionFilingDefence;
-    private List<Event> defenceFiled;
-    private List<Event> defenceAndCounterClaim;
-    private List<Event> receiptOfPartAdmission;
-    private List<Event> receiptOfAdmission;
-    private List<Event> replyToDefence;
-    private List<Event> directionsQuestionnaireFiled;
-    private List<Event> breathingSpaceEntered;
-    private List<Event> breathingSpaceLifted;
-    private List<Event> breathingSpaceMentalHealthEntered;
-    private List<Event> breathingSpaceMentalHealthLifted;
-    private List<Event> interlocutoryJudgment;
-    private List<Event> defaultJudgment;
-    private List<Event> setAsideJudgment;
-    private List<Event> statesPaid;
-    private List<Event> judgmentByAdmission;
-    private List<Event> generalFormOfApplication;
-    private List<Event> defenceStruckOut;
-    private List<Event> certificateOfSatisfactionOrCancellation;
+    private List<Event> miscellaneous = new ArrayList<>();
+    private List<Event> acknowledgementOfServiceReceived = new ArrayList<>();
+    private List<Event> consentExtensionFilingDefence = new ArrayList<>();
+    private List<Event> defenceFiled = new ArrayList<>();
+    private List<Event> defenceAndCounterClaim = new ArrayList<>();
+    private List<Event> receiptOfPartAdmission = new ArrayList<>();
+    private List<Event> receiptOfAdmission = new ArrayList<>();
+    private List<Event> replyToDefence = new ArrayList<>();
+    private List<Event> directionsQuestionnaireFiled = new ArrayList<>();
+    private List<Event> breathingSpaceEntered = new ArrayList<>();
+    private List<Event> breathingSpaceLifted = new ArrayList<>();
+    private List<Event> breathingSpaceMentalHealthEntered = new ArrayList<>();
+    private List<Event> breathingSpaceMentalHealthLifted = new ArrayList<>();
+    private List<Event> interlocutoryJudgment = new ArrayList<>();
+    private List<Event> defaultJudgment = new ArrayList<>();
+    private List<Event> setAsideJudgment = new ArrayList<>();
+    private List<Event> statesPaid = new ArrayList<>();
+    private List<Event> judgmentByAdmission = new ArrayList<>();
+    private List<Event> generalFormOfApplication = new ArrayList<>();
+    private List<Event> defenceStruckOut = new ArrayList<>();
+    private List<Event> certificateOfSatisfactionOrCancellation = new ArrayList<>();
 
     @JsonIgnore
     public List<Event> flatEvents() {

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.notification.robotics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataExceptio
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
-import java.util.Set;
+import java.util.List;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -36,7 +36,7 @@ public class RoboticsNotifier {
 
         RoboticsCaseData roboticsCaseData = null;
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
-        Set<ValidationMessage> errors = null;
+        List<Error> errors = null;
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
