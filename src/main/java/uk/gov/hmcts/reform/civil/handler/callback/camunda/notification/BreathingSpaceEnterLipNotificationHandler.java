@@ -13,6 +13,8 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_BREATHING_SPACE_ENTER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_ENTER;
 
+// Only kept for instances still currently in-flight. Check out AbstractBreathingSpaceLipNotificationHandler for more information
+
 @Service
 public class BreathingSpaceEnterLipNotificationHandler extends AbstractBreathingSpaceLipNotificationHandler {
 
