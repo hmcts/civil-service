@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.BilingualOrderDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
@@ -74,6 +76,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final BilingualOrderDocumentService bilingualOrderDocumentService;
     private static final String CATEGORY_ID = "caseManagementOrders";
 
     @Override
@@ -85,12 +88,32 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             callbackParams,
             aboutToStartOrSubmitCallbackResponseBuilder
         );
-        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
-        updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams);
-        updateDocumentCollectionsWithTranslationDocuments(
-            caseData);
-        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
+        // Capture stitch flags and business-process event before collections/translated docs are mutated
+        // (updateNoticeOfDiscontinuanceTranslatedDoc clears discontinuance docs from translatedDocuments).
+        List<Element<TranslatedDocument>> translatedDocuments =
+            Optional.ofNullable(caseData.getTranslatedDocuments()).orElse(Collections.emptyList());
+        boolean uploadedSdo = isContainsSpecifiedDocType(translatedDocuments, STANDARD_DIRECTION_ORDER);
+        boolean uploadedFinalOrder = isContainsSpecifiedDocType(translatedDocuments, FINAL_ORDER);
+        boolean uploadedHearingNotice = isContainsSpecifiedDocType(translatedDocuments, HEARING_NOTICE);
+        final CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
 
+        updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams);
+        updateDocumentCollectionsWithTranslationDocuments(caseData);
+        // OCCC-827: after EN is restored and CY appended, stitch EN+CY for bilingual (BOTH) parties.
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (uploadedSdo || uploadedFinalOrder || uploadedHearingNotice)) {
+            String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            if (uploadedSdo) {
+                bilingualOrderDocumentService.stitchSdoIfRequired(caseData, authorisation);
+            }
+            if (uploadedFinalOrder) {
+                bilingualOrderDocumentService.stitchFinalOrderIfRequired(caseData, authorisation);
+            }
+            if (uploadedHearingNotice) {
+                bilingualOrderDocumentService.stitchHearingNoticeIfRequired(caseData, authorisation);
+            }
+        }
+        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
         if (businessProcessEvent != null) {
             caseData.setBusinessProcess(BusinessProcess.ready(businessProcessEvent));
         }

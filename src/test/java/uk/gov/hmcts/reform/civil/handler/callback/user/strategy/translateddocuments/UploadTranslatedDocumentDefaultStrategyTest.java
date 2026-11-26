@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.BilingualOrderDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -70,6 +71,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private AssignCategoryId assignCategoryId;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private BilingualOrderDocumentService bilingualOrderDocumentService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -79,7 +82,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
                                                                                               featureToggleService,
-                                                                                              deadlinesCalculator
+                                                                                              deadlinesCalculator,
+                                                                                              bilingualOrderDocumentService
         );
     }
 

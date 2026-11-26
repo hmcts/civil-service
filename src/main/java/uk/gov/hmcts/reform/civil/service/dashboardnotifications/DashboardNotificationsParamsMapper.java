@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.BilingualOrderDocumentService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ public class DashboardNotificationsParamsMapper {
 
     private final List<DashboardNotificationsParamsBuilder> dashboardNotificationsParamsBuilders;
     private final FeatureToggleService featureToggleService;
+    private final BilingualOrderDocumentService bilingualOrderDocumentService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
         return buildBaseParams(caseData);
@@ -52,24 +54,23 @@ public class DashboardNotificationsParamsMapper {
     }
 
     private String addToMapDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        boolean welshEnabled = featureToggleService.isWelshEnabledForMainCase();
         return Optional.ofNullable(caseEvent).map(event -> switch (event) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
-                if (featureToggleService.isWelshEnabledForMainCase()
-                    && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-                    yield null;
-                } else {
-                    yield getFirstFinalOrderUrlIfPresent(caseData);
-                }
-            }
-            case UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT -> getFirstFinalOrderUrlIfPresent(caseData);
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT ->
+                bilingualOrderDocumentService.resolveFinalOrderDocumentUrl(caseData, true, welshEnabled).orElse(null);
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT ->
+                bilingualOrderDocumentService.resolveFinalOrderDocumentUrl(caseData, false, welshEnabled).orElse(null);
+            case UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT ->
+                getFirstFinalOrderUrlIfPresent(caseData);
             case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT ->
                 Optional.ofNullable(caseData.getOrderSDODocumentDJCollection())
                     .filter(collection -> !collection.isEmpty())
                     .map(collection -> collection.get(0).getValue().getDocumentLink().getDocumentBinaryUrl())
                     .orElse(null);
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> caseData.getSDODocument()
-                .map(sdoDocument -> sdoDocument.getValue().getDocumentLink().getDocumentBinaryUrl())
-                .orElse(null);
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT ->
+                bilingualOrderDocumentService.resolveSdoDocumentUrl(caseData, true, welshEnabled).orElse(null);
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT ->
+                bilingualOrderDocumentService.resolveSdoDocumentUrl(caseData, false, welshEnabled).orElse(null);
             default -> null;
         }).orElse(null);
     }
