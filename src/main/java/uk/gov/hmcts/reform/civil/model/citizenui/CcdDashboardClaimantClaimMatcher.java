@@ -268,12 +268,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean hasClaimEnded() {
-        return NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
-            && caseData.isRespondentResponseFullDefence();
-    }
-
-    @Override
     public boolean isClaimRejectedAndOfferSettleOutOfCourt() {
         return false;
     }
