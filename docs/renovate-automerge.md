@@ -6,7 +6,7 @@
 
 Repo-level settings:
 
-- `enabled`: `false`. Renovate is paused for this repository (#8711) while the open dependency PRs are sorted out; see [Pausing Renovate](#pausing-renovate). The rest of this section describes the configuration that applies once it is turned back on.
+- `enabled`: `false`. Renovate is paused for this repository (#8711) for a release freeze; see [Pausing Renovate](#pausing-renovate). The rest of this section describes the configuration that applies once it is turned back on.
 - `timezone`: `Europe/London`.
 - `schedule` and `automergeSchedule`: after 7am and before 9am, and after 5pm and before 8pm, every weekday.
 - `platformAutomerge`: `false`, so Renovate enforces the configured merge windows instead of queuing GitHub auto-merge.
@@ -174,9 +174,6 @@ If Renovate must stop before a configuration change can merge, an organisation a
 
 ### Current pause
 
-Paused by #8711 (2026-11-26) while these are fixed:
+Paused by #8711 (2026-11-26) for a release freeze. The freeze uses a full pause rather than the release-freeze rule, so Renovate PRs aren't rebased or updated during it as well as not being merged.
 
-- `#8706` All non-major updates: Byte Buddy 1.18.16 breaks Mockito mocking of `CaseData` on Java 25 (held by #8709), and the Micrometer BOM moves to 1.18.0, past the 1.17.x that Spring Boot 4.1 manages.
-- `#8571` Spring Boot and related updates: Spring Boot 4.2.0 isn't accepted by Spring Cloud 2025.1.3, and the Reactor, Micrometer and Netty CVE-minimum pins in `build.gradle` sit below the versions Boot 4.2 picks.
-
-Revert #8711 once #8709 has merged and the Spring Boot 4.2 route is agreed.
+Revert #8711 when the freeze ends, then follow the checks under [End a freeze](#end-a-freeze).
