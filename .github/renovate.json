@@ -78,8 +78,8 @@
         "net.bytebuddy:byte-buddy",
         "net.bytebuddy:byte-buddy-agent"
       ],
-      "allowedVersions": "!/^1\\.18\\.17(-|$)/",
-      "description": "Byte Buddy 1.18.17 stops Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
+      "allowedVersions": "!/^1\\.18\\.1[67](-|$)/",
+      "description": "Byte Buddy 1.18.16 and 1.18.17 stop Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
     },
     {
       "matchDatasources": [
