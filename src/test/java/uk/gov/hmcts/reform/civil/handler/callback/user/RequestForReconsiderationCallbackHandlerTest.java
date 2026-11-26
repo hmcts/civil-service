@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -71,6 +73,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
@@ -643,7 +648,11 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(
+                new CaseDocument().setDocumentName("Name of document")
+                    .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                    .setDocumentLink(new Document().setDocumentUrl("fake-url"))
+            );
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -658,6 +667,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocument")
                 .extracting("documentName")
                 .isEqualTo("Name of document");
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -677,7 +690,11 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(
+                new CaseDocument().setDocumentName("Name of document")
+                    .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                    .setDocumentLink(new Document().setDocumentUrl("fake-url"))
+            );
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -692,6 +709,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
                 .extracting("documentName")
                 .isEqualTo("Name of document");
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -705,8 +726,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
-            CaseDocument caseDocument = mock(CaseDocument.class);
-            when(caseDocument.getDocumentName()).thenReturn("Generated document name");
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentName("Generated document name")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("fake-url"));
             when(documentService.generateLiPDocument(
                 caseData,
                 params.getParams().get(BEARER_TOKEN).toString(),
@@ -726,6 +749,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocument")
                 .extracting("documentName")
                 .isEqualTo(caseDocument.getDocumentName());
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo(caseDocument.getDocumentName());
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -740,8 +769,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
-            CaseDocument caseDocument = mock(CaseDocument.class);
-            when(caseDocument.getDocumentName()).thenReturn("Generated document for defendant");
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentName("Generated document for defendant")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("fake-url"));
             when(documentService.generateLiPDocument(
                 caseData,
                 params.getParams().get(BEARER_TOKEN).toString(),
@@ -760,6 +791,52 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
                 .extracting("documentName")
                 .isEqualTo(caseDocument.getDocumentName());
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo(caseDocument.getDocumentName());
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
+        }
+
+        @Test
+        void shouldAppendReconsiderationDocumentToExistingSystemGeneratedCaseDocuments() {
+            //Given: Casedata with existing SDO document
+            CaseDocument sdoDocument = new CaseDocument()
+                .setDocumentName("SDO Document")
+                .setDocumentType(DocumentType.SDO_ORDER)
+                .setDocumentLink(new Document().setDocumentUrl("sdo-url"));
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(new CaseDataLiP()
+                                 .setRequestForReviewCommentsClaimant("Comments from claimant"))
+                .systemGeneratedCaseDocuments(List.of(ElementUtils.element(sdoDocument)))
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+            CaseDocument reconDocument = new CaseDocument()
+                .setDocumentName("Reconsideration Document")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("recon-url"));
+            when(documentService.generateLiPDocument(
+                caseData,
+                params.getParams().get(BEARER_TOKEN).toString(),
+                true
+            )).thenReturn(reconDocument);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: reconsideration doc is appended and category ID is set to applications
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo("SDO Document");
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentName())
+                .isEqualTo("Reconsideration Document");
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test

@@ -70,6 +70,15 @@ public class AssignCategoryIdTests {
     }
 
     @Test
+    void shouldNotThrowException_whenAssignCaseDocumentCategoryIdInvokedWithNullOrNullLink() {
+        assignCategoryId.assignCategoryIdToCaseDocument(null, "testCaseDocumentID");
+
+        CaseDocument docWithNullLink = new CaseDocument();
+        assignCategoryId.assignCategoryIdToCaseDocument(docWithNullLink, "testCaseDocumentID");
+        assertThat(docWithNullLink.getDocumentLink()).isNull();
+    }
+
+    @Test
     void shouldAssignDocumentCategoryId_whenInvoked() {
         assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
 
