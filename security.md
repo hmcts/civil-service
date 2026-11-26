@@ -142,10 +142,13 @@ OpenAPI v3 (`/v3/api-docs`) and no longer serves the v2 endpoint.
 ### Nightly ZAP scan
 
 The nightly pipeline (`Jenkinsfile_nightly`) runs a ZAP API scan of
-civil-service on AAT with `enableSecurityScan()`, except on a rerun of failed
-tests. The HMCTS pipeline library runs `.ci/security.sh` in its ZAP container,
-in place of its default backend script, which this follows with three
-changes:
+civil-service on AAT in a `Security scan` stage, except on a rerun of failed
+tests. The stage calls the pipeline library's `YarnBuilder.securityScan()`
+rather than `enableSecurityScan()`, because for a java pipeline that uses
+`GradleBuilder.securityScan()`, which fails with `MissingFieldException: No
+such field: securitytest` (JENKINS-47355). The HMCTS pipeline library runs
+`.ci/security.sh` in its ZAP container, in place of its default backend
+script, which this follows with three changes:
 
 - it scans the springdoc spec at `/v3/api-docs` (the default scans
   `/v2/api-docs`, which civil-service no longer serves)

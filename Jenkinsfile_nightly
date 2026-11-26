@@ -268,7 +268,7 @@ withNightlyPipeline(type, product, component) {
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
-  // The ZAP security scan (enableSecurityScan below, run by .ci/security.sh) scans TEST_URL with the rules in SecurityRules
+  // The ZAP security scan (the 'Security scan' stage below, run by .ci/security.sh) scans TEST_URL with the rules in SecurityRules
   env.TEST_URL = civilServiceUrl
   env.SecurityRules = params.SECURITY_RULES
   env.TESTS_FOR_ACCESSIBILITY = true
@@ -397,19 +397,31 @@ withNightlyPipeline(type, product, component) {
     }
 
     // Run ZAP security scan except when rerunning failed tests.
+    // Not enableSecurityScan(): for a java pipeline that calls GradleBuilder.securityScan(), which fails with
+    // "MissingFieldException: No such field: securitytest" (GradleBuilder has no securitytest field of its own,
+    // see https://issues.jenkins.io/browse/JENKINS-47355). YarnBuilder.securityScan() does the same thing
+    // (.ci/security.sh, ZAP, then the audit.json check) and has the field, so the scan runs through yarnBuilder.
     if(!runFailedTests) {
-      enableSecurityScan()
-
-      // Link ZAP's HTML report in the build's sidebar, whether the scan passed or failed
-      afterAlways('securityScan') {
-        publishHTML([
-          allowMissing: true,
-          alwaysLinkToLastBuild: true,
-          keepAll: true,
-          reportDir: 'functional-output',
-          reportFiles: 'api-report.html',
-          reportName: 'ZAP Security Report'
-        ])
+      afterAlways('build') {
+        stage('Security scan') {
+          warnError('Failure in securityScan') {
+            try {
+              timeout(time: 120, unit: 'MINUTES') {
+                yarnBuilder.securityScan()
+              }
+            } finally {
+              // Link ZAP's HTML report in the build's sidebar, whether the scan passed or failed
+              publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'functional-output',
+                reportFiles: 'api-report.html',
+                reportName: 'ZAP Security Report'
+              ])
+            }
+          }
+        }
       }
     }
 
