@@ -33,9 +33,8 @@ public class EmailSubjectUtils {
 
     public static Map<String, String> addLipClaimantVDefendant(GeneralApplicationCaseData caseData,
                                                                Map<String, String> properties) {
-        String partyNames = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
-        properties.put(CASE_TITLE, partyNames);
-        properties.put(CLAIMANT_V_DEFENDANT, partyNames);
+        properties.put(CASE_TITLE, JudicialFinalDecisionHandler.getAllPartyNames(caseData));
+        properties.put(CLAIMANT_V_DEFENDANT, JudicialFinalDecisionHandler.getAllPartyNames(caseData, "V"));
         return properties;
     }
 }
