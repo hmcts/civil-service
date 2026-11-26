@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 25.0.4+101.0.LTS
+          java-version: 25.0.5+100000002.0.LTS
       - name: Run checks
         run: |
           # Jenkins owns PR unit execution and Sonar coverage. Keep every other check here.
