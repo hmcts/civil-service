@@ -227,6 +227,15 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
+    void shouldReturnNullTriggerReason_whenEventHistoryHasNoDatedEvents() {
+        EventHistory eventHistory = new EventHistory()
+            .setDirectionsQuestionnaireFiled(List.of(new Event()));
+
+        assertThat(RoboticsNotificationService.findLatestEventTriggerReason(eventHistory)).isNull();
+        assertThat(RoboticsNotificationService.findLatestEventTriggerReason(new EventHistory())).isNull();
+    }
+
+    @Test
     @SneakyThrows
     void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
         // Given

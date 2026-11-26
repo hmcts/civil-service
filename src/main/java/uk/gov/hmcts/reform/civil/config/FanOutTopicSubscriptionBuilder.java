@@ -171,7 +171,7 @@ public class FanOutTopicSubscriptionBuilder implements TopicSubscriptionBuilder 
     private static void closeQuietly(TopicSubscription subscription) {
         try {
             subscription.close();
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException _) {
             // already unwinding a failed open; the original cause is the one worth reporting
         }
     }
