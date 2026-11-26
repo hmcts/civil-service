@@ -29,6 +29,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +79,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
         BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-        breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+        breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now(LOCAL_ZONE));
         caseData.getBreathing().setLift(breathingSpaceLiftInfo);
 
         if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
@@ -159,6 +160,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             || caseData.getBreathing().getLift().getExpectedEnd() == null) {
             return false;
         }
-        return caseData.getBreathing().getLift().getExpectedEnd().isAfter(LocalDate.now());
+        return caseData.getBreathing().getLift().getExpectedEnd().isAfter(LocalDate.now(LOCAL_ZONE));
     }
 }
