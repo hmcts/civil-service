@@ -18,7 +18,7 @@ Repo-level settings:
 
 `CODEOWNERS` globally assigns `*` to `@hmcts/civil`, then has more specific ownerless entries intended to exempt some Renovate-updated files from code-owner review. The workflow exemption only covered `.github/workflows/*.yaml`; this repo also uses `.yml` workflow files, so GitHub Actions Renovate PRs still matched the global `* @hmcts/civil` owner rule.
 
-An earlier check found the same `.yaml`-only workflow exemption in `cmc-claim-store` and `cmc-citizen-frontend`; those haven't been rechecked. `civil-citizen-ui`, `civil-ccd-definition` and `civil-wa-task-configuration` now have their own ownerless Renovate blocks covering both `.yaml` and `.yml` workflow files, and each documents its Renovate setup in its own `docs/renovate-automerge.md`. Their Jenkinsfiles are in that block too, so Jenkins library PRs don't need code-owner review (`civil-citizen-ui` #8619 and `civil-ccd-definition` #7112 add them there). Any CODEOWNERS exemption changes need to be raised and merged in each repository separately.
+An earlier check found the same `.yaml`-only workflow exemption in `cmc-claim-store` and `cmc-citizen-frontend`; those haven't been rechecked. `civil-citizen-ui`, `civil-ccd-definition` and `civil-wa-task-configuration` now have their own ownerless Renovate blocks covering both `.yaml` and `.yml` workflow files, and each documents its Renovate setup in its own `docs/renovate-automerge.md`. Their Jenkinsfiles are in that block too, so Jenkins library PRs don't need code-owner review (added by hmcts/civil-citizen-ui#8619 and hmcts/civil-ccd-definition#7112). Any CODEOWNERS exemption changes need to be raised and merged in each repository separately.
 
 ## Current queue check
 
