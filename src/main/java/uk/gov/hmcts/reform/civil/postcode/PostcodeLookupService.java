@@ -20,7 +20,6 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@Slf4j
 @SuppressWarnings("unchecked")
 public class PostcodeLookupService {
 
