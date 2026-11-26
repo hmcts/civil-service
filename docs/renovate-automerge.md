@@ -6,6 +6,7 @@
 
 Repo-level settings:
 
+- `enabled`: `false`. Renovate is paused for this repository (#8711) while the open dependency PRs are sorted out; see [Pausing Renovate](#pausing-renovate). The rest of this section describes the configuration that applies once it is turned back on.
 - `schedule`: after 8am and before 11am every weekday.
 - `automergeSchedule`: after 7am and before 8am, and after 6pm and before 8pm, every weekday.
 - `platformAutomerge`: `false`, so Renovate enforces the configured merge windows instead of queuing GitHub auto-merge.
@@ -133,4 +134,29 @@ The rule must remain last because Renovate combines all matching package rules a
 3. Verify a clean, in-scope Renovate PR is offered for automerge and merges only after all required checks pass.
 4. Continue monitoring `.github/workflows/renovate-stalled-alert.yml` for queues blocked by failed checks, required reviews or stale branches.
 
-For an emergency stop, the repository can instead be paused in the Mend Developer Portal. Pausing is broader than a release freeze because it also stops update discovery, rebases and PR maintenance. Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
+For a full stop, pause Renovate instead (see below). Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
+
+## Pausing Renovate
+
+Pausing is broader than a release freeze. A freeze only stops automerge. A pause also stops update discovery, new PRs, rebases and PR maintenance. Use it when open Renovate PRs need fixing by hand and rebuilding them on every merge to `master` only adds noise, or when no Renovate PR should change at all.
+
+| | Release freeze (`automerge: false` rule) | Pause (`enabled: false`) |
+|---|---|---|
+| New PRs and rebases | continue | stop |
+| Automerge | stops | stops |
+| Renovate's PR queue | stays current; merges are manual | builds up until turned back on |
+
+To pause, set `"enabled": false` at the top level of `.github/renovate.json` in a pull request, giving the reason and the expected end. Renovate reads its configuration from `master`, so the pause starts only once the change merges and Renovate next runs. Open Renovate PRs stay open but are no longer rebased, updated or automerged.
+
+To turn Renovate back on, revert that pull request. On its next run Renovate rebases the open PRs against `master`, applying any rules merged in the meantime, and catches up on the updates it skipped.
+
+If Renovate must stop before a configuration change can merge, an organisation admin can pause the repository in the Mend Developer Portal. A portal pause is turned back on in the portal, not by reverting configuration.
+
+### Current pause
+
+Paused by #8711 (2026-11-26) while these are fixed:
+
+- `#8706` All non-major updates: Byte Buddy 1.18.16 breaks Mockito mocking of `CaseData` on Java 25 (held by #8709), and the Micrometer BOM moves to 1.18.0, past the 1.17.x that Spring Boot 4.1 manages.
+- `#8571` Spring Boot and related updates: Spring Boot 4.2.0 isn't accepted by Spring Cloud 2025.1.3, and the Reactor, Micrometer and Netty CVE-minimum pins in `build.gradle` sit below the versions Boot 4.2 picks.
+
+Revert #8711 once #8709 has merged and the Spring Boot 4.2 route is agreed.
