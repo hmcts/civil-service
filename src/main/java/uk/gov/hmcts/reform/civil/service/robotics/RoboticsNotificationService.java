@@ -276,6 +276,9 @@ public class RoboticsNotificationService {
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
         List<Event> events = flatEvents(eventHistory);
+        if (events.isEmpty()) {
+            return null;
+        }
         events.sort(Comparator.comparing(Event::getDateReceived));
 
         List<Event> lastMiscellaneousEvent = events.stream()
