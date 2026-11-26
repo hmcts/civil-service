@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,7 +76,7 @@ class DefaultJudgmentRoboticsNotifierTest {
             .build();
         RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
         when(roboticsDataMapper.toRoboticsCaseData(any(), eq("auth"))).thenReturn(roboticsCaseData);
-        when(jsonSchemaValidationService.validate(any())).thenReturn(Set.of());
+        when(jsonSchemaValidationService.validate(any())).thenReturn(List.of());
 
         defaultJudgmentRoboticsNotifier.notifyRobotics(data, "auth");
 

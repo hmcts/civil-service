@@ -50,11 +50,8 @@ class JsonSchemaValidationServiceTest {
             var errors = validationService.validate(payload);
 
             assertThat(errors).hasSize(1);
-            assertThat(errors)
-                .isNotEmpty()
-                .element(0)
-                .extracting("message")
-                .isEqualTo("$: boolean found, object expected");
+            assertThat(errors.getFirst().getMessage())
+                .isEqualTo("boolean found, object expected");
         }
 
         @Test
@@ -63,11 +60,9 @@ class JsonSchemaValidationServiceTest {
             var errors = validationService.validate(payload);
 
             assertThat(errors).hasSize(1);
-            assertThat(errors)
-                .isNotEmpty()
-                .element(0)
-                .extracting("message")
-                .isEqualTo("$.age: must have a minimum value of 0");
+            assertThat(errors.getFirst().getInstanceLocation().toString()).isEqualTo("/age");
+            assertThat(errors.getFirst().getMessage())
+                .isEqualTo("must have a minimum value of 0");
         }
 
         @Test
