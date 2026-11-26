@@ -129,6 +129,17 @@ def runCcdDefinitionSpecs() {
 
 withPipeline(type, product, component) {
   pipelineConf = config
+
+  nonDeployableApp()
+  before('sonarscan') {
+    withEnv(['CHANGE_ID=', 'CHANGE_TARGET=', 'CHANGE_BRANCH=', 'BRANCH_NAME=DTSCCI-7079-sonar-baseline']) {
+      withSonarQubeEnv('SonarQube') {
+        new uk.gov.hmcts.contino.GradleBuilder(this, product).gradle(
+          '-Dsonar.branch.name=DTSCCI-7079-sonar-baseline -Dsonar.branch.target=master sonarqube'
+        )
+      }
+    }
+  }
   disableLegacyDeployment()
   enableAksStagingDeployment()
   syncBranchesWithMaster(branchesToSync)
