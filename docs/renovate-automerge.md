@@ -6,8 +6,8 @@
 
 Repo-level settings:
 
-- `schedule`: after 8am and before 11am every weekday.
-- `automergeSchedule`: after 7am and before 8am, and after 6pm and before 8pm, every weekday.
+- `timezone`: `Europe/London`.
+- `schedule` and `automergeSchedule`: after 7am and before 9am, and after 5pm and before 8pm, every weekday.
 - `platformAutomerge`: `false`, so Renovate enforces the configured merge windows instead of queuing GitHub auto-merge.
 - `rebaseWhen`: `behind-base-branch`, so Renovate refreshes branches that fall behind `master`.
 - `automergeStrategy`: `squash`.
@@ -74,34 +74,54 @@ To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_UR
 
 ## Merge window and Jenkins availability
 
-Renovate uses the `Europe/London` timezone inherited from the shared HMCTS preset. PTL Jenkins runs on `cft-ptl-00-aks`, which [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown) normally stops from 20:00 to 06:30 daily. There is no scheduled weekend startup. An approved exclusion is required for overnight or weekend use; it can postpone shutdown until 23:00 or keep PTL running overnight.
+`.github/renovate.json` sets the `Europe/London` timezone. PTL Jenkins runs on `cft-ptl-00-aks`, which [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown) normally stops from 20:00 to 06:30 daily. There is no scheduled weekend startup. An approved exclusion is required for overnight or weekend use; it can postpone shutdown until 23:00 or keep PTL running overnight.
 
-If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Branch creation remains between 08:00 and 11:00, while automerge is restricted to periods when Jenkins is online and developer activity is lower:
+If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Branch creation and automerge therefore share the same windows, when Jenkins is online and developer activity is lower:
 
 ```json
+"schedule": [
+  "after 7am and before 9am every weekday",
+  "after 5pm and before 8pm every weekday"
+],
 "automergeSchedule": [
-  "after 7am and before 8am every weekday",
-  "after 6pm and before 8pm every weekday"
+  "after 7am and before 9am every weekday",
+  "after 5pm and before 8pm every weekday"
 ],
 "platformAutomerge": false
 ```
 
-The 07:00-08:00 and 18:00-20:00 weekday windows avoid the normal PTL outage and reduce disruption to developer PRs. `platformAutomerge` must be `false`; otherwise Renovate enables GitHub auto-merge and GitHub can merge later whenever checks pass, regardless of `automergeSchedule`. Automerge-enabled package rules inherit the repository-level schedule so they cannot widen it. PRs that miss a window wait for a later Renovate run, and the stalled-queue alert remains the control for updates that do not merge.
+The 07:00-09:00 and 17:00-20:00 weekday windows fall inside PTL's normal hours and avoid the busiest part of the developer day. A PR created or rebased late in the evening window may not finish its Jenkins build before the 20:00 shutdown; it then merges in a later window. `platformAutomerge` must be `false`; otherwise Renovate enables GitHub auto-merge and GitHub can merge later whenever checks pass, regardless of `automergeSchedule`. Automerge-enabled package rules inherit the repository-level schedule so they cannot widen it. PRs that miss a window wait for a later Renovate run, and the stalled-queue alert remains the control for updates that do not merge.
 
 ## Holds for updates master cannot build
 
 `rebaseWhen: behind-base-branch` rebuilds every open Renovate PR on each merge to `master`. That is what keeps green PRs mergeable, but a PR that can never pass is rebuilt, and fails, every time too. In the 30 days to 2026-11-20, five such PRs took 313 Jenkins builds, about 23 agent-hours, without one green build.
 
-Updates that need a platform the service hasn't moved to yet are therefore held in `.github/renovate.json`, each with the reason in its `description`:
+Updates that master can't build, or that break the tests, are therefore held in `.github/renovate.json`, each with the reason in its `description`:
 
-| Package | Held below | Needs |
+| Package | Hold | Reason |
 |---|---|---|
-| `com.github.hmcts:core-case-data-store-client` | 5.4.0 | Spring Boot 4 (`spring-boot-http-converter`) |
-| `org.springframework.cloud:spring-cloud-dependencies` | 2025.1.0 | Spring Boot 4 (OpenFeign loads Boot 4 converter classes) |
-| `com.github.hmcts:send-letter-client` | 6.0.0 | Java 25 |
-| Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors | disabled | Spring Boot 4 |
+| `com.github.hmcts:*` | skips versions with a ticket suffix, e.g. `4.1.0-CCD-8220`, `9.2.12_CCD-8388` | Feature-branch builds. Maven ranks the suffix above the release, so Renovate would otherwise offer them as the newest version. This rule comes first so the package-specific holds below override it |
+| `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes") |
+| `python` (`actions/setup-python`) | below 3.15 | semgrep's `ruamel.yaml.clib` has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15 |
+| Pact packages | disabled | |
+| CCD Helm chart | disabled | DTSCCI-7065, chart size limit |
+| Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors | disabled | Set before the Spring Boot 4 migration |
 
-Remove these holds as part of the Spring Boot 4 and Java 25 migrations. When a new Renovate PR fails the build on every rebase, find the cause and add a hold here rather than leaving it open.
+#8709, still open, adds two more: Byte Buddy 1.18.16 is skipped as well, and `io.projectreactor:reactor-bom` and `io.micrometer:micrometer-bom` take patch updates only, because they only set CVE minimums. Update this table when it merges.
+
+These older holds are out of date. The service is now on Spring Boot 4.1 and Java 25, so their reasons no longer apply:
+
+| Package | Hold | In use | Effect now |
+|---|---|---|---|
+| `com.github.hmcts:core-case-data-store-client` | below 5.4.0 | 5.3.0 | Blocks 5.4.x, which was held for Spring Boot 4. Version 6 moves to Jackson 3, which the CCD SDK's Jackson 2 guard rejects |
+| `org.springframework.cloud:spring-cloud-dependencies` | below 2025.1.0 | 2025.1.3 | Blocks every update, including a release train that supports Spring Boot 4.2 |
+| `com.github.hmcts:send-letter-client` | below 6.0.0 | 5.1.1 | Blocks 6.x, which was held only for Java 25 |
+| `com.github.hmcts:auth-checker-lib` | below 3.2.0 | 3.2.2 | Blocks every update |
+| `com.github.hmcts:ccd-case-document-am-client` | below 1.60.0 | 2.0.0 | Blocks every update |
+
+A rule that sets only `matchUpdateTypes` for `auth-checker-lib`, `payments-java-client`, `ccd-case-document-am-client` and `core-case-data-store-client` has no effect: it doesn't set `enabled`, `allowedVersions` or a group.
+
+Review each of these holds and remove or update them. When a new Renovate PR fails the build on every rebase, find the cause and add a hold here rather than leaving it open.
 
 ## Release freeze
 
@@ -133,4 +153,20 @@ The rule must remain last because Renovate combines all matching package rules a
 3. Verify a clean, in-scope Renovate PR is offered for automerge and merges only after all required checks pass.
 4. Continue monitoring `.github/workflows/renovate-stalled-alert.yml` for queues blocked by failed checks, required reviews or stale branches.
 
-For an emergency stop, the repository can instead be paused in the Mend Developer Portal. Pausing is broader than a release freeze because it also stops update discovery, rebases and PR maintenance. Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
+For a full stop, pause Renovate instead (see below). Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
+
+## Pausing Renovate
+
+Pausing is broader than a release freeze. A freeze only stops automerge. A pause also stops update discovery, new PRs, rebases and PR maintenance. Use it when open Renovate PRs need fixing by hand and rebuilding them on every merge to `master` only adds noise, or when no Renovate PR should change at all.
+
+| | Release freeze (`automerge: false` rule) | Pause (`enabled: false`) |
+|---|---|---|
+| New PRs and rebases | continue | stop |
+| Automerge | stops | stops |
+| Renovate's PR queue | stays current; merges are manual | builds up until turned back on |
+
+To pause, set `"enabled": false` at the top level of `.github/renovate.json` in a pull request, giving the reason and the expected end. Renovate reads its configuration from `master`, so the pause starts only once the change merges and Renovate next runs. Open Renovate PRs stay open but are no longer rebased, updated or automerged.
+
+To turn Renovate back on, revert that pull request. On its next run Renovate rebases the open PRs against `master`, applying any rules merged in the meantime, and catches up on the updates it skipped.
+
+If Renovate must stop before a configuration change can merge, an organisation admin can pause the repository in the Mend Developer Portal. A portal pause is turned back on in the portal, not by reverting configuration.
