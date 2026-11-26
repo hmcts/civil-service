@@ -75,14 +75,10 @@ public class DashboardClaimInfo {
 
     @JsonGetter("numberOfDaysOverdue")
     public long numberOfDaysOverdue() {
+        LocalDate today = LocalDate.now(LOCAL_ZONE);
         return Optional.ofNullable(responseDeadline)
-            .filter(deadline ->
-                        deadline.isBefore(LocalDate.now()))
-            .map(deadline ->
-                     deadline.until(
-                         LocalDate.now(),
-                         ChronoUnit.DAYS
-                     ))
+            .filter(deadline -> deadline.isBefore(today))
+            .map(deadline -> deadline.until(today, ChronoUnit.DAYS))
             .orElse(0L);
     }
 }

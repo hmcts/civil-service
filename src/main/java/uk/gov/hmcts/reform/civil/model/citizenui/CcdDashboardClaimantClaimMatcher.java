@@ -26,6 +26,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 @Slf4j
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
@@ -55,21 +56,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean hasResponsePending() {
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
             && caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM));
     }
 
     @Override
     public boolean hasResponsePendingOverdue() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.hasBreathingSpace();
     }
 
     @Override
     public boolean hasResponseDueToday() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now(LOCAL_ZONE))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM));
     }
 
     @Override
@@ -111,7 +112,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         }
         return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())
             && caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null;
     }
 
@@ -324,7 +325,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return (caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
             || (Objects.nonNull(caseData.getRespondent1ResponseDeadline())
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null);
     }
 
@@ -414,18 +415,17 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHwfPaymentOutcome() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
-        if (Optional.ofNullable(caseData.getHearingFeePaymentDetails())
-            .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
-                Boolean.FALSE) || caseData.hearingFeePaymentDoneWithHWF()) {
-            return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
-                && (eventTime = getTimeOfMostRecentEventOfType(
-                EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT, CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent()
-                && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get()
-                .isAfter(orderTime.get()));
+        boolean hearingFeePaid = Optional.ofNullable(caseData.getHearingFeePaymentDetails())
+            .map(payment -> payment.getStatus() == PaymentStatus.SUCCESS)
+            .orElse(false) || caseData.hearingFeePaymentDoneWithHWF();
+        if (!hearingFeePaid || !CaseState.HEARING_READINESS.equals(caseData.getCcdState())) {
+            return false;
         }
-        return false;
+
+        return getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT, CaseEvent.FEE_PAYMENT_OUTCOME))
+            .filter(eventTime -> getTimeOfLastNonSDOOrder().map(eventTime::isAfter).orElse(true))
+            .isPresent();
     }
 
     @Override
