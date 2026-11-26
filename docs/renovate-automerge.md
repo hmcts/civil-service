@@ -174,6 +174,6 @@ If Renovate must stop before a configuration change can merge, an organisation a
 
 ### Current pause
 
-Paused by #8711 (2026-11-26) for a release freeze. The freeze uses a full pause rather than the release-freeze rule, so Renovate PRs aren't rebased or updated during it as well as not being merged.
+Paused by #8711 (2026-11-26) for the release freeze for the Judgement Buffer release on 26/11/2026. The freeze uses a full pause rather than the release-freeze rule, so Renovate PRs aren't rebased or updated during it as well as not being merged.
 
 Revert #8711 when the freeze ends, then follow the checks under [End a freeze](#end-a-freeze).
