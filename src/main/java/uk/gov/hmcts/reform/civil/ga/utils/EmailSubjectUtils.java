@@ -33,8 +33,11 @@ public class EmailSubjectUtils {
 
     public static Map<String, String> addLipClaimantVDefendant(GeneralApplicationCaseData caseData,
                                                                Map<String, String> properties) {
-        properties.put(CASE_TITLE, JudicialFinalDecisionHandler.getAllPartyNames(caseData));
-        properties.put(CLAIMANT_V_DEFENDANT, JudicialFinalDecisionHandler.getAllPartyNames(caseData, "V"));
+        // CASE_TITLE ("ClaimantvDefendant") and CLAIMANT_V_DEFENDANT ("claimantvdefendant") differ only in case, and
+        // GOV.UK Notify matches placeholders case-insensitively, so both must hold the same "V" text for the subject
+        String claimantVDefendant = JudicialFinalDecisionHandler.getAllPartyNames(caseData, "V");
+        properties.put(CASE_TITLE, claimantVDefendant);
+        properties.put(CLAIMANT_V_DEFENDANT, claimantVDefendant);
         return properties;
     }
 }

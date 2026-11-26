@@ -777,7 +777,7 @@ class JudicialApplicantNotificationServiceTest {
 
         private Map<String, String> notificationPropertiesSummeryJudgement() {
 
-            customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+            customProp.put(NotificationDataGA.CASE_TITLE, "CL V DEF");
 
             customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL V DEF");
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
@@ -802,7 +802,7 @@ class JudicialApplicantNotificationServiceTest {
 
         private Map<String, String> notificationPropertiesVaryOrder(boolean isLipTemplate) {
             if (isLipTemplate) {
-                customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+                customProp.put(NotificationDataGA.CASE_TITLE, "CL V DEF");
                 customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL V DEF");
             }
 
@@ -2625,7 +2625,7 @@ class JudicialApplicantNotificationServiceTest {
             NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.STAY_THE_CLAIM.getDisplayedValue(),
             NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE,
-            NotificationDataGA.CASE_TITLE, "CL v DEF",
+            NotificationDataGA.CASE_TITLE, "CL V DEF",
             NotificationData.CLAIMANT_V_DEFENDANT, "CL V DEF"
         ));
         properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
@@ -2646,7 +2646,7 @@ class JudicialApplicantNotificationServiceTest {
 
     private Map<String, String> notificationPropertiesToStayTheClaimLipRespondent() {
         HashMap<String, String> properties = new HashMap<>(Map.of(
-            "ClaimantvDefendant", "CL v DEF",
+            "ClaimantvDefendant", "CL V DEF",
             "claimantvdefendant", "CL V DEF",
             "claimReferenceNumber", "111111",
             "GenAppclaimReferenceNumber", "111111",

@@ -273,7 +273,8 @@ public class HwfNotificationService implements NotificationDataGA {
     }
 
     private Map<String, String> getPaymentOutcomeProperties(GeneralApplicationCaseData caseData) {
-        String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
+        // "V", as in addLipClaimantVDefendant: to GOV.UK Notify, CASE_TITLE and CLAIMANT_V_DEFENDANT are one placeholder
+        String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData, "V");
         return Map.of(
                 CASE_TITLE, caseTitle,
                 APPLICANT_NAME, caseData.getApplicantPartyName()

@@ -297,7 +297,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
             assertThat(argumentCaptor.getValue().get("respondentName")).isEqualTo("DEF");
-            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
+            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL V DEF");
         }
 
         @Test
@@ -327,7 +327,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
             assertThat(argumentCaptor.getValue().get("respondentName")).isEqualTo("CL");
-            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
+            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL V DEF");
         }
 
         @Test
@@ -357,7 +357,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             );
             assertThat(argumentCaptor.getValue().get("partyReferences"))
                 .isEqualTo("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd");
-            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
+            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL V DEF");
         }
 
         @Test
@@ -389,7 +389,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 any(), eq("general-application-respondent-welsh-template-lip-id"), argumentCaptor.capture(), any()
             );
             assertThat(argumentCaptor.getValue().get("respondentName")).isEqualTo("DEF");
-            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
+            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL V DEF");
         }
 
         @Test
@@ -459,7 +459,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 NotificationDataGA.GA_NOTIFICATION_DEADLINE,
                 NOTIFICATION_DEADLINE.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
                 NotificationDataGA.GA_LIP_RESP_NAME, isLip ? "Lip Resp" : "",
-                NotificationDataGA.CASE_TITLE, isLip ? "CL v DEF" : ""
+                NotificationDataGA.CASE_TITLE, isLip ? "CL V DEF" : ""
             ));
             properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
             properties.put(NotificationData.CASEMAN_REF, "Not provided");

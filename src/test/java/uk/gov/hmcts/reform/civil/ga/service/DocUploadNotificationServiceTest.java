@@ -370,7 +370,7 @@ public class DocUploadNotificationServiceTest {
             Map<String, String> customProp = new HashMap<>();
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
-            customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+            customProp.put(NotificationDataGA.CASE_TITLE, "CL V DEF");
             customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL V DEF");
             customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE);

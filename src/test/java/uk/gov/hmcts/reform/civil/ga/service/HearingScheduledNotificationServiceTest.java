@@ -117,7 +117,7 @@ class HearingScheduledNotificationServiceTest {
         customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_ID.toString());
         customProp.put(NotificationDataGA.GA_HEARING_DATE, DateFormatHelper.formatLocalDate(
             GA_HEARING_DATE_SAMPLE, DateFormatHelper.DATE));
-        customProp.put(NotificationDataGA.CASE_TITLE, "Test Claimant1 Name v Test Defendant1 Name");
+        customProp.put(NotificationDataGA.CASE_TITLE, "Test Claimant1 Name V Test Defendant1 Name");
         customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "Test Claimant1 Name V Test Defendant1 Name");
 
         customProp.put(NotificationDataGA.GA_HEARING_TIME, GA_HEARING_TIME_SAMPLE.toString());
