@@ -658,7 +658,6 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-
             // Unregistered
             // 1. Both def1 and def2 unregistered
             @Test
