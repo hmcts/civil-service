@@ -36,7 +36,7 @@ public class SdoReconsiderationDeadlineService {
                     date = date.plusDays(1);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception _) {
             log.error("Error when retrieving public days");
             date = time.now().toLocalDate().plusDays(7);
         }

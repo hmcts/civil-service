@@ -88,6 +88,21 @@ If Renovate updates or rebases a PR while Jenkins is unavailable, the required c
 
 The 07:00-08:00 and 18:00-20:00 weekday windows avoid the normal PTL outage and reduce disruption to developer PRs. `platformAutomerge` must be `false`; otherwise Renovate enables GitHub auto-merge and GitHub can merge later whenever checks pass, regardless of `automergeSchedule`. Automerge-enabled package rules inherit the repository-level schedule so they cannot widen it. PRs that miss a window wait for a later Renovate run, and the stalled-queue alert remains the control for updates that do not merge.
 
+## Holds for updates master cannot build
+
+`rebaseWhen: behind-base-branch` rebuilds every open Renovate PR on each merge to `master`. That is what keeps green PRs mergeable, but a PR that can never pass is rebuilt, and fails, every time too. In the 30 days to 2026-11-20, five such PRs took 313 Jenkins builds, about 23 agent-hours, without one green build.
+
+Updates that need a platform the service hasn't moved to yet are therefore held in `.github/renovate.json`, each with the reason in its `description`:
+
+| Package | Held below | Needs |
+|---|---|---|
+| `com.github.hmcts:core-case-data-store-client` | 5.4.0 | Spring Boot 4 (`spring-boot-http-converter`) |
+| `org.springframework.cloud:spring-cloud-dependencies` | 2025.1.0 | Spring Boot 4 (OpenFeign loads Boot 4 converter classes) |
+| `com.github.hmcts:send-letter-client` | 6.0.0 | Java 25 |
+| Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors | disabled | Spring Boot 4 |
+
+Remove these holds as part of the Spring Boot 4 and Java 25 migrations. When a new Renovate PR fails the build on every rebase, find the cause and add a hold here rather than leaving it open.
+
 ## Release freeze
 
 Use a code-controlled Renovate package rule for a planned release freeze. This is reviewable, auditable and consistent across repository administrators. LaunchDarkly is not suitable because Renovate evaluates repository configuration in Mend and does not call the application or its runtime feature flags.

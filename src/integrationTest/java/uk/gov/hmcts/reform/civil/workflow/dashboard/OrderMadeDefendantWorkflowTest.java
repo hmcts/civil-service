@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.workflow.dashboard;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OrderMadeDefendantWorkflowTest extends DashboardWorkflowIntegrationTest {
 
     public static final String DEFENDANT = "DEFENDANT";
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test

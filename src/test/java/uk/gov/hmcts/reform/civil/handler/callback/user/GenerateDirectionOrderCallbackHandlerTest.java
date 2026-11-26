@@ -627,6 +627,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
+        void shouldOfferOtherLocation_whenCurrentHearingLocationIsMissing() {
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now());
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(new ArrayList<>());
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(null);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("hearingLocationList").asString().contains("Other location");
+        }
+
+        @Test
         void shouldPopulateFields_whenIsCalledAfterSdoDiffSol() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()

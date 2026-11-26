@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.13.6")
+@Library("Infrastructure@2.15.0")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -107,6 +107,26 @@ def createBpmnGithubRelease() {
   """
 }
 
+// The CCD definition specs (ccd-definition/test) check this checkout's ccd-definition/: the mirror until
+// ccd-definition/SOURCE_OF_TRUTH is added, then the live definitions. They run at the start of the Build
+// stage, because the preview import later replaces ccd-definition/ with civil-ccd-definition's copy until
+// the switch.
+// Node comes from .nvmrc through nvm, as the library's YarnBuilder sets it up.
+def runCcdDefinitionSpecs() {
+  stage('CCD definition specs') {
+    timeout(time: 10, unit: 'MINUTES') {
+      sh '''
+        set +ex
+        export NVM_DIR='/home/jenkinsssh/.nvm'
+        . /opt/nvm/nvm.sh
+        nvm install || exit 1
+        set -ex
+        ./bin/run-ccd-definition-specs.sh
+      '''
+    }
+  }
+}
+
 withPipeline(type, product, component) {
   pipelineConf = config
   disableLegacyDeployment()
@@ -157,28 +177,22 @@ withPipeline(type, product, component) {
     setPreviewUrls(product, component)
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
-    before('build') {
+  }
+
+  // Every branch's before('build') steps go here. The library keeps one closure per hook, so a second
+  // before('build'), for example inside onPR, would replace this one.
+  before('build') {
+    runCcdDefinitionSpecs()
+    onPR {
       stage('Check chart size') {
         // Reuse Jenkins registry access; GitHub-hosted runners cannot pull these private charts.
         withAcrClient('nonprod') {
           def chartCheckDir = sh(script: 'mktemp -d', returnStdout: true).trim()
           withEnv(["CHART_CHECK_DIR=${chartCheckDir}"]) {
             try {
-              sh 'cp -R charts/civil-service "$CHART_CHECK_DIR/civil-service"'
-              // Match Infrastructure@2.13.6's published chart: preview/staging keep these dependencies.
-              def chart = readYaml(file: "${chartCheckDir}/civil-service/Chart.yaml")
-              def previewDependencies = (chart.annotations?.get('hmcts.github.io/skip-publish') ?: '')
-                .split(',').collect { it.trim() }.findAll { it }
-              def dependencyNames = (chart.dependencies ?: []).collect { it.alias ?: it.name }
-              def unknownDependencies = previewDependencies.findAll { !dependencyNames.contains(it) }
-              if (unknownDependencies) {
-                error("Unknown skip-publish dependencies: ${unknownDependencies.join(', ')}")
-              }
-              chart.dependencies = (chart.dependencies ?: []).findAll {
-                !previewDependencies.contains(it.alias ?: it.name)
-              }
-              echo "Checking published chart dependencies: ${chart.dependencies.collect { it.alias ?: it.name }.join(', ')}"
-              writeYaml(file: "${chartCheckDir}/civil-service/Chart.yaml", data: chart, overwrite: true)
+              def charts = load 'bin/helm/preview-chart.groovy'
+              def checkPreview = charts.previewCheckRequired()
+              charts.prepareSlim("${chartCheckDir}/civil-service")
               sh '''
                 set -eu
                 # Match the Azure CLI profile used by withAcrClient's subscription login.
@@ -188,8 +202,6 @@ withPipeline(type, product, component) {
                 else
                   AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
                 fi
-                # Rebuild the lock after removing preview dependencies, as the publisher does.
-                rm -f "$CHART_CHECK_DIR/civil-service/Chart.lock"
                 helm dependency build "$CHART_CHECK_DIR/civil-service"
                 helm package "$CHART_CHECK_DIR/civil-service" --destination "$CHART_CHECK_DIR/package"
                 chart_size_script="$PWD/.github/scripts/check-chart-size.py"
@@ -198,6 +210,11 @@ withPipeline(type, product, component) {
                   python3 "$chart_size_script"
                 )
               '''
+              if (checkPreview) {
+                def directory = "${chartCheckDir}/civil-service-preview"
+                charts.prepare(directory)
+                charts.verify(directory)
+              }
             } finally {
               sh 'rm -rf "$CHART_CHECK_DIR"'
             }
@@ -212,12 +229,33 @@ withPipeline(type, product, component) {
 
   onMaster {
     env.PACT_BRANCH_NAME = "master"
-    enableHighLevelDataSetup("", true)
+    // No prod skip: the prod import, like aat, runs only once ccd-definition/SOURCE_OF_TRUTH is in this repo
+    // (the highLevelDataSetup onlyIf in build.gradle). Until then civil-ccd-definition imports into both.
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
-    env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
     env.STASH_DIAGNOSTICS = 'false'
+
+    afterSuccess('Publish Helm chart') {
+      catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE', catchInterruptions: false,
+        message: 'Companion chart publication failed. Check civil-service-preview in ACR and retry the master build.') {
+        def directory = 'charts/civil-service-preview'
+        try {
+          def charts = load 'bin/helm/preview-chart.groovy'
+          charts.prepare(directory)
+          helmPublish(
+            appPipelineConfig: pipelineConf,
+            subscription: new uk.gov.hmcts.contino.Subscription(env).nonProdName,
+            environment: new uk.gov.hmcts.contino.Environment(env).nonProdName,
+            product: product,
+            component: 'service-preview'
+          )
+        } finally {
+          dir(directory) { deleteDir() }
+        }
+      }
+    }
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
@@ -227,16 +265,19 @@ withPipeline(type, product, component) {
   }
 
   onDemo {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "demo"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onPerftest {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "perftest"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onIthc {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "ithc"
     loadVaultSecrets(secretsOtherenv)
   }
@@ -563,7 +604,7 @@ def runStagingHighLevelDataSetup() {
   withEnv([
     'ENVIRONMENT=aat',
     'TEST_DATA_LOAD_SKIP_PERIOD=0',
-    'SKIP_COMMON_AAT_CCD_SETUP=false',
+    'STAGING_HIGH_LEVEL_DATA_SETUP=true',
     'IDAM_API_URL_BASE=https://idam-api.aat.platform.hmcts.net',
     'S2S_URL_BASE=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
     'CCD_API_GATEWAY_S2S_ID=ccd_gw',

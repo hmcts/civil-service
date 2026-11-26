@@ -41,8 +41,8 @@ class InitiateGeneralApplicationTest extends BpmnBaseGASpecTest {
     private static final String GENERATE_DRAFT_DOC_EVENT = "GENERATE_DRAFT_DOCUMENT";
     private static final String GENERATE_DRAFT_DOC_ID = "DraftDocumentGenerator";
     //Notifying respondents
-    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_GENERAL_APPLICATION_RESPONDENT";
-    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "GeneralApplicationNotifying";
+    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_EVENT";
+    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "NotifyGaApplicationCreated";
 
     private static final String LIP_APPLICANT = "LIP_APPLICANT";
     private static final String LIP_RESPONDENT = "LIP_RESPONDENT";

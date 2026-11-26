@@ -62,10 +62,6 @@ class EndBusinessProcessTaskHandlerTest {
             caseDetailsConverter,
             objectMapper
         );
-    }
-
-    @BeforeEach
-    void init() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 

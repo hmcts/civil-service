@@ -54,7 +54,6 @@ public class SendGridClient {
                     response.getBody()
                 )));
             }
-            log.info("EMAIl SENT:---------" + subject);
         } catch (IOException exception) {
             throw new EmailSendFailedException(exception);
         }

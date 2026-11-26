@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.notifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -27,7 +27,7 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
     @Autowired
     private DashboardNotificationHandler handler;
 
-    @SpyBean
+    @MockitoSpyBean
     private DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService;
 
     @Test

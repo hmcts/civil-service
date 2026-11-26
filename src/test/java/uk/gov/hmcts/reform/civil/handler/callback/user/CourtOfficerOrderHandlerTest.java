@@ -121,6 +121,19 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+        @Test
+        void shouldOfferOtherLocation_whenCurrentHearingLocationIsMissing() {
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(null);
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(7));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("courtOfficerFurtherHearingComplex"))
+                .extracting("hearingLocationList").asString().contains("Other location");
+        }
+
     }
 
     @Nested

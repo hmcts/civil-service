@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.civil.ga.service.SendFinalOrderPrintService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,6 +63,26 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldReturnCorrectTaskId() {
         assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldReportMissingOriginalOrderBeforeAttemptingBulkPrint(List<Element<CaseDocument>> originals) {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdCaseReference(123L)
+            .originalDocumentsBulkPrint(originals)
+            .translatedDocumentsBulkPrint(List.of(new Element<TranslatedDocument>().setValue(
+                TranslatedDocument.builder().documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER).build())))
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT.name()).build())
+            .build();
+        handler.printServiceEnabled = true;
+
+        assertThatThrownBy(() -> handler.handle(params))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("No original order available for bulk print for GA case 123");
+        verifyNoInteractions(sendOrderPrintService, coreCaseDataService, caseDetailsConverter);
     }
 
     @Nested

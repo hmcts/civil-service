@@ -7089,12 +7089,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setDefenceAdmitPartEmploymentTypeRequired(YesOrNo yesOrNo) {
-        this.defenceAdmitPartEmploymentTypeRequired = defenceAdmitPartEmploymentTypeRequired;
+        this.defenceAdmitPartEmploymentTypeRequired = yesOrNo;
         return this;
     }
 
     public CaseDataBuilder specDefenceFullAdmitted2Required(YesOrNo yesOrNo) {
-        this.specDefenceFullAdmitted2Required = specDefenceFullAdmitted2Required;
+        this.specDefenceFullAdmitted2Required = yesOrNo;
         return this;
     }
 

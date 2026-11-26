@@ -20,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_
 @Service
 public class CaseStateSearchService extends GaElasticSearchService {
 
+    private static final String STATE_FIELD = "state";
+
     public CaseStateSearchService(GaCoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
@@ -27,7 +29,7 @@ public class CaseStateSearchService extends GaElasticSearchService {
     public Set<CaseDetails> getUncheckedResponseDeadlineApplications(CaseState caseState) {
         return searchGeneralApplications(startIndex -> new Query(
             boolQuery()
-                .must(matchQuery("state", caseState.toString()))
+                .must(matchQuery(STATE_FIELD, caseState.toString()))
                 .mustNot(matchQuery("data.respondentResponseDeadlineChecked", "Yes")),
             emptyList(),
             startIndex
@@ -38,7 +40,7 @@ public class CaseStateSearchService extends GaElasticSearchService {
     public Query query(int startIndex, CaseState caseState) {
 
         return new Query(
-            matchQuery("state", caseState.toString()),
+            matchQuery(STATE_FIELD, caseState.toString()),
             emptyList(),
             startIndex
         );
@@ -46,7 +48,7 @@ public class CaseStateSearchService extends GaElasticSearchService {
 
     @Override
     Query queryForOrderMade(int startIndex, CaseState caseState, GeneralApplicationTypes gaType) {
-        MatchQueryBuilder queryCaseState = QueryBuilders.matchQuery("state", caseState.toString());
+        MatchQueryBuilder queryCaseState = QueryBuilders.matchQuery(STATE_FIELD, caseState.toString());
         MatchQueryBuilder queryGaType = QueryBuilders.matchQuery("data.generalAppType.types", gaType);
         MatchQueryBuilder consentOrder = QueryBuilders
             .matchQuery("data.approveConsentOrder.isOrderProcessedByStayScheduler", "No");
