@@ -4,14 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,12 +18,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Slf4j
 @SuppressWarnings("unchecked")
 public class PostcodeLookupService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PostcodeLookupService.class);
 
     private final RestTemplate restTemplate;
     private final PostcodeLookupConfiguration configuration;
@@ -35,6 +33,9 @@ public class PostcodeLookupService {
     }
 
     public boolean validatePostCodeForDefendant(String postcode) {
+        if (StringUtils.isBlank(postcode)) {
+            return false;
+        }
         String countryName = fetchCountryFromPostCode(postcode.toUpperCase(Locale.UK));
         return (countryName != null
             && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase(Locale.UK))
@@ -87,7 +88,7 @@ public class PostcodeLookupService {
             if (responseStatus.value() == org.apache.http.HttpStatus.SC_OK) {
                 JSONObject jsonObj = new JSONObject(response.getBody());
 
-                if (jsonObj.has("results")) {
+                if (jsonObj.has("results") && jsonObj.getJSONArray("results").length() > 0) {
                     JSONObject gazeteerEntry = new JSONObject(new JSONObject(((JSONArray) jsonObj
                         .get("results")).get(0).toString()).get("GAZETTEER_ENTRY").toString());
                     postcodeFromApilookup = StringUtils.deleteWhitespace(gazeteerEntry.get("NAME1").toString());
@@ -97,13 +98,16 @@ public class PostcodeLookupService {
                 }
             } else if (responseStatus.value() == org.apache.http.HttpStatus.SC_NOT_FOUND) {
                 postcode = postcode.replaceAll("[\n\r]", "_");
-                LOG.info("Postcode {0} not found", postcode);
+                log.info("Postcode {} not found", postcode);
             } else {
-                LOG.info("Postcode lookup failed with status {}", responseStatus.value());
+                log.info("Postcode lookup failed with status {}", responseStatus.value());
             }
 
+        } catch (HttpClientErrorException.NotFound e) {
+            log.info("Postcode {} not found", StringUtils.deleteWhitespace(postcode));
         } catch (Exception e) {
-            LOG.error("Postcode Lookup Failed - ", e.getMessage());
+            // HTTP exception messages can include the API key in the request URL.
+            log.error("Postcode lookup failed ({})", e.getClass().getSimpleName());
             throw new RuntimeException(e);
         }
         return countryName;

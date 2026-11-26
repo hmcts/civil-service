@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.postcode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @SpringBootTest(classes = PostcodeLookupService.class)
 class PostcodeLookupServiceTest {
@@ -63,6 +66,34 @@ class PostcodeLookupServiceTest {
 
         assertThat(postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
             .isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "\t"})
+    void shouldRejectBlankPostcodeWithoutLookup(String postcode) {
+        assertThat(postcodeLookupService.validatePostCodeForDefendant(postcode)).isFalse();
+        verifyNoInteractions(restTemplate);
+    }
+
+    @Test
+    void shouldReturnFalseWhenResultsAreEmpty() {
+        mockConfiguration();
+        mockExchangeResponse(ResponseEntity.ok("{\"results\":[]}"));
+
+        assertThat(postcodeLookupService.validatePostCodeForDefendant("CM145NB")).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseWhenRestTemplateThrowsNotFound() {
+        mockConfiguration();
+        when(restTemplate.exchange(
+            ArgumentMatchers.any(URI.class),
+            ArgumentMatchers.any(HttpMethod.class),
+            ArgumentMatchers.<HttpEntity<?>>any(),
+            ArgumentMatchers.<Class<String>>any()
+        )).thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not Found", null, null, null));
+
+        assertThat(postcodeLookupService.validatePostCodeForDefendant("CM145NB")).isFalse();
     }
 
     @Test
