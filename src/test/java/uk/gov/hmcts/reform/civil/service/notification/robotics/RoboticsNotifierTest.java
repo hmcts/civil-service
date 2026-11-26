@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.notification.robotics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidation
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +52,7 @@ class RoboticsNotifierTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
-        when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of());
+        when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(List.of());
 
         roboticsNotifier.notifyRobotics(caseData, TOKEN);
 
@@ -66,8 +66,8 @@ class RoboticsNotifierTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
-        when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of(
-            ValidationMessage.builder().message("whoops").build()
+        when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(List.of(
+            Error.builder().message("whoops").build()
         ));
 
         assertThrows(JsonSchemaValidationException.class, () -> roboticsNotifier.notifyRobotics(caseData, TOKEN));
@@ -80,7 +80,7 @@ class RoboticsNotifierTest {
         RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
 
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
-        when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of());
+        when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(List.of());
 
         roboticsNotifier.notifyRobotics(caseData, TOKEN);
 
@@ -94,8 +94,8 @@ class RoboticsNotifierTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
-        when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of(
-            ValidationMessage.builder().message("whoops").build()
+        when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(List.of(
+            Error.builder().message("whoops").build()
         ));
 
         assertThrows(JsonSchemaValidationException.class, () -> roboticsNotifier.notifyRobotics(caseData, TOKEN));
