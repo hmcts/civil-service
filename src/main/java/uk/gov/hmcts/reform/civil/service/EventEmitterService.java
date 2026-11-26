@@ -49,7 +49,7 @@ public class EventEmitterService {
                     camundaEvent, TENANT_ID, Map.of(CASE_ID, caseId));
             }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (FeignException.BadRequest ex) {
+        } catch (FeignException.BadRequest _) {
             // 400 is the engine reporting no start message definition for this tenant
             // (MismatchingMessageCorrelationException), the only case the without-tenant
             // retry is for. Anything else, including a RetryableException on a request

@@ -65,6 +65,26 @@ with both scripts from the definitions at `.source-sha`, and fails unless the sp
 The mirror workflow runs it on every PR that touches this folder or the build scripts. Change an exclusion
 rule in civil-ccd-definition first, then here when the mirror is re-synced past that change.
 
+### Shuttering Civil for a release
+
+Once `SOURCE_OF_TRUTH` is here, every civil-service master build imports the definitions into prod, so the
+shutter lives on master:
+
+1. **Release prep PR:** make `bin/build-civil-xlsx-definitions.sh` build the shuttered variant for prod, as
+   civil-ccd-definition's release prep PRs did in its `build-release-ccd-definition.sh`. When it merges, the
+   pipeline imports the shuttered definitions into prod.
+2. Merge the release's code changes. Each master build re-imports the shuttered definitions, so Civil stays
+   shuttered while they go out and are tested.
+3. **Unshutter PR:** take the change back out. Its master build imports the unshuttered definitions.
+
+Release prep and unshutter PRs made in civil-ccd-definition do nothing once this repo owns the
+definitions: its pipeline no longer imports into prod.
+
+`bin/build-definitions-prod-shuttered.sh` and `bin/build-definitions-demo.sh` build the shuttered prod and
+the demo spreadsheets, with the environment's callback URL, for an import by hand. A shutter imported by
+hand lasts only until the next civil-service master build reaches prod. Both scripts refuse to run until
+`SOURCE_OF_TRUTH` is here. Until then, use the scripts of the same name in civil-ccd-definition.
+
 ## Definition specs
 
 `test/` holds civil-ccd-definition's mocha specs from `e2e/tests/unit`. They check the JSON for
