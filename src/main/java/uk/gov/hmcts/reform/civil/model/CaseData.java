@@ -131,7 +131,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class CaseData extends CaseDataParent implements MappableObject, NotifiableCaseData {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private  Long ccdCaseReference;
+    private Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private  CaseState ccdState;
     private  CaseState previousCCDState;
