@@ -19,14 +19,14 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '25.0.4+101.0.LTS'
+          java-version: '25.0.5+100000002.0.LTS'
 
       - uses: actions/setup-node@v7
         with:
           node-version: '26'
 
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli@11.14.0 --ignore-scripts
 
       - name: Export StateFlow artefacts
         run: python3 scripts/export_stateflow_transitions.py
@@ -35,11 +35,13 @@ jobs:
         run: ruby scripts/generate_flowstate_tables.rb
 
       - name: Render diagrams
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
         run: |
-          npx mmdc -i docs/draft_flow.mmd -o docs/draft_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
-          npx mmdc -i docs/issue_flow.mmd -o docs/issue_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
-          npx mmdc -i docs/response_flow.mmd -o docs/response_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
-          npx mmdc -i docs/post_response.mmd -o docs/post_response.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          mmdc -i docs/draft_flow.mmd -o docs/draft_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          mmdc -i docs/issue_flow.mmd -o docs/issue_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          mmdc -i docs/response_flow.mmd -o docs/response_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          mmdc -i docs/post_response.mmd -o docs/post_response.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
 
       - name: Commit updates
         run: |

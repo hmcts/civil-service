@@ -105,6 +105,7 @@
       <option value='notify_applicant_lip_hwf'>Notify lip app help with fees (NOTIFY_APPLICANT_LIP_HWF)</option>
       <option value='trial_ready_notification'>Notify of trial readiness (TRIAL_READY_NOTIFICATION)</option>
       <option value='partial_remission_hwf_granted'>Part remission HwF - granted (PARTIAL_REMISSION_HWF_GRANTED)</option>
+      <option value='apply_pending_breathing_space_lift'>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</option>
       <option value='process_cosc_application'>Process COSC Application (PROCESS_COSC_APPLICATION)</option>
       <option value='querymanagementraisequery'>Raise a new query (queryManagementRaiseQuery)</option>
       <option value='hearing_scheduled_retrigger'>Request a listing (HEARING_SCHEDULED_RETRIGGER)</option>
@@ -598,36 +599,92 @@
         <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/09fec736-2025-46a6-ae8d-94a39a3c69da'>notifyRespondentLipForClaimantRepresentedTemplate (09fec736-2025-46a6-ae8d-94a39a3c69da)</a></td>
       </tr>
-      <tr data-ccd-events='lift_breathing_space_spec' data-channel='email'>
-        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)</td>
-        <td><code>NotifyApplicantSolicitorBSLifted</code></td>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipApplicant</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
         <td>Email</td>
         <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/b6dbc714-210e-475d-a1db-bf5ea28de98b'>notifyLiPApplicantBreathingSpaceLifted (b6dbc714-210e-475d-a1db-bf5ea28de98b)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/44100d49-d8b7-4c70-bcd5-9347f9d0110c'>notifyLiPApplicantBreathingSpaceLiftedWelsh (44100d49-d8b7-4c70-bcd5-9347f9d0110c)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/4ca3017b-b2fa-4ac0-a867-9bfada50a80c'>notifyLiPRespondentBreathingSpaceLifted (4ca3017b-b2fa-4ac0-a867-9bfada50a80c)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/52440946-2dc5-411f-8a54-454bbe36c4e1'>notifyLiPRespondentBreathingSpaceLiftedWelsh (52440946-2dc5-411f-8a54-454bbe36c4e1)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/b6dbc714-210e-475d-a1db-bf5ea28de98b'>notifyLiPApplicantBreathingSpaceLifted (b6dbc714-210e-475d-a1db-bf5ea28de98b)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/44100d49-d8b7-4c70-bcd5-9347f9d0110c'>notifyLiPApplicantBreathingSpaceLiftedWelsh (44100d49-d8b7-4c70-bcd5-9347f9d0110c)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/4ca3017b-b2fa-4ac0-a867-9bfada50a80c'>notifyLiPRespondentBreathingSpaceLifted (4ca3017b-b2fa-4ac0-a867-9bfada50a80c)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/52440946-2dc5-411f-8a54-454bbe36c4e1'>notifyLiPRespondentBreathingSpaceLiftedWelsh (52440946-2dc5-411f-8a54-454bbe36c4e1)</a></td>
+      </tr>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyParties</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
+        <td>Email</td>
+        <td>Applicant solicitor (LR)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/50740783-fc24-49bb-a49f-48fcd3213e06'>breathingSpaceLiftedApplicantEmailTemplate (50740783-fc24-49bb-a49f-48fcd3213e06)</a></td>
       </tr>
-      <tr data-ccd-events='lift_breathing_space_spec' data-channel='email'>
-        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)</td>
-        <td><code>NotifyApplicantSolicitorBSLifted</code></td>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>—</td>
+        <td>Respondent 1 solicitor (LR)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/05b6362f-ef50-4be1-b386-54b3f4c6f2b0'>breathingSpaceLiftedRespondentEmailTemplate (05b6362f-ef50-4be1-b386-54b3f4c6f2b0)</a></td>
       </tr>
-      <tr data-ccd-events='lift_breathing_space_spec' data-channel='email'>
-        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)</td>
-        <td><code>NotifyRespondentSolicitorBSLifted</code></td>
+      <tr data-ccd-events='lift_breathing_space_spec apply_pending_breathing_space_lift' data-channel='email'>
+        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)<br>Pending breathing space lift (APPLY_PENDING_BREATHING_SPACE_LIFT)</td>
+        <td><code>BreathingSpaceLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>—</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/50740783-fc24-49bb-a49f-48fcd3213e06'>breathingSpaceLiftedApplicantEmailTemplate (50740783-fc24-49bb-a49f-48fcd3213e06)</a></td>
-      </tr>
-      <tr data-ccd-events='lift_breathing_space_spec' data-channel='email'>
-        <td>Lift Breathing Space (LIFT_BREATHING_SPACE_SPEC)</td>
-        <td><code>NotifyRespondentSolicitorBSLifted</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/breathing_space_lifted.png'>breathing_space_lifted.bpmn</a></td>
-        <td>Email</td>
-        <td>—</td>
+        <td>Respondent 2 solicitor (LR)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/05b6362f-ef50-4be1-b386-54b3f4c6f2b0'>breathingSpaceLiftedRespondentEmailTemplate (05b6362f-ef50-4be1-b386-54b3f4c6f2b0)</a></td>
       </tr>
       <tr data-ccd-events='bundle_creation_notification' data-channel='email'>
@@ -2864,18 +2921,90 @@
       </tr>
       <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
         <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
-        <td><code>UNKNOWN</code></td>
+        <td><code>BreathingSpaceEnterNotifyLipApplicant</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
         <td>Email</td>
         <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/7e34af74-ec20-476b-aea5-6a6508d3acaf'>notifyApplicant1EnteredBreathingSpaceLip (7e34af74-ec20-476b-aea5-6a6508d3acaf)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/9d590339-194c-4bd9-96c4-4f2457218fc6'>notifyApplicant1EnteredBreathingSpaceLipWelsh (9d590339-194c-4bd9-96c4-4f2457218fc6)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e551a04f-9da1-4654-a7be-2040e02925aa'>notifyEnteredBreathingSpaceForDefendantLip (e551a04f-9da1-4654-a7be-2040e02925aa)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipApplicant</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/98605ac9-f4db-406e-aa47-7b83ffca53af'>notifyEnteredBreathingSpaceForDefendantLipWelsh (98605ac9-f4db-406e-aa47-7b83ffca53af)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/7e34af74-ec20-476b-aea5-6a6508d3acaf'>notifyApplicant1EnteredBreathingSpaceLip (7e34af74-ec20-476b-aea5-6a6508d3acaf)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/9d590339-194c-4bd9-96c4-4f2457218fc6'>notifyApplicant1EnteredBreathingSpaceLipWelsh (9d590339-194c-4bd9-96c4-4f2457218fc6)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e551a04f-9da1-4654-a7be-2040e02925aa'>notifyEnteredBreathingSpaceForDefendantLip (e551a04f-9da1-4654-a7be-2040e02925aa)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyLipRespondent1</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>—</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/98605ac9-f4db-406e-aa47-7b83ffca53af'>notifyEnteredBreathingSpaceForDefendantLipWelsh (98605ac9-f4db-406e-aa47-7b83ffca53af)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyParties</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>Applicant solicitor (LR)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bb4bc8ea-273b-4303-bc0a-d3121f78a4d8'>breathingSpaceEnterApplicantEmailTemplate (bb4bc8ea-273b-4303-bc0a-d3121f78a4d8)</a></td>
       </tr>
       <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
         <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
-        <td><code>UNKNOWN</code></td>
+        <td><code>BreathingSpaceEnterNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
         <td>Email</td>
-        <td>—</td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/a32f5713-fc3b-4250-972f-84da7bd4e9b0'>breathingSpaceEnterDefendantEmailTemplate (a32f5713-fc3b-4250-972f-84da7bd4e9b0)</a></td>
+      </tr>
+      <tr data-ccd-events='enter_breathing_space_spec' data-channel='email'>
+        <td>Enter Breathing Space (ENTER_BREATHING_SPACE_SPEC)</td>
+        <td><code>BreathingSpaceEnterNotifyParties</code></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/enter_breathing_space_spec.png'>enter_breathing_space_spec.bpmn</a></td>
+        <td>Email</td>
+        <td>Respondent 2 solicitor (LR)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/a32f5713-fc3b-4250-972f-84da7bd4e9b0'>breathingSpaceEnterDefendantEmailTemplate (a32f5713-fc3b-4250-972f-84da7bd4e9b0)</a></td>
       </tr>
       <tr data-ccd-events='evidence_uploaded evidence_upload_applicant evidence_upload_respondent' data-channel='dashboard'>
@@ -6158,54 +6287,6 @@
         <td>Claimant</td>
         <td><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant.json'><code>Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant.json'><code>Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant.json'><code>Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant.json'><code>Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant.json'><code>Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant.json'><code>Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant.json'><code>Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant.json'><code>Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant.json'><code>Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.Defendant.json'><code>Notice.AAA6.ClaimantIntent.Mediation.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Multi.Int.Await.Defendant.json'><code>Notice.AAA6.ClaimantIntent.Multi.Int.Await.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.PartAdmit.Defendant.json'><code>Notice.AAA6.ClaimantIntent.PartAdmit.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.ClaimantDisagreesCourtPlan.Defendant.json'><code>Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.ClaimantDisagreesCourtPlan.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant.json'><code>Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant.json'><code>Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant</code></a><br><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithDefendant.Defendant.json'><code>Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithDefendant.Defendant</code></a></td>
       </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/de6b386e-fcad-466d-a5ca-84931c1fe15a'>lipGeneralAppApplicantEmailTemplate (de6b386e-fcad-466d-a5ca-84931c1fe15a)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/a1a529e2-2c28-4c76-8633-af338dfa6f8c'>notifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual (a1a529e2-2c28-4c76-8633-af338dfa6f8c)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/979ea25b-1de8-4158-9c04-d22b957fe562'>notifyLRTranslatedDocumentUploaded (979ea25b-1de8-4158-9c04-d22b957fe562)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e88fa6cb-d012-4f0f-b0a0-68d5e07e6632'>lipGeneralAppRespondentEmailTemplate (e88fa6cb-d012-4f0f-b0a0-68d5e07e6632)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/979ea25b-1de8-4158-9c04-d22b957fe562'>notifyLRTranslatedDocumentUploaded (979ea25b-1de8-4158-9c04-d22b957fe562)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='email'>
-        <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
-        <td><code>UNKNOWN</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_ga_lip_notify.png'>upload_translated_document_ga_lip_notify.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/dd60b122-462a-4d6d-91eb-9ef551871640'>notifyRespondentLiPTranslatedDocumentUploadedWhenParentCaseInBilingual (dd60b122-462a-4d6d-91eb-9ef551871640)</a></td>
-      </tr>
       <tr data-ccd-events='upload_translated_document_ga_lip' data-channel='dashboard'>
         <td>Upload translated document GA Lip (UPLOAD_TRANSLATED_DOCUMENT_GA_LIP)</td>
         <td><code>GenerateDashboardNotificationsGaTranslatedDocument</code></td>
@@ -8357,6 +8438,54 @@
         <td>Email</td>
         <td>Respondent</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/b2e4ac03-4c1a-40c1-855c-718c61cb73e9'>solicitorTrialReady (b2e4ac03-4c1a-40c1-855c-718c61cb73e9)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Applicant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/de6b386e-fcad-466d-a5ca-84931c1fe15a'>lipGeneralAppApplicantEmailTemplate (de6b386e-fcad-466d-a5ca-84931c1fe15a)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Applicant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/a1a529e2-2c28-4c76-8633-af338dfa6f8c'>notifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual (a1a529e2-2c28-4c76-8633-af338dfa6f8c)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Applicant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/979ea25b-1de8-4158-9c04-d22b957fe562'>notifyLRTranslatedDocumentUploaded (979ea25b-1de8-4158-9c04-d22b957fe562)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Respondent</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e88fa6cb-d012-4f0f-b0a0-68d5e07e6632'>lipGeneralAppRespondentEmailTemplate (e88fa6cb-d012-4f0f-b0a0-68d5e07e6632)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Respondent</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/979ea25b-1de8-4158-9c04-d22b957fe562'>notifyLRTranslatedDocumentUploaded (979ea25b-1de8-4158-9c04-d22b957fe562)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>UNKNOWN</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Respondent</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/dd60b122-462a-4d6d-91eb-9ef551871640'>notifyRespondentLiPTranslatedDocumentUploadedWhenParentCaseInBilingual (dd60b122-462a-4d6d-91eb-9ef551871640)</a></td>
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>

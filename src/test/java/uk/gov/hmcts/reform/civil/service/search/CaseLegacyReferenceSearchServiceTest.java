@@ -48,7 +48,7 @@ class CaseLegacyReferenceSearchServiceTest {
         new Query(boolQuery().must(matchQuery("data.previousServiceCaseReference", REFERENCE)), List.of(), 0);
 
     @BeforeEach
-    private void setUp() {
+    void setUp() {
         searchResult = mock(SearchResult.class);
         given(coreCaseDataService.searchCases(any())).willReturn(searchResult);
     }

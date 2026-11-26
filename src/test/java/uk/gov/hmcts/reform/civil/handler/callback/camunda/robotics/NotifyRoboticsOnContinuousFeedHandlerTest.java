@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -42,10 +43,12 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -136,6 +139,25 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             );
         }
 
+        @Test
+        void shouldOmitBreathingSpace_whenCaseHasBreathingSpace() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineAdmissionOrCounterClaim()
+                .build()
+                .toBuilder()
+                .breathing(new BreathingSpaceInfo())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(
+                argThat(data -> data.getBreathing() == null),
+                eq(false),
+                eq(params.getParams().get(BEARER_TOKEN).toString())
+            );
+        }
+
     }
 
     @Nested
@@ -143,7 +165,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
-            when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
+            when(validationService.validate(anyString())).thenReturn(List.of(Error.builder().message("invalid payload").build()));
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

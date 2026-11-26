@@ -797,8 +797,7 @@ public class CaseData extends CaseDataParent implements MappableObject, Notifiab
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return getBreathing() != null
-            && getBreathing().getEnter() != null
-            && getBreathing().getLift() == null;
+            && YesOrNo.YES.equals(getBreathing().getActive());
     }
 
     @JsonIgnore
