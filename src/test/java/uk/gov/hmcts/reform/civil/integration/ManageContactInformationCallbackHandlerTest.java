@@ -2038,14 +2038,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             }
 
             @Test
-            void shouldReturnPostcodeErrorWhenAddressChanges() {
-                Address previousAddress = new Address();
-                previousAddress.setPostCode("CM14 5NB");
+            void shouldReturnPostcodeError() {
                 given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
 
                 CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .applicant1(new Party().setType(INDIVIDUAL)
-                                    .setPrimaryAddress(previousAddress))
+                    .applicant1(new Party().setType(INDIVIDUAL))
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
@@ -2061,6 +2058,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                     .setPrimaryAddress(new Address()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
