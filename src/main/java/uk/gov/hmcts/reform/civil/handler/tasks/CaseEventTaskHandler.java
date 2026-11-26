@@ -125,6 +125,10 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
         variables.putValue("isApplicantUploadTranslatedDocumentTaskRequiredCancellation",
                            cancelApplicantWaDocumentUploadTask(data));
+        if (data.getDecisionOnRequestReconsiderationOptions() != null) {
+            variables.putValue("decisionOnRequestReconsiderationOptions",
+                               data.getDecisionOnRequestReconsiderationOptions().name());
+        }
         return variables;
     }
 
