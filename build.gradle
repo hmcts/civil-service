@@ -800,6 +800,8 @@ dependencies {
   implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
+  // Used directly by ScenarioConfigLoader; springdoc 3.2 (swagger-core 3, Jackson 3) no longer brings it in.
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
   implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
