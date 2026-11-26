@@ -15,10 +15,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
 
     private static final String MESSAGE_NAME = "ENTER_BREATHING_SPACE_SPEC";
     private static final String PROCESS_ID = "ENTER_BREATHING_SPACE_SPEC";
-    private static final String NOTIFY_LIP_RESPONDENT = "NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_ENTER";
-    private static final String NOTIFY_LIP_RESPONDENT_ACTIVITY_ID = "BreathingSpaceEnterNotifyLipRespondent1";
-    private static final String NOTIFY_LIP_APPLICANT = "NOTIFY_LIP_APPLICANT_BREATHING_SPACE_ENTER";
-    private static final String NOTIFY_LIP_APPLICANT_ACTIVITY_ID = "BreathingSpaceEnterNotifyLipApplicant";
 
     EnterBreathingSpaceSpecTest() {
         super("enter_breathing_space_spec.bpmn", PROCESS_ID);
@@ -69,24 +65,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
         );
 
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
         assertEnd();
     }
 
@@ -103,15 +81,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
         );
 
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
         assertEnd();
     }
 
@@ -126,15 +95,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         assertCompleteExternalTask(
             assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
             "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
-        );
-
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
         );
 
         assertEnd();

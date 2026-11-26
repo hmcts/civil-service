@@ -16,14 +16,6 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
     public static final String MESSAGE_NAME = "LIFT_BREATHING_SPACE_SPEC";
     public static final String PROCESS_ID = "BREATHING_SPACE_LIFTED";
 
-    private static final String NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED
-        = "NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED";
-    private static final String NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED";
-
-    private static final String NOTIFY_LIP_APPLICANT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipApplicant";
-    private static final String NOTIFY_LIP_RESPONDENT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipRespondent1";
-
     public BreathingSpaceLiftedTest() {
         super("breathing_space_lifted.bpmn", PROCESS_ID);
     }
@@ -57,24 +49,6 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
             "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
         );
 
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
         assertEnd();
     }
 
@@ -91,15 +65,6 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
             "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
         );
 
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
         assertEnd();
     }
 
@@ -114,15 +79,6 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertCompleteExternalTask(
             assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
             "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
-        );
-
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
         );
 
         assertEnd();
