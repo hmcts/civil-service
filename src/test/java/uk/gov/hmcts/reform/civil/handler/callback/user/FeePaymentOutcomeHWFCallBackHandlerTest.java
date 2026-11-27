@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -180,6 +182,73 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                 .isEqualTo("READY");
         }
 
+    }
+
+    @Nested
+    class RemissionTypeOutstandingFee {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "0.00"})
+        void shouldNotReturnError_whenClaimIssueFullRemissionAndOutstandingFeeIsZero(String outstandingFee) {
+            CaseData caseData = claimIssueFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "0.00"})
+        void shouldNotReturnError_whenHearingFullRemissionAndOutstandingFeeIsZero(String outstandingFee) {
+            CaseData caseData = hearingFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0.01", "100.00"})
+        void shouldStillReturnError_whenClaimIssueFullRemissionAndOutstandingFeeIsNotZero(String outstandingFee) {
+            CaseData caseData = claimIssueFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).containsExactly(WRONG_REMISSION_TYPE_SELECTED);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0.01", "100.00"})
+        void shouldStillReturnError_whenHearingFullRemissionAndOutstandingFeeIsNotZero(String outstandingFee) {
+            CaseData caseData = hearingFullRemissionCase(new BigDecimal(outstandingFee));
+
+            assertThat(validateRemissionType(caseData).getErrors()).containsExactly(WRONG_REMISSION_TYPE_SELECTED);
+        }
+
+        private AboutToStartOrSubmitCallbackResponse validateRemissionType(CaseData caseData) {
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");
+            return (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        }
+
+        private CaseData claimIssueFullRemissionCase(BigDecimal outstandingFee) {
+            FeePaymentOutcomeDetails feePaymentDetails = new FeePaymentOutcomeDetails();
+            feePaymentDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.YES);
+            HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails();
+            hwfDetails.setOutstandingFeeInPounds(outstandingFee);
+
+            CaseData caseData = CaseData.builder().build();
+            caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+            caseData.setClaimIssuedHwfDetails(hwfDetails);
+            return caseData;
+        }
+
+        private CaseData hearingFullRemissionCase(BigDecimal outstandingFee) {
+            FeePaymentOutcomeDetails feePaymentDetails = new FeePaymentOutcomeDetails();
+            feePaymentDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+            HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails();
+            hwfDetails.setOutstandingFeeInPounds(outstandingFee);
+
+            CaseData caseData = CaseData.builder().build();
+            caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setHearingHwfDetails(hwfDetails);
+            return caseData;
+        }
     }
 
     @Test

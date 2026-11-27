@@ -445,4 +445,32 @@ class JudgmentByAdmissionStrategyTest {
         assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getPaymentInFullDate())
             .isEqualTo(LocalDate.of(2024, 12, 20).atStartOfDay());
     }
+
+    @Test
+    void defaultsAmountOfCostsToZeroForLipOneVOneWhenClaimFeeIsMissing() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        LocalDateTime responseDate = LocalDateTime.of(2024, 5, 1, 9, 0);
+        when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
+
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(500));
+        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(80));
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(50));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.NO);
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setApplicant1ResponseDate(responseDate);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setClaimFee(null);
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfCosts())
+            .isEqualByComparingTo("0.00");
+    }
 }
