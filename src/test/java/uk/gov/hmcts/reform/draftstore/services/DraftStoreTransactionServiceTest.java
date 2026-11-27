@@ -166,6 +166,7 @@ class DraftStoreTransactionServiceTest {
     private DraftStoreEntity draft() {
         OffsetDateTime now = OffsetDateTime.now();
         return new DraftStoreEntity(UUID.randomUUID(), "user", null, DraftType.DRAFT_CLAIM,
-                                    new HashMap<>(), now, now, now.plusDays(30), null);
+                                    new HashMap<>(), now, now, now.plusDays(30), null,
+                                    null);
     }
 }

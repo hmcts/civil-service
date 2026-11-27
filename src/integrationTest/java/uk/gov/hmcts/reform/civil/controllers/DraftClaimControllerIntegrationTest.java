@@ -599,7 +599,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             createdAt,
             createdAt,
             expiresAt,
-            null
-        );
+            null,
+            null);
     }
 }

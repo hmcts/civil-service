@@ -120,8 +120,8 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
             createdAt,
             createdAt,
             createdAt.plusDays(30),
-            null
-        );
+            null,
+            null);
         draftStoreRepository.saveAndFlush(draft);
     }
 

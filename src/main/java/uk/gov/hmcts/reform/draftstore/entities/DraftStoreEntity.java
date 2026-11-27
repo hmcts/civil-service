@@ -64,4 +64,8 @@ public class DraftStoreEntity {
     @Size(max = 200)
     @Column(name = "submission_id")
     private String submissionId;
+
+    @Size(max = 200)
+    @Column(name = "application_id")
+    private String applicationId;
 }

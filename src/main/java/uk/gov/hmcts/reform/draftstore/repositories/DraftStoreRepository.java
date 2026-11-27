@@ -34,6 +34,38 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         OffsetDateTime now
     );
 
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseId(
+        String userId,
+        DraftType draftType,
+        String caseId
+    );
+
+    List<DraftStoreEntity> findAllByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
+        String userId,
+        DraftType draftType,
+        String caseId,
+        OffsetDateTime now
+    );
+
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndApplicationId(
+        String userId,
+        DraftType draftType,
+        String applicationId
+    );
+
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndApplicationIdAndExpiresAtAfter(
+        String userId,
+        DraftType draftType,
+        String applicationId,
+        OffsetDateTime now
+    );
+
+    List<DraftStoreEntity> findAllByUserIdAndDraftTypeAndExpiresAtAfter(
+        String userId,
+        DraftType draftType,
+        OffsetDateTime now
+    );
+
     Optional<DraftStoreEntity> findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
         UUID id,
         String userId,
