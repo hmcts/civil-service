@@ -24,16 +24,23 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.BilingualOrderDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
 import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.NO;
 import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.YES;
@@ -70,6 +77,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private AssignCategoryId assignCategoryId;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private BilingualOrderDocumentService bilingualOrderDocumentService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -79,7 +88,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
                                                                                               featureToggleService,
-                                                                                              deadlinesCalculator
+                                                                                              deadlinesCalculator,
+                                                                                              bilingualOrderDocumentService
         );
     }
 
@@ -1400,5 +1410,148 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM.name());
+    }
+
+    @Test
+    void shouldStitchSdo_WhenWelshEnabledAndSdoUploaded() {
+        Document sdoFileDoc = new Document();
+        sdoFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(STANDARD_DIRECTION_ORDER);
+        translatedDocument1.setFile(sdoFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document sdoDoc = new Document();
+        sdoDoc.setDocumentFileName("standard_direction_order.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(sdoDoc, DocumentType.SDO_ORDER)));
+
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(caseData)
+            .params(Map.of(BEARER_TOKEN, "Bearer token"));
+
+        uploadTranslatedDocumentDefaultStrategy.uploadDocument(callbackParams);
+
+        verify(bilingualOrderDocumentService).stitchSdoIfRequired(any(CaseData.class), eq("Bearer token"));
+        verify(bilingualOrderDocumentService, never()).stitchFinalOrderIfRequired(any(), anyString());
+        verify(bilingualOrderDocumentService, never()).stitchHearingNoticeIfRequired(any(), anyString());
+    }
+
+    @Test
+    void shouldStitchFinalOrder_WhenWelshEnabledAndFinalOrderUploaded() {
+        Document finalOrderFileDoc = new Document();
+        finalOrderFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(FINAL_ORDER);
+        translatedDocument1.setFile(finalOrderFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document finalOrderDoc = new Document();
+        finalOrderDoc.setDocumentFileName("final_order.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(finalOrderDoc, DocumentType.JUDGE_FINAL_ORDER)));
+
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setFinalOrderDocumentCollection(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        when(systemGeneratedDocumentService.getFinalOrderDocumentsWithAddedDocument(any(), any()))
+            .thenReturn(new ArrayList<>());
+
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(caseData)
+            .params(Map.of(BEARER_TOKEN, "Bearer token"));
+
+        uploadTranslatedDocumentDefaultStrategy.uploadDocument(callbackParams);
+
+        verify(bilingualOrderDocumentService).stitchFinalOrderIfRequired(any(CaseData.class), eq("Bearer token"));
+        verify(bilingualOrderDocumentService, never()).stitchSdoIfRequired(any(), anyString());
+        verify(bilingualOrderDocumentService, never()).stitchHearingNoticeIfRequired(any(), anyString());
+    }
+
+    @Test
+    void shouldStitchHearingNotice_WhenWelshEnabledAndHearingNoticeUploaded() {
+        Document hearingNoticeFileDoc = new Document();
+        hearingNoticeFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(HEARING_NOTICE);
+        translatedDocument1.setFile(hearingNoticeFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document hearingDoc = new Document();
+        hearingDoc.setDocumentFileName("hearing_small_claim.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(hearingDoc, DocumentType.HEARING_FORM)));
+
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setHearingDocuments(new ArrayList<>());
+        caseData.setHearingDocumentsWelsh(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        when(systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(any(), any()))
+            .thenReturn(new ArrayList<>());
+
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(caseData)
+            .params(Map.of(BEARER_TOKEN, "Bearer token"));
+
+        uploadTranslatedDocumentDefaultStrategy.uploadDocument(callbackParams);
+
+        verify(bilingualOrderDocumentService).stitchHearingNoticeIfRequired(any(CaseData.class), eq("Bearer token"));
+        verify(bilingualOrderDocumentService, never()).stitchSdoIfRequired(any(), anyString());
+        verify(bilingualOrderDocumentService, never()).stitchFinalOrderIfRequired(any(), anyString());
+    }
+
+    @Test
+    void shouldNotStitch_WhenWelshDisabled() {
+        Document sdoFileDoc = new Document();
+        sdoFileDoc.setDocumentFileName(FILE_NAME_1);
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(STANDARD_DIRECTION_ORDER);
+        translatedDocument1.setFile(sdoFileDoc);
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        Document sdoDoc = new Document();
+        sdoDoc.setDocumentFileName("standard_direction_order.pdf");
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(sdoDoc, DocumentType.SDO_ORDER)));
+
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setTranslatedDocuments(List.of(element(translatedDocument1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setCcdCaseReference(123L);
+
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(caseData)
+            .params(Map.of(BEARER_TOKEN, "Bearer token"));
+
+        uploadTranslatedDocumentDefaultStrategy.uploadDocument(callbackParams);
+
+        verify(bilingualOrderDocumentService, never()).stitchSdoIfRequired(any(), anyString());
+        verify(bilingualOrderDocumentService, never()).stitchFinalOrderIfRequired(any(), anyString());
+        verify(bilingualOrderDocumentService, never()).stitchHearingNoticeIfRequired(any(), anyString());
     }
 }

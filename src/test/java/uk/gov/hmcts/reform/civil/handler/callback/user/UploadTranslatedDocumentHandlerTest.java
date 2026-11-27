@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.BilingualOrderDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
     private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private BilingualOrderDocumentService bilingualOrderDocumentService;
 
     private static final String FILE_NAME_1 = "Some file 1";
 
@@ -62,7 +65,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             objectMapper,
             assignCategoryId,
             featureToggleService,
-            deadlinesCalculator
+            deadlinesCalculator,
+            bilingualOrderDocumentService
         );
         UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory = new UploadTranslatedDocumentStrategyFactory(
             uploadTranslatedDocumentDefaultStrategy,

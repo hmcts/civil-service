@@ -572,9 +572,13 @@ public class DashboardNotificationsParamsMapperTest {
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT"
     })
-    void shouldNotMapOrderDocument_whenWelshEnabledAndBilingual(CaseEvent caseEvent) {
+    void shouldNotMapOrderDocument_whenWelshEnabledAndWelshPartyWithoutTranslatedOrder(CaseEvent caseEvent) {
+        // OCCC-827: Welsh party waits for CY / bilingual doc — EN-only must not open.
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+        caseData.setCaseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+            new uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse()
+                .setRespondent1ResponseLanguage(Language.WELSH.toString())));
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
@@ -583,6 +587,43 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
         assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
+    void shouldMapTranslatedFinalOrder_whenWelshEnabledAndWelshClaimant() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+
+        CaseDocument translated = generateOrder(DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT);
+        translated.getDocumentLink().setDocumentBinaryUrl("welsh-binary-url");
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+        finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
+        finalCaseDocuments.add(element(translated));
+        caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(
+            caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
+
+        assertThat(result).extracting("orderDocument").isEqualTo("welsh-binary-url");
+    }
+
+    @Test
+    void shouldMapBilingualFinalOrder_whenWelshEnabledAndBothPreference() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
+
+        CaseDocument bilingual = generateOrder(DocumentType.FINAL_ORDER_BILINGUAL_DOCUMENT);
+        bilingual.getDocumentLink().setDocumentBinaryUrl("bilingual-binary-url");
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+        finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
+        finalCaseDocuments.add(element(generateOrder(DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT)));
+        finalCaseDocuments.add(element(bilingual));
+        caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(
+            caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
+
+        assertThat(result).extracting("orderDocument").isEqualTo("bilingual-binary-url");
     }
 
     @ParameterizedTest
