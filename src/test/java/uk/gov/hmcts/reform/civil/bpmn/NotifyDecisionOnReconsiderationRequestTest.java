@@ -16,6 +16,8 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
     public static final String PROCESS_ID = "DECISION_ON_RECONSIDERATION_REQUEST";
     public static final String NOTIFY_EVENT = "NOTIFY_EVENT";
     public static final String NOTIFY_ACTIVITY_ID = "NotifyDecisionOnReconsiderationRequestNotifier";
+    public static final String CANCEL_RECONSIDERATION_HEARING_TASK_EVENT = "CANCEL_RECONSIDERATION_HEARING_TASK";
+    public static final String CANCEL_RECONSIDERATION_HEARING_TASK_ACTIVITY_ID = "CancelReconsiderationHearingTask";
 
     public NotifyDecisionOnReconsiderationRequestTest() {
         super("notify_decision_on_reconsideration_request.bpmn", "DECISION_ON_RECONSIDERATION_REQUEST");
@@ -542,6 +544,133 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
         //fail the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
         assertFailExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
+
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldCancelHearingTaskAndSkipNotifications_whenDecisionIsCreateSDO() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
+
+        VariableMap variables = Variables.createVariables();
+        variables.put("flowFlags", Map.of());
+        variables.put("decisionOnRequestReconsiderationOptions", "CREATE_SDO");
+
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
+            variables
+        );
+
+        //complete the cancel hearing task
+        ExternalTask cancelHearingTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            cancelHearingTask,
+            PROCESS_CASE_EVENT,
+            CANCEL_RECONSIDERATION_HEARING_TASK_EVENT,
+            CANCEL_RECONSIDERATION_HEARING_TASK_ACTIVITY_ID,
+            variables
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldCancelHearingTaskAndSkipNotifications_whenDecisionIsCreateGeneralOrder() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
+
+        VariableMap variables = Variables.createVariables();
+        variables.put("flowFlags", Map.of());
+        variables.put("decisionOnRequestReconsiderationOptions", "CREATE_GENERAL_ORDER");
+
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
+            variables
+        );
+
+        //complete the cancel hearing task
+        ExternalTask cancelHearingTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            cancelHearingTask,
+            PROCESS_CASE_EVENT,
+            CANCEL_RECONSIDERATION_HEARING_TASK_EVENT,
+            CANCEL_RECONSIDERATION_HEARING_TASK_ACTIVITY_ID,
+            variables
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldNotifyPartiesAndNotCancelHearingTask_whenDecisionIsYes() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
+
+        VariableMap variables = Variables.createVariables();
+        variables.put("flowFlags", Map.of());
+        variables.put("decisionOnRequestReconsiderationOptions", "YES");
+
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
+            variables
+        );
+
+        //complete the notification to parties
+        ExternalTask partyNotifications = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            partyNotifications,
+            PROCESS_CASE_EVENT,
+            NOTIFY_EVENT,
+            NOTIFY_ACTIVITY_ID,
+            variables
+        );
+
+        //complete the dashboard notification
+        ExternalTask dashboardNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            dashboardNotification,
+            PROCESS_CASE_EVENT,
+            "DASHBOARD_NOTIFICATION_EVENT",
+            "GenerateDashboardNotificationsDecisionReconsideration",
+            variables
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
 
         assertNoExternalTasksLeft();
     }

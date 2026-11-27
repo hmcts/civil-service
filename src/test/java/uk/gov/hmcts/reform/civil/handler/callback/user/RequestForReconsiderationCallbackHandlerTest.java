@@ -17,18 +17,22 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sdo.ResponseToReconsideration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -70,6 +74,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
@@ -181,8 +188,25 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
         }
 
+        @Test
+        void shouldSendErrorMessageIfDeadlineCheckedIsYes() {
+            //Given : Casedata with requestForReconsiderationDeadlineChecked set to YES
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
+                .build().toBuilder()
+                .requestForReconsiderationDeadlineChecked(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: The error should be displayed
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_DEADLINE_EXPIRED);
+        }
+
         @ParameterizedTest
-        @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO"})
+        @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO", "CLAIMANT", "DEFENDANT"})
         void shouldGetSelectedUserRole(String userRole) {
             //Given : Casedata and return applicant solicitor role
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -200,16 +224,46 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: It should set casePartyRequestForReconsideration to selected user
-            if (userRole.equals("APPLICANTSOLICITORONE")) {
+            if (userRole.equals("APPLICANTSOLICITORONE") || userRole.equals("CLAIMANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Applicant");
-            } else if (userRole.equals("RESPONDENTSOLICITORONE")) {
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("APPLICANT"));
+            } else if (userRole.equals("RESPONDENTSOLICITORONE") || userRole.equals("DEFENDANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent1");
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("RESPONDENT1"));
             } else {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent2");
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("RESPONDENT2"));
             }
+        }
+
+        @Test
+        void shouldAddSelectedUserRoleToListWhenOtherPartiesAlreadyRequested() {
+            //Given : Casedata with Respondent1 already requested
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(new CaseDocument()
+                                                                       .setDocumentType(DocumentType.SDO_ORDER)
+                                                                       .setCreatedDatetime(
+                                                                           LocalDateTime.now().minusDays(5)))))
+                .casePartiesRequestingReconsideration(List.of(ReconsiderationParties.RESPONDENT1))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: It should add APPLICANT to casePartiesRequestingReconsideration list
+            assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                .isEqualTo(List.of("RESPONDENT1", "APPLICANT"));
         }
 
         @Test
@@ -267,6 +321,142 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class AboutToSubmitCallback {
         @Test
+        void shouldStoreApplicantSolicitorSubmissionAsReconsiderationRequest() {
+            Party applicant = new Party().setIndividualFirstName("FirstName").setIndividualLastName("LastName")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Claimant reasons", null))
+                .applicant1(applicant).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - FirstName LastName"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+            assertThat(updatedCaseData.getReasonForReconsiderationApplicant()).isEqualTo(updatedCaseData.getReconsiderationRequest());
+        }
+
+        @Test
+        void shouldStoreRespondentSolicitorSubmissionAsReconsiderationRequest() {
+            Party respondent = new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationRespondent1(new ReasonForReconsideration("Defendant reasons", null))
+                .respondent1(respondent).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Defendant reasons", "Defendant - Defendant Name"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.RESPONDENT1);
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldStoreLiPSubmissionAsReconsiderationRequest() {
+            Party applicant = new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(new CaseDataLiP().setRequestForReviewCommentsClaimant("Claimant reasons"))
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1(applicant).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - Claimant Name"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldStoreOpposingPartySubmissionAsResponseAndMigrateLegacyRequest() {
+            Party respondent = new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Original reasons", "Claimant - Claimant Name")
+                )
+                .reasonForReconsiderationRespondent1(new ReasonForReconsideration("Defendant comments", null))
+                .respondent1(respondent).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Original reasons", "Claimant - Claimant Name"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+            assertThat(updatedCaseData.getReconsiderationResponse())
+                .isEqualTo(new ResponseToReconsideration("Defendant - Defendant Name", "Defendant comments"));
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldOverwriteRequestWhenRequestingPartySubmitsAgain() {
+            Party applicant = new Party().setIndividualFirstName("FirstName").setIndividualLastName("LastName")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Updated reasons", null))
+                .applicant1(applicant).build();
+            caseData.setReconsiderationRequest(new ReasonForReconsideration("Original reasons", "Claimant - Previous Name"));
+            caseData.setReconsiderationRequestingParty(ReconsiderationParties.APPLICANT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Updated reasons", "Claimant - FirstName LastName"));
+            assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
+        }
+
+        @Test
+        void shouldNotPopulateRoleAgnosticFieldsForMultiPartySubmission() {
+            Party applicant = new Party().setIndividualFirstName("FirstName").setIndividualLastName("LastName")
+                .setType(Party.Type.INDIVIDUAL);
+            Party respondent2 = new Party().setIndividualFirstName("Second").setIndividualLastName("Defendant")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Claimant reasons", null))
+                .addRespondent2(YesOrNo.YES).respondent2(respondent2).applicant1(applicant).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest()).isNull();
+            assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isNull();
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isNull();
+        }
+
+        @Test
         void shouldPopulateReasonAndRequestorDetailsOfApplicant() {
             //Given : Casedata
             ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
@@ -292,7 +482,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
         }
 
         @Test
@@ -319,7 +509,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Not provided");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
         }
 
         @Test
@@ -355,7 +545,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName and FirstName2 LastName2");
+                .isEqualTo("Claimant - FirstName LastName and FirstName2 LastName2");
         }
 
         @Test
@@ -595,7 +785,11 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(
+                new CaseDocument().setDocumentName("Name of document")
+                    .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                    .setDocumentLink(new Document().setDocumentUrl("fake-url"))
+            );
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -606,10 +800,14 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
             assertThat(response.getData()).extracting("requestForReconsiderationDocument")
                 .extracting("documentName")
                 .isEqualTo("Name of document");
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -629,7 +827,11 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(
+                new CaseDocument().setDocumentName("Name of document")
+                    .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                    .setDocumentLink(new Document().setDocumentUrl("fake-url"))
+            );
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -644,6 +846,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
                 .extracting("documentName")
                 .isEqualTo("Name of document");
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -657,8 +863,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
-            CaseDocument caseDocument = mock(CaseDocument.class);
-            when(caseDocument.getDocumentName()).thenReturn("Generated document name");
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentName("Generated document name")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("fake-url"));
             when(documentService.generateLiPDocument(
                 caseData,
                 params.getParams().get(BEARER_TOKEN).toString(),
@@ -678,6 +886,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocument")
                 .extracting("documentName")
                 .isEqualTo(caseDocument.getDocumentName());
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo(caseDocument.getDocumentName());
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test
@@ -692,8 +906,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
-            CaseDocument caseDocument = mock(CaseDocument.class);
-            when(caseDocument.getDocumentName()).thenReturn("Generated document for defendant");
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentName("Generated document for defendant")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("fake-url"));
             when(documentService.generateLiPDocument(
                 caseData,
                 params.getParams().get(BEARER_TOKEN).toString(),
@@ -712,6 +928,52 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
                 .extracting("documentName")
                 .isEqualTo(caseDocument.getDocumentName());
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments()).hasSize(1);
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo(caseDocument.getDocumentName());
+            assertThat(responseCaseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
+        }
+
+        @Test
+        void shouldAppendReconsiderationDocumentToExistingSystemGeneratedCaseDocuments() {
+            //Given: Casedata with existing SDO document
+            CaseDocument sdoDocument = new CaseDocument()
+                .setDocumentName("SDO Document")
+                .setDocumentType(DocumentType.SDO_ORDER)
+                .setDocumentLink(new Document().setDocumentUrl("sdo-url"));
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(new CaseDataLiP()
+                                 .setRequestForReviewCommentsClaimant("Comments from claimant"))
+                .systemGeneratedCaseDocuments(List.of(ElementUtils.element(sdoDocument)))
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+            CaseDocument reconDocument = new CaseDocument()
+                .setDocumentName("Reconsideration Document")
+                .setDocumentType(DocumentType.REQUEST_FOR_RECONSIDERATION)
+                .setDocumentLink(new Document().setDocumentUrl("recon-url"));
+            when(documentService.generateLiPDocument(
+                caseData,
+                params.getParams().get(BEARER_TOKEN).toString(),
+                true
+            )).thenReturn(reconDocument);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: reconsideration doc is appended and category ID is set to applications
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentName())
+                .isEqualTo("SDO Document");
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentName())
+                .isEqualTo("Reconsideration Document");
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID())
+                .isEqualTo(AssignCategoryId.APPLICATIONS);
         }
 
         @Test

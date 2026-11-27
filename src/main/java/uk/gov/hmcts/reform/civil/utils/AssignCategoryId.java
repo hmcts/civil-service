@@ -28,7 +28,7 @@ public class AssignCategoryId {
     }
 
     public void assignCategoryIdToCaseDocument(CaseDocument documentUpload, String theID) {
-        if (documentUpload == null) {
+        if (documentUpload == null || documentUpload.getDocumentLink() == null) {
             return;
         }
         documentUpload.getDocumentLink().setCategoryID(theID);

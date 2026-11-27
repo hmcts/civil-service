@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -115,6 +116,34 @@ class StartBusinessProcessTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
         verify(coreCaseDataService).submitUpdate(CASE_ID, content(startEventResponse, businessProcess.start()));
         verify(externalTaskService).complete(mockTask, variables);
+    }
+
+    @Test
+    void shouldIncludeDecisionOnRequestReconsiderationOptionsInVariables_whenPresent() {
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(BusinessProcessStatus.READY);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(businessProcess)
+            .build().toBuilder()
+            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+            .build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
+
+        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
+
+        VariableMap expectedVariables = Variables.createVariables();
+        expectedVariables.putValue(FLOW_STATE, "MAIN.DRAFT");
+        expectedVariables.putValue(FLOW_FLAGS, Map.of());
+        expectedVariables.putValue("decisionOnRequestReconsiderationOptions", "CREATE_SDO");
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService).complete(mockTask, expectedVariables);
     }
 
     @Test

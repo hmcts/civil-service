@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.39.0">
   <bpmn:process id="DECISION_ON_RECONSIDERATION_REQUEST" name="Decision on reconsideration request" isExecutable="true" camunda:historyTimeToLive="P90D">
     <bpmn:callActivity id="NotifyDecisionOnReconsiderationRequest" name="Start Business Process" calledElement="StartBusinessProcess">
       <bpmn:extensionElements>
@@ -27,13 +27,35 @@
         <camunda:in variables="all" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1r02v0z</bpmn:incoming>
+      <bpmn:incoming>Flow_CancelHearingToEnd</bpmn:incoming>
       <bpmn:outgoing>Flow_1og0z75</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:endEvent id="Event_0jlhskg">
       <bpmn:incoming>Flow_1og0z75</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1og0z75" sourceRef="Activity_0pqcpvc" targetRef="Event_0jlhskg" />
-    <bpmn:sequenceFlow id="Flow_1vs00o9" sourceRef="NotifyDecisionOnReconsiderationRequest" targetRef="Gateway_1fhcsxk" />
+    <bpmn:sequenceFlow id="Flow_1vs00o9" sourceRef="NotifyDecisionOnReconsiderationRequest" targetRef="Gateway_DecisionOption" />
+    <bpmn:exclusiveGateway id="Gateway_DecisionOption" name="Decision option?">
+      <bpmn:incoming>Flow_1vs00o9</bpmn:incoming>
+      <bpmn:outgoing>Flow_DecisionUpheld</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DecisionNewOrder</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_DecisionUpheld" name="Yes (Uphold order)" sourceRef="Gateway_DecisionOption" targetRef="Gateway_1fhcsxk">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty execution.getVariable('decisionOnRequestReconsiderationOptions') || execution.getVariable('decisionOnRequestReconsiderationOptions') == "YES"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_DecisionNewOrder" name="Create SDO / General Order" sourceRef="Gateway_DecisionOption" targetRef="CancelReconsiderationHearingTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty execution.getVariable('decisionOnRequestReconsiderationOptions') &amp;&amp; execution.getVariable('decisionOnRequestReconsiderationOptions') != "YES"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="CancelReconsiderationHearingTask" name="Cancel hearing task" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">CANCEL_RECONSIDERATION_HEARING_TASK</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DecisionNewOrder</bpmn:incoming>
+      <bpmn:outgoing>Flow_CancelHearingToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_CancelHearingToEnd" sourceRef="CancelReconsiderationHearingTask" targetRef="Activity_0pqcpvc" />
     <bpmn:serviceTask id="GenerateDashboardNotificationsDecisionReconsideration" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -45,7 +67,7 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1r02v0z" sourceRef="GenerateDashboardNotificationsDecisionReconsideration" targetRef="Activity_0pqcpvc" />
     <bpmn:exclusiveGateway id="Gateway_1fhcsxk">
-      <bpmn:incoming>Flow_1vs00o9</bpmn:incoming>
+      <bpmn:incoming>Flow_DecisionUpheld</bpmn:incoming>
       <bpmn:outgoing>Flow_10kpido</bpmn:outgoing>
       <bpmn:outgoing>Flow_1wv90dl</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -116,125 +138,154 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="DECISION_ON_RECONSIDERATION_REQUEST">
       <bpmndi:BPMNShape id="Activity_0x0o0ha_di" bpmnElement="NotifyDecisionOnReconsiderationRequest">
-        <dc:Bounds x="200" y="180" width="100" height="80" />
+        <dc:Bounds x="200" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0andzqc_di" bpmnElement="Event_0andzqc">
-        <dc:Bounds x="232" y="82" width="36" height="36" />
+        <dc:Bounds x="232" y="162" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0x1swz2_di" bpmnElement="Event_0x1swz2">
-        <dc:Bounds x="122" y="202" width="36" height="36" />
+        <dc:Bounds x="122" y="282" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="129" y="245" width="24" height="14" />
+          <dc:Bounds x="129" y="325" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0pqcpvc_di" bpmnElement="Activity_0pqcpvc">
-        <dc:Bounds x="1190" y="180" width="100" height="80" />
+        <dc:Bounds x="1190" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jlhskg_di" bpmnElement="Event_0jlhskg">
-        <dc:Bounds x="1432" y="202" width="36" height="36" />
+        <dc:Bounds x="1432" y="282" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0txb7dk_di" bpmnElement="NotifyDecisionOnReconsiderationRequestNotifier">
-        <dc:Bounds x="710" y="180" width="100" height="80" />
+      <bpmndi:BPMNShape id="Gateway_DecisionOption_di" bpmnElement="Gateway_DecisionOption" isMarkerVisible="true">
+        <dc:Bounds x="365" y="275" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="350" y="332" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CancelReconsiderationHearingTask_di" bpmnElement="CancelReconsiderationHearingTask">
+        <dc:Bounds x="480" y="160" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0mksa1f" bpmnElement="GenerateDashboardNotificationsDecisionReconsideration">
-        <dc:Bounds x="960" y="180" width="100" height="80" />
+        <dc:Bounds x="960" y="260" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1fhcsxk_di" bpmnElement="Gateway_1fhcsxk" isMarkerVisible="true">
-        <dc:Bounds x="515" y="195" width="50" height="50" />
+        <dc:Bounds x="515" y="275" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0zj33b5_di" bpmnElement="Gateway_0zj33b5" isMarkerVisible="true">
-        <dc:Bounds x="625" y="195" width="50" height="50" />
+        <dc:Bounds x="625" y="275" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_03fueyi" bpmnElement="SendDORToClaimantLIP">
-        <dc:Bounds x="480" y="370" width="100" height="80" />
+        <dc:Bounds x="480" y="450" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1k6crm0_di" bpmnElement="SendToDefendantLIP">
-        <dc:Bounds x="710" y="370" width="100" height="80" />
+        <dc:Bounds x="710" y="450" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_1kl1nm4_di" bpmnElement="TextAnnotation_1kl1nm4">
-        <dc:Bounds x="490" y="95" width="100" height="41" />
+      <bpmndi:BPMNShape id="Activity_0txb7dk_di" bpmnElement="NotifyDecisionOnReconsiderationRequestNotifier">
+        <dc:Bounds x="710" y="260" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0qef7qn_di" bpmnElement="TextAnnotation_0qef7qn">
-        <dc:Bounds x="600" y="101" width="100" height="41" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_09l6czo_di" bpmnElement="Association_09l6czo">
+        <di:waypoint x="650" y="275" />
+        <di:waypoint x="650" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_19p5yrb_di" bpmnElement="Association_19p5yrb">
+        <di:waypoint x="527" y="312" />
+        <di:waypoint x="414" y="410" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_065sy6f_di" bpmnElement="Event_065sy6f">
-        <dc:Bounds x="232" y="162" width="36" height="36" />
+        <dc:Bounds x="232" y="242" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="268" y="143" width="26" height="14" />
+          <dc:Bounds x="268" y="223" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0nvdd4d_di" bpmnElement="Flow_0nvdd4d">
-        <di:waypoint x="250" y="180" />
-        <di:waypoint x="250" y="118" />
+        <di:waypoint x="250" y="260" />
+        <di:waypoint x="250" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1xqzkty_di" bpmnElement="Flow_1xqzkty">
-        <di:waypoint x="158" y="220" />
-        <di:waypoint x="200" y="220" />
+        <di:waypoint x="158" y="300" />
+        <di:waypoint x="200" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1og0z75_di" bpmnElement="Flow_1og0z75">
-        <di:waypoint x="1290" y="220" />
-        <di:waypoint x="1432" y="220" />
+        <di:waypoint x="1290" y="300" />
+        <di:waypoint x="1432" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1vs00o9_di" bpmnElement="Flow_1vs00o9">
-        <di:waypoint x="300" y="220" />
-        <di:waypoint x="515" y="220" />
+        <di:waypoint x="300" y="300" />
+        <di:waypoint x="365" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionUpheld_di" bpmnElement="Flow_DecisionUpheld">
+        <di:waypoint x="415" y="300" />
+        <di:waypoint x="515" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="435" y="275" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionNewOrder_di" bpmnElement="Flow_DecisionNewOrder">
+        <di:waypoint x="390" y="275" />
+        <di:waypoint x="390" y="200" />
+        <di:waypoint x="480" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="370" y="228" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CancelHearingToEnd_di" bpmnElement="Flow_CancelHearingToEnd">
+        <di:waypoint x="580" y="201" />
+        <di:waypoint x="1240" y="200" />
+        <di:waypoint x="1240" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1r02v0z_di" bpmnElement="Flow_1r02v0z">
-        <di:waypoint x="1060" y="220" />
-        <di:waypoint x="1190" y="220" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_08avc9f_di" bpmnElement="Flow_08avc9f">
-        <di:waypoint x="675" y="220" />
-        <di:waypoint x="710" y="220" />
+        <di:waypoint x="1060" y="300" />
+        <di:waypoint x="1190" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_10kpido_di" bpmnElement="Flow_10kpido">
-        <di:waypoint x="540" y="245" />
-        <di:waypoint x="540" y="370" />
+        <di:waypoint x="540" y="325" />
+        <di:waypoint x="540" y="450" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="468" y="313" width="64" height="14" />
+          <dc:Bounds x="469" y="393" width="63" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0a4a3kg_di" bpmnElement="Flow_0a4a3kg">
-        <di:waypoint x="650" y="245" />
-        <di:waypoint x="650" y="410" />
-        <di:waypoint x="710" y="410" />
+        <di:waypoint x="650" y="325" />
+        <di:waypoint x="650" y="490" />
+        <di:waypoint x="710" y="490" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="654" y="325" width="71" height="14" />
+          <dc:Bounds x="655" y="405" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1idq44w_di" bpmnElement="Flow_1idq44w">
-        <di:waypoint x="580" y="410" />
-        <di:waypoint x="600" y="410" />
-        <di:waypoint x="600" y="220" />
-        <di:waypoint x="625" y="220" />
+        <di:waypoint x="580" y="490" />
+        <di:waypoint x="600" y="490" />
+        <di:waypoint x="600" y="300" />
+        <di:waypoint x="625" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1wv90dl_di" bpmnElement="Flow_1wv90dl">
-        <di:waypoint x="565" y="220" />
-        <di:waypoint x="625" y="220" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1737ozj_di" bpmnElement="Flow_1737ozj">
-        <di:waypoint x="760" y="370" />
-        <di:waypoint x="760" y="260" />
+        <di:waypoint x="565" y="300" />
+        <di:waypoint x="625" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1yfyxrt_di" bpmnElement="Flow_1yfyxrt">
-        <di:waypoint x="810" y="220" />
-        <di:waypoint x="960" y="220" />
+        <di:waypoint x="810" y="300" />
+        <di:waypoint x="960" y="300" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Association_19p5yrb_di" bpmnElement="Association_19p5yrb">
-        <di:waypoint x="540" y="195" />
-        <di:waypoint x="540" y="150" />
-        <di:waypoint x="540" y="136" />
+      <bpmndi:BPMNEdge id="Flow_1737ozj_di" bpmnElement="Flow_1737ozj">
+        <di:waypoint x="760" y="450" />
+        <di:waypoint x="760" y="340" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Association_09l6czo_di" bpmnElement="Association_09l6czo">
-        <di:waypoint x="650" y="195" />
-        <di:waypoint x="650" y="142" />
+      <bpmndi:BPMNEdge id="Flow_08avc9f_di" bpmnElement="Flow_08avc9f">
+        <di:waypoint x="675" y="300" />
+        <di:waypoint x="710" y="300" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0qef7qn_di" bpmnElement="TextAnnotation_0qef7qn">
+        <dc:Bounds x="600" y="80" width="100" height="41" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1kl1nm4_di" bpmnElement="TextAnnotation_1kl1nm4">
+        <dc:Bounds x="340" y="410" width="100" height="41" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

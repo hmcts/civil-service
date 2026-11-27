@@ -15,15 +15,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sdo.ResponseToReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
@@ -42,7 +46,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
@@ -56,7 +62,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
     private static final String AND = " and ";
-    private static final String APPLICANT_PREFIX = "Applicant - ";
+    private static final String CLAIMANT_PREFIX = "Claimant - ";
     private static final String DEFENDANT_PREFIX = "Defendant - ";
     private static final String REASON_NOT_PROVIDED = "Not provided";
     protected final ObjectMapper objectMapper;
@@ -73,6 +79,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             " your notifications/dashboard for an update.";
 
     private final LiPRequestReconsiderationGeneratorService documentGenerator;
+    private final AssignCategoryId assignCategoryId;
     private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Override
@@ -115,6 +122,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> roles = getUserRole(callbackParams);
+        ReconsiderationParties submittingParty = getReconsiderationParty(roles);
 
         if (isApplicantSolicitor(roles)) {
             handleSolicitorRequest(caseData, callbackParams, true);
@@ -128,9 +136,71 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             handleLiPRequest(caseData, callbackParams, false);
         }
 
+        if (submittingParty != null && isOneVOne(caseData)) {
+            saveRoleAgnosticReason(caseData, submittingParty);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();
+    }
+
+    private ReconsiderationParties getReconsiderationParty(List<String> roles) {
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+            return ReconsiderationParties.APPLICANT;
+        }
+        if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
+            return ReconsiderationParties.RESPONDENT1;
+        }
+        return null;
+    }
+
+    private void saveRoleAgnosticReason(CaseData caseData, ReconsiderationParties submittingParty) {
+        ReasonForReconsideration submittedReason = getLegacyReason(caseData, submittingParty);
+        if (submittedReason == null) {
+            return;
+        }
+
+        ReconsiderationParties requestingParty = caseData.getReconsiderationRequestingParty();
+        if (requestingParty == null) {
+            ReconsiderationParties otherParty = getOtherParty(submittingParty);
+            ReasonForReconsideration otherPartyReason = getLegacyReason(caseData, otherParty);
+            if (isReasonPopulated(otherPartyReason)) {
+                caseData.setReconsiderationRequest(otherPartyReason);
+                caseData.setReconsiderationRequestingParty(otherParty);
+                caseData.setReconsiderationResponse(toResponse(submittedReason));
+            } else {
+                caseData.setReconsiderationRequest(submittedReason);
+                caseData.setReconsiderationRequestingParty(submittingParty);
+            }
+        } else if (requestingParty == submittingParty) {
+            caseData.setReconsiderationRequest(submittedReason);
+        } else {
+            caseData.setReconsiderationResponse(toResponse(submittedReason));
+        }
+
+        caseData.setIsReconsiderationRoleAgnostic(YesOrNo.YES);
+    }
+
+    private ReasonForReconsideration getLegacyReason(CaseData caseData, ReconsiderationParties party) {
+        return party == ReconsiderationParties.APPLICANT
+            ? caseData.getReasonForReconsiderationApplicant()
+            : caseData.getReasonForReconsiderationRespondent1();
+    }
+
+    private ReconsiderationParties getOtherParty(ReconsiderationParties party) {
+        return party == ReconsiderationParties.APPLICANT
+            ? ReconsiderationParties.RESPONDENT1
+            : ReconsiderationParties.APPLICANT;
+    }
+
+    private boolean isReasonPopulated(ReasonForReconsideration reason) {
+        return reason != null && (StringUtils.isNotBlank(reason.getRequestor())
+            || StringUtils.isNotBlank(reason.getReasonForReconsiderationTxt()));
+    }
+
+    private ResponseToReconsideration toResponse(ReasonForReconsideration reason) {
+        return new ResponseToReconsideration(reason.getRequestor(), reason.getReasonForReconsiderationTxt());
     }
 
     private List<String> validateRequestEligibility(CaseData caseData) {
@@ -155,6 +225,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
      * or calculated as 7 days (RECONSIDERATION_DEADLINE_DAYS) from the most recent SDO order creation date.
      */
     private void validateDeadline(CaseData caseData, List<String> errors) {
+        if (caseData.getRequestForReconsiderationDeadlineChecked() == YES) {
+            errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+            return;
+        }
         LocalDateTime deadline = Optional.ofNullable(caseData.getRequestForReconsiderationDeadline())
             .orElseGet(() -> caseData.getSystemGeneratedCaseDocuments().stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
@@ -171,15 +245,29 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         List<String> roles = getUserRole(callbackParams);
 
         Optional<String> party = Optional.empty();
-        if (isApplicantSolicitor(roles)) {
+        Optional<ReconsiderationParties> reconsiderationParty = Optional.empty();
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             party = Optional.of("Applicant");
-        } else if (isRespondentSolicitorOne(roles)) {
+            reconsiderationParty = Optional.of(ReconsiderationParties.APPLICANT);
+        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
             party = Optional.of("Respondent1");
+            reconsiderationParty = Optional.of(ReconsiderationParties.RESPONDENT1);
         } else if (isRespondentSolicitorTwo(roles)) {
             party = Optional.of("Respondent2");
+            reconsiderationParty = Optional.of(ReconsiderationParties.RESPONDENT2);
         }
 
         party.ifPresent(caseData::setCasePartyRequestForReconsideration);
+        reconsiderationParty.ifPresent(rp -> addPartyRequestingReconsideration(caseData, rp));
+    }
+
+    private void addPartyRequestingReconsideration(CaseData caseData, ReconsiderationParties rp) {
+        List<ReconsiderationParties> parties = new ArrayList<>(Optional.ofNullable(caseData.getCasePartiesRequestingReconsideration())
+                                                                   .orElse(Collections.emptyList()));
+        if (!parties.contains(rp)) {
+            parties.add(rp);
+            caseData.setCasePartiesRequestingReconsideration(parties);
+        }
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -200,7 +288,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         boolean isOtherPartyLiP;
 
         if (isApplicant) {
-            partyName = APPLICANT_PREFIX
+            partyName = CLAIMANT_PREFIX
                 + Optional.ofNullable(caseData.getApplicant1())
                 .map(Party::getPartyName)
                 .orElse("")
@@ -231,14 +319,20 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         if (isApplicant) {
             caseData.setReasonForReconsiderationApplicant(reason);
             if (isOtherPartyLiP) {
-                caseData.setRequestForReconsiderationDocument(generateLiPDocument(caseData, callbackParams, true));
+                CaseDocument lipDocument = generateLiPDocument(caseData, callbackParams, true);
+                assignCategoryId.assignCategoryIdToCaseDocument(lipDocument, AssignCategoryId.APPLICATIONS);
+                caseData.setRequestForReconsiderationDocument(lipDocument);
+                addDocumentToSystemGeneratedCaseDocuments(caseData, lipDocument);
                 caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
                 caseData.setOrderRequestedForReviewClaimant(YES);
             }
         } else {
             caseData.setReasonForReconsiderationRespondent1(reason);
             if (isOtherPartyLiP) {
-                caseData.setRequestForReconsiderationDocumentRes(generateLiPDocument(caseData, callbackParams, false));
+                CaseDocument lipDocument = generateLiPDocument(caseData, callbackParams, false);
+                assignCategoryId.assignCategoryIdToCaseDocument(lipDocument, AssignCategoryId.APPLICATIONS);
+                caseData.setRequestForReconsiderationDocumentRes(lipDocument);
+                addDocumentToSystemGeneratedCaseDocuments(caseData, lipDocument);
                 caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
                 caseData.setOrderRequestedForReviewDefendant(YES);
             }
@@ -256,7 +350,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                                                                  : caseData.getReasonForReconsiderationRespondent1())
             .orElseGet(ReasonForReconsideration::new);
 
-        String prefix = isClaimant ? APPLICANT_PREFIX : DEFENDANT_PREFIX;
+        String prefix = isClaimant ? CLAIMANT_PREFIX : DEFENDANT_PREFIX;
         Party party1 = isClaimant ? caseData.getApplicant1() : caseData.getRespondent1();
         Party party2 = isClaimant ? caseData.getApplicant2() : null;
 
@@ -268,15 +362,32 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
         if (isClaimant) {
             caseData.setReasonForReconsiderationApplicant(reason);
-            caseData.setRequestForReconsiderationDocument(generateLiPDocument(caseData, callbackParams, true));
+            CaseDocument lipDocument = generateLiPDocument(caseData, callbackParams, true);
+            assignCategoryId.assignCategoryIdToCaseDocument(lipDocument, AssignCategoryId.APPLICATIONS);
+            caseData.setRequestForReconsiderationDocument(lipDocument);
+            addDocumentToSystemGeneratedCaseDocuments(caseData, lipDocument);
             caseData.setOrderRequestedForReviewClaimant(YES);
             caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
         } else {
             caseData.setReasonForReconsiderationRespondent1(reason);
-            caseData.setRequestForReconsiderationDocumentRes(generateLiPDocument(caseData, callbackParams, false));
+            CaseDocument lipDocument = generateLiPDocument(caseData, callbackParams, false);
+            assignCategoryId.assignCategoryIdToCaseDocument(lipDocument, AssignCategoryId.APPLICATIONS);
+            caseData.setRequestForReconsiderationDocumentRes(lipDocument);
+            addDocumentToSystemGeneratedCaseDocuments(caseData, lipDocument);
             caseData.setOrderRequestedForReviewDefendant(YES);
             caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
         }
+    }
+
+    private void addDocumentToSystemGeneratedCaseDocuments(CaseData caseData, CaseDocument document) {
+        if (document == null) {
+            return;
+        }
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>(
+            Optional.ofNullable(caseData.getSystemGeneratedCaseDocuments()).orElse(Collections.emptyList())
+        );
+        systemGeneratedCaseDocuments.add(element(document));
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
     private void handleRespondentSolicitorTwo(CaseData caseData) {

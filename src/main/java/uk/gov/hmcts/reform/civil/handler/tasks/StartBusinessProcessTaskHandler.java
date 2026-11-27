@@ -55,6 +55,10 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        if (caseData.getDecisionOnRequestReconsiderationOptions() != null) {
+            variables.putValue("decisionOnRequestReconsiderationOptions",
+                               caseData.getDecisionOnRequestReconsiderationOptions().name());
+        }
 
         return new ExternalTaskData().setVariables(variables);
     }
