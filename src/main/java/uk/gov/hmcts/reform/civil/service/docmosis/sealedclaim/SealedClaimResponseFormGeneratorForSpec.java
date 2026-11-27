@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -142,11 +143,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handleTimeline(SealedClaimResponseFormForSpec form, CaseData caseData) {
-        if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
+        Document timelineDocument = isRespondent2InOneVTwoTwoLegalRep(caseData)
+            ? caseData.getSpecResponsTimelineDocumentFiles2()
+            : caseData.getSpecResponseTimelineDocumentFiles();
+        if (timelineDocument != null) {
             form.setTimelineUploaded(true)
-                .setSpecResponseTimelineDocumentFiles(
-                    caseData.getSpecResponseTimelineDocumentFiles().getDocumentFileName()
-                );
+                .setSpecResponseTimelineDocumentFiles(timelineDocument.getDocumentFileName());
         } else {
             form.setTimelineUploaded(false)
                 .setTimeline(getTimeLine(caseData));
@@ -256,6 +258,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         } else {
             return response.getHowWasThisAmountPaid().getHumanFriendly();
         }
+    }
+
+    private boolean isRespondent2InOneVTwoTwoLegalRep(CaseData caseData) {
+        return getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP && isRespondent2(caseData);
     }
 
     private boolean isRespondent2(CaseData caseData) {

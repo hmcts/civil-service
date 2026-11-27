@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
@@ -39,6 +41,8 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 @Service
 @RequiredArgsConstructor
@@ -149,16 +153,23 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             "Sealed Claim form",
             LocalDate.now().toString()
         ));
-        if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
+        boolean respondent2Responding = isRespondent2InOneVTwoTwoLegalRep(caseData);
+        Document timelineDocument = respondent2Responding
+            ? caseData.getSpecResponsTimelineDocumentFiles2()
+            : caseData.getSpecResponseTimelineDocumentFiles();
+        if (timelineDocument != null) {
             documents.add(new DocumentMetaData(
-                caseData.getSpecResponseTimelineDocumentFiles(),
+                timelineDocument,
                 "Claim timeline",
                 LocalDate.now().toString()
             ));
         }
-        if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+        ResponseDocument supportingDocument = respondent2Responding
+            ? caseData.getRespondent2SpecDefenceResponseDocument()
+            : caseData.getRespondent1SpecDefenceResponseDocument();
+        if (supportingDocument != null) {
             documents.add(new DocumentMetaData(
-                caseData.getRespondent1SpecDefenceResponseDocument().getFile(),
+                supportingDocument.getFile(),
                 "Supported docs",
                 LocalDate.now().toString()
             ));
@@ -186,5 +197,12 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 ).forEach(documents::add);
         }
         return documents;
+    }
+
+    private boolean isRespondent2InOneVTwoTwoLegalRep(CaseData caseData) {
+        return getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+            && caseData.getRespondent2ResponseDate() != null
+            && (caseData.getRespondent1ResponseDate() == null
+            || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
 }
