@@ -26,6 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Slf4j
@@ -46,7 +47,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         }
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
             && caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM));
     }
 
     @Override
@@ -55,15 +56,15 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             return false;
         }
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.hasBreathingSpace();
     }
 
     @Override
     public boolean hasResponseDueToday() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now(LOCAL_ZONE))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM));
     }
 
     @Override
@@ -108,7 +109,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         }
         return (CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())
             && caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
             && caseData.getDefaultJudgmentDocuments().isEmpty());
     }
@@ -279,13 +280,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean hasClaimEnded() {
-        return (nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
-            && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence());
-    }
-
-    @Override
     public boolean isClaimRejectedAndOfferSettleOutOfCourt() {
         return false;
     }
@@ -341,7 +335,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
             || (caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now(LOCAL_ZONE).atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null);
     }
 

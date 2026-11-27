@@ -14,9 +14,11 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 
@@ -67,20 +69,16 @@ public class DashboardClaimInfo {
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
         return Optional.ofNullable(responseDeadlineTime).map(
-            time -> ChronoUnit.DAYS.between(LocalDateTime.now(), responseDeadlineTime)
+            deadline -> ChronoUnit.DAYS.between(ZonedDateTime.now(LOCAL_ZONE), deadline.atZone(LOCAL_ZONE))
         ).orElse(0L);
     }
 
     @JsonGetter("numberOfDaysOverdue")
     public long numberOfDaysOverdue() {
+        LocalDate today = LocalDate.now(LOCAL_ZONE);
         return Optional.ofNullable(responseDeadline)
-            .filter(deadline ->
-                        deadline.isBefore(LocalDate.now()))
-            .map(deadline ->
-                     deadline.until(
-                         LocalDate.now(),
-                         ChronoUnit.DAYS
-                     ))
+            .filter(deadline -> deadline.isBefore(today))
+            .map(deadline -> deadline.until(today, ChronoUnit.DAYS))
             .orElse(0L);
     }
 }

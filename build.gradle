@@ -582,11 +582,8 @@ tasks.named('sonarqube') {
 }
 
 def sonarExclusions = [
-  "**/model/**",
-  "**/hmc/model/**",
   "**/utils/**",
   "**/filters/**",
-  "**/model/hearingvalues/**",
   "**/config/HttpClientRestConfiguration.java",
   "**/config/HttpClientFeignConfiguration.java",
   "**/config/HttpClientFeignConfigurationTest.java",
@@ -636,7 +633,10 @@ def sonarExclusions = [
 ]
 
 def sonarCoverageExclusions = [
-  "**/.github/scripts/**"
+  "**/.github/scripts/**",
+  "**/model/**",
+  "**/hmc/model/**",
+  "**/model/hearingvalues/**"
 ]
 
 
