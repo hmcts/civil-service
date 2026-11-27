@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,32 @@ public class HttpClientFeignConfiguration {
     private int maxPerRoute;
     @Value("${http.client.maxTotal:25}")
     private int maxTotal;
+
+    /**
+     * Read-only POSTs that keep Feign's replay after a read timeout, as a comma-separated list of
+     * {@code <feign-client-name>:<path-suffix>}. This is the only place the list is defined: it is
+     * the default for {@code http.client.retry.replay-on-read-timeout}, which is deliberately not set
+     * in {@code application.yaml}, so every Spring context gets the same list. Set the property (or
+     * the {@code HTTP_CLIENT_RETRY_REPLAYONREADTIMEOUT} environment variable) to override it for an
+     * environment.
+     *
+     * <p>{@code FeignWriteEndpointReplayPolicyTest} fails if a new POST, PUT or PATCH Feign endpoint
+     * has not been classified, or if this list disagrees with the classification.</p>
+     */
+    static final String DEFAULT_REPLAY_ON_READ_TIMEOUT =
+        "core-case-data-api:/searchCases,"
+            + "docmosis:/rs/render,"
+            + "idam-api:/o/token,"
+            + "case-assignment-api:/noc/check-noc-approval,"
+            + "camunda-rest-engine-api:/evaluate,"
+            + "camunda-rest-engine-api:/history/process-instance,"
+            + "camunda-testing-support-api:/history/process-instance,"
+            + "am-role-assignment-service-api:/am/role-assignments/query,"
+            + "wa:/task,"
+            + "idam-s2s-auth:/lease";
+
+    @Value("${http.client.retry.replay-on-read-timeout:" + DEFAULT_REPLAY_ON_READ_TIMEOUT + "}")
+    private String replayOnReadTimeoutPaths;
 
     @Bean
     public PoolingHttpClientConnectionManager connectionManager4() {
@@ -75,10 +102,22 @@ public class HttpClientFeignConfiguration {
      *
      * <p>Declared here rather than left implicit so the behaviour is visible and owned. Defaults
      * are Feign's: 5 attempts, 100ms initial interval, 1s maximum.</p>
+     *
+     * <p>The one exception is a read timeout on a POST, PUT or PATCH: the server may already have
+     * processed it, so replaying it duplicates side effects or, for a CCD event submit, fails with
+     * a 404 because the event token is stale. Those are propagated so the Camunda task retry can
+     * re-run the handler with fresh data. Read-only POSTs in
+     * {@code http.client.retry.replay-on-read-timeout} (default {@link #DEFAULT_REPLAY_ON_READ_TIMEOUT})
+     * keep the replay.</p>
      */
     @Bean
-    public Retryer feignRetryer() {
-        return new Retryer.Default();
+    public Retryer feignRetryer(TelemetryClient telemetryClient) {
+        return new ReadTimeoutAwareRetryer(
+            Arrays.stream(replayOnReadTimeoutPaths.split(","))
+                .map(String::trim)
+                .filter(path -> !path.isEmpty())
+                .toList(),
+            telemetryClient);
     }
 
     @Bean

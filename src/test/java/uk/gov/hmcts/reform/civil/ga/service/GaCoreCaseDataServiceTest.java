@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import feign.Request;
+import feign.RetryableException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -35,9 +38,11 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.mockito.ArgumentMatchers.any;
@@ -579,13 +584,34 @@ class GaCoreCaseDataServiceTest {
             );
         }
 
+        private FeignException feignFailure(int status) {
+            Request request = Request.create(
+                Request.HttpMethod.POST,
+                "http://ccd/caseworkers/1/jurisdictions/CIVIL/case-types/CIVIL/cases/1/events",
+                Map.of(), null, null, null
+            );
+            return FeignException.errorStatus(
+                "submitEventForCaseWorker",
+                feign.Response.builder().status(status).reason("error").request(request)
+                    .headers(Map.of()).build()
+            );
+        }
+
+        private RetryableException readTimeout() {
+            return new RetryableException(
+                -1, "Read timed out", Request.HttpMethod.POST, new java.net.SocketTimeoutException("Read timed out"),
+                (Long) null,
+                Request.create(Request.HttpMethod.POST, "http://ccd/cases/1/events", Map.of(), null, null, null)
+            );
+        }
+
         @Test
         void shouldRetry_submitUpdate_WhenTokenExpired() {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
-            )).thenThrow(new RuntimeException("Exception"));
+            )).thenThrow(feignFailure(401));
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitUpdate(CASE_ID, CaseDataContent.builder().build());
@@ -597,12 +623,101 @@ class GaCoreCaseDataServiceTest {
         }
 
         @Test
+        void shouldRetry_submitUpdate_WhenForbidden() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(feignFailure(403));
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
+
+            service.submitUpdate(CASE_ID, CaseDataContent.builder().build());
+
+            verify(coreCaseDataApi, times(2)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                                       anyString(), anyString(), anyString(),
+                                                                       anyBoolean(), any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldSubmitOnce_submitUpdate_WhenReadTimeout() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            RetryableException timeout = readTimeout();
+            when(coreCaseDataApi.submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(timeout);
+
+            assertThatThrownBy(() -> service.submitUpdate(CASE_ID, CaseDataContent.builder().build()))
+                .isSameAs(timeout);
+
+            verify(coreCaseDataApi, times(1)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                                       anyString(), anyString(), anyString(),
+                                                                       anyBoolean(), any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldSubmitOnce_submitUpdate_WhenBadGateway() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            FeignException badGateway = feignFailure(502);
+            when(coreCaseDataApi.submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(badGateway);
+
+            assertThatThrownBy(() -> service.submitUpdate(CASE_ID, CaseDataContent.builder().build()))
+                .isSameAs(badGateway);
+
+            verify(coreCaseDataApi, times(1)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                                       anyString(), anyString(), anyString(),
+                                                                       anyBoolean(), any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldSubmitOnce_submitGaUpdate_WhenReadTimeout() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            RetryableException timeout = readTimeout();
+            when(coreCaseDataApi.submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(timeout);
+
+            assertThatThrownBy(() -> service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build()))
+                .isSameAs(timeout);
+
+            verify(coreCaseDataApi, times(1)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                                       anyString(), anyString(), anyString(),
+                                                                       anyBoolean(), any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldSubmitOnce_submitGaUpdate_WhenBadGateway() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            FeignException badGateway = feignFailure(502);
+            when(coreCaseDataApi.submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(badGateway);
+
+            assertThatThrownBy(() -> service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build()))
+                .isSameAs(badGateway);
+
+            verify(coreCaseDataApi, times(1)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
+                                                                       anyString(), anyString(), anyString(),
+                                                                       anyBoolean(), any(CaseDataContent.class)
+            );
+        }
+
+        @Test
         void shouldRetry_submitGaUpdate_WhenTokenExpired() {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
-            )).thenThrow(new RuntimeException("Exception"));
+            )).thenThrow(feignFailure(401));
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build());
@@ -617,11 +732,54 @@ class GaCoreCaseDataServiceTest {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(coreCaseDataApi.submitForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
                                                      anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
-            )).thenThrow(new RuntimeException("Exception"));
+            )).thenThrow(feignFailure(401));
 
             service.submitForCaseWorker(CaseDataContent.builder().build());
             verify(coreCaseDataApi,
                    times(2))
+                .submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(CaseDataContent.class));
+        }
+
+        @Test
+        void shouldRetry_submitForCaseWorker_WhenForbidden() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.submitForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
+                                                     anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(feignFailure(403));
+
+            service.submitForCaseWorker(CaseDataContent.builder().build());
+            verify(coreCaseDataApi,
+                   times(2))
+                .submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(CaseDataContent.class));
+        }
+
+        @Test
+        void shouldSubmitOnce_submitForCaseWorker_WhenReadTimeout() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            RetryableException timeout = readTimeout();
+            when(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(),
+                                                     anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(timeout);
+
+            assertThatThrownBy(() -> service.submitForCaseWorker(CaseDataContent.builder().build()))
+                .isSameAs(timeout);
+            verify(coreCaseDataApi,
+                   times(1))
+                .submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(CaseDataContent.class));
+        }
+
+        @Test
+        void shouldSubmitOnce_submitForCaseWorker_WhenBadGateway() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            FeignException badGateway = feignFailure(502);
+            when(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(),
+                                                     anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(badGateway);
+
+            assertThatThrownBy(() -> service.submitForCaseWorker(CaseDataContent.builder().build()))
+                .isSameAs(badGateway);
+            verify(coreCaseDataApi,
+                   times(1))
                 .submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(CaseDataContent.class));
         }
 

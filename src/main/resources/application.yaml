@@ -746,6 +746,8 @@ http:
     maxPerRoute: ${HTTP_MAX_PER_ROUTE:20}
     maxTotal: ${HTTP_MAX_TOTAL:75}
     threshold: 10000
+    # The read-only POST allowlist for Feign read-timeout replay (http.client.retry.replay-on-read-timeout) is
+    # deliberately not set here: HttpClientFeignConfiguration.DEFAULT_REPLAY_ON_READ_TIMEOUT is its only definition.
 
 court-location:
   specified-claim:
