@@ -29,6 +29,9 @@ spring:
       preferred-json-mapper: jackson2
   main:
     allow-bean-definition-overriding: true
+  # Pods get 30s to stop. Must be longer than async.event.responseTimeout.
+  lifecycle:
+    timeout-per-shutdown-phase: 28s
   task:
     scheduling:
       thread-name-prefix: civil-scheduler-
@@ -801,7 +804,8 @@ async:
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:500}
   event:
     lockDuration: ${EVENT_LOCK_DURATION:1980000}
-    responseTimeout: ${EVENT_RESPONSE_TIMEOUT:29500}
+    # Long poll. Keep well under the 30s gateway timeout and under spring.lifecycle.timeout-per-shutdown-phase.
+    responseTimeout: ${EVENT_RESPONSE_TIMEOUT:20000}
     retryCount: ${EVENT_RETRY_COUNT:3}
     backoffDelay: ${EVENT_BACKOFF_DELAY:300000}
     dispatchDelay: ${EVENT_DISPATCH_DELAY:1900}

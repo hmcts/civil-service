@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -57,6 +59,7 @@ import java.util.stream.Stream;
  *
  * @see ExternalTaskListenerConfiguration
  */
+@Slf4j
 public class TopicRoutingExternalTaskClient implements ExternalTaskClient {
 
     private final List<ExternalTaskClient> caseDrivenClients;
@@ -104,9 +107,26 @@ public class TopicRoutingExternalTaskClient implements ExternalTaskClient {
         allClients().forEach(ExternalTaskClient::start);
     }
 
+    /**
+     * Stops the clients in parallel. Each {@code stop()} waits for that client's long poll and any
+     * task it fetched, so one after another they would not fit in a pod's termination grace period.
+     */
     @Override
     public void stop() {
-        allClients().forEach(ExternalTaskClient::stop);
+        long startedAt = System.nanoTime();
+        List<Thread> stoppers = allClients()
+            .map(client -> Thread.ofPlatform().daemon().name("external-task-client-stop").start(client::stop))
+            .toList();
+        try {
+            for (Thread stopper : stoppers) {
+                stopper.join();
+            }
+            log.info("Stopped {} external task clients in {} ms", stoppers.size(),
+                     TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while stopping {} external task clients", stoppers.size());
+        }
     }
 
     /**

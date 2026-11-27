@@ -10,9 +10,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -260,5 +265,27 @@ class TopicRoutingExternalTaskClientTest {
             noCaseDrivenClients, schedulerClient, schedulerTopics))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("At least one case driven");
+    }
+
+    /**
+     * Each client's stop waits for the others to have been asked to stop, so stopping them one after
+     * another would time out.
+     */
+    @Test
+    void shouldStopClientsInParallelAndWaitForAllOfThem() {
+        CountDownLatch allAsked = new CountDownLatch(3);
+        AtomicInteger stopped = new AtomicInteger();
+        List<ExternalTaskClient> clients = Stream.generate(() -> mock(ExternalTaskClient.class)).limit(3).toList();
+        clients.forEach(client -> doAnswer(invocation -> {
+            allAsked.countDown();
+            if (allAsked.await(5, TimeUnit.SECONDS)) {
+                stopped.incrementAndGet();
+            }
+            return null;
+        }).when(client).stop());
+
+        new TopicRoutingExternalTaskClient(clients.subList(0, 2), clients.get(2), Set.of()).stop();
+
+        assertThat(stopped).hasValue(3);
     }
 }

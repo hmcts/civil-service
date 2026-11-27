@@ -49,7 +49,7 @@ public class ExternalTaskListenerConfiguration {
      * {@code EngineClientException} (EXC-CS-020).
      *
      * <p>{@link CamundaErrorAwareBackoffStrategy} only backs off when a {@code fetchAndLock} call
-     * actually errors; a successful or empty poll stays at {@code 0ms} (the 29.5s long-poll already
+     * actually errors; a successful or empty poll stays at {@code 0ms} (the 20s long-poll already
      * paces the loop). Because the backoff never touches healthy pickup latency the cap can be set
      * high enough - {@code EVENT_CLIENT_BACKOFF_MAX}, default 60s - to genuinely throttle a retry
      * storm. Pairs with {@link NonJsonCamundaErrorResponseInterceptor}, which turns the otherwise
@@ -134,6 +134,8 @@ public class ExternalTaskListenerConfiguration {
     // Spring infers close() or shutdown() as destroy methods, never stop(). Without this, every
     // client keeps its subscription thread running after the context closes. In unit tests that
     // thread has no subscriptions, so it spins on a full core for the life of the test JVM.
+    // ExternalTaskClientLifecycle stops them first on a normal shutdown; this covers a context that
+    // fails before its lifecycle beans start.
     @Bean(destroyMethod = "stop")
     @Primary
     public ExternalTaskClient client(
@@ -141,6 +143,11 @@ public class ExternalTaskListenerConfiguration {
         @Qualifier("schedulerExternalTaskClient") ExternalTaskClient schedulerClient) {
         return new TopicRoutingExternalTaskClient(
             caseDrivenClients.clients(), schedulerClient, SCHEDULER_TOPICS);
+    }
+
+    @Bean
+    public ExternalTaskClientLifecycle externalTaskClientLifecycle(ExternalTaskClient client) {
+        return new ExternalTaskClientLifecycle(client);
     }
 
     /**
@@ -185,8 +192,8 @@ public class ExternalTaskListenerConfiguration {
      *
      * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
      * are reused after Camunda pod restarts or idle timeouts and surface as
-     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
-     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
+     * {@code NoHttpResponseException}. Any response timeout set here must be well
+     * above the long-poll {@code asyncResponseTimeout} (20000ms), or it would race it (EXC-CS-105).
      */
     private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy, int maxTasks) {
         return ExternalTaskClient.create()

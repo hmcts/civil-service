@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>The plain {@link org.camunda.bpm.client.backoff.ExponentialBackoffStrategy} also ramps on an
  * empty poll, which forces a trade-off: a short cap keeps idle task-pickup latency low but barely
  * throttles an upstream outage, a long cap throttles the outage but delays pickup after a quiet
- * period. Because civil-service long-polls ({@code asyncResponseTimeout} 29.5s) an empty poll
- * already takes ~29.5s to return, so it needs no extra backoff at all.
+ * period. Because civil-service long-polls ({@code asyncResponseTimeout} 20s) an empty poll
+ * already takes ~20s to return, so it needs no extra backoff at all.
  *
  * <p>This strategy therefore stays at {@code 0ms} on every successful or empty poll and only ramps
  * on error - a gateway 502/503/504, a dropped connection, or an unparseable body (EXC-CS-020) -
