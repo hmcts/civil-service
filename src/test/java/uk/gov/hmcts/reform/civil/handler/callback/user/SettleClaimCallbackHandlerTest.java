@@ -173,5 +173,27 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Claim marked as settled"));
             Assertions.assertTrue(response.getConfirmationBody().contains("<br />"));
         }
+
+        @Test
+        void should_clear_judgment_online_data_when_settling_a_pending_judgment() {
+            CaseData caseData = CaseDataBuilder.builder().atStateJudgmentRequested().build();
+            caseData.setJoDJCreatedDate(java.time.LocalDateTime.now());
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            assertThat(caseData.getJoDJCreatedDate()).isNull();
+        }
+
+        @Test
+        void should_preserve_judgment_online_data_when_not_settling_a_pending_judgment() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setJoDJCreatedDate(java.time.LocalDateTime.now());
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            assertThat(caseData.getJoDJCreatedDate()).isNotNull();
+        }
     }
 }
