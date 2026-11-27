@@ -1,0 +1,112 @@
+{
+  "list_of_values": [
+    {
+      "category_key": "caseType",
+      "key": "AAA6-SMALL_CLAIM",
+      "value_en": "Small Claims",
+      "value_cy": "Hawliadau Bychain",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 1,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": [
+        {
+          "category_key": "caseSubType",
+          "key": "AAA6-SMALL_CLAIM",
+          "value_en": "Small Claims",
+          "value_cy": "Hawliadau Bychain",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 1,
+          "parent_category": "caseType",
+          "parent_key": "AAA6-SMALL_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    },
+    {
+      "category_key": "caseType",
+      "key": "AAA6-FAST_CLAIM",
+      "value_en": "Fast Track",
+      "value_cy": "Llwybr Carlam",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 2,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": [
+        {
+          "category_key": "caseSubType",
+          "key": "AAA6-FAST_CLAIM",
+          "value_en": "Fast Track",
+          "value_cy": "Llwybr Carlam",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 2,
+          "parent_category": "caseType",
+          "parent_key": "AAA6-FAST_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    },
+    {
+      "category_key": "caseType",
+      "key": "AAA6-INTERMEDIATE_CLAIM",
+      "value_en": "Intermediate Track",
+      "value_cy": "Llwybr Canolradd",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 3,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": [
+        {
+          "category_key": "caseSubType",
+          "key": "AAA6-INTERMEDIATE_CLAIM",
+          "value_en": "Intermediate Track",
+          "value_cy": "Llwybr Canolradd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 3,
+          "parent_category": "caseType",
+          "parent_key": "AAA6-INTERMEDIATE_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    },
+    {
+      "category_key": "caseType",
+      "key": "AAA6-MULTI_CLAIM",
+      "value_en": "Multi Track",
+      "value_cy": "Llwybr Aml-drywydd",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 4,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": [
+        {
+          "category_key": "caseSubType",
+          "key": "AAA6-MULTI_CLAIM",
+          "value_en": "Multi Track",
+          "value_cy": "Llwybr Aml-drywydd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 4,
+          "parent_category": "caseType",
+          "parent_key": "AAA6-MULTI_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    }
+  ]
+}

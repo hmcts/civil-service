@@ -41,7 +41,6 @@ class CivilCftlibTest extends CftlibTest {
     private static final String PASSWORD = "password";
     // cftlib's runtime, which serves IDAM's /loginUser for tests over the IDAM simulator.
     private static final String RUNTIME = "http://localhost:8489";
-    private static final String WIREMOCK = "http://localhost:8765";
 
     @Autowired
     private UserService userService;
@@ -178,24 +177,29 @@ class CivilCftlibTest extends CftlibTest {
     }
 
     /**
-     * The reference data ExUI's hearing journeys read, which wiremock serves, keyed as this service looks it up.
+     * The reference data ExUI's hearing journeys read, which cftlib's refData stand-in serves from src/cftlib/refdata
+     * and civil-wiremock-mappings, keyed as this service looks it up.
      */
     @Test
     @SneakyThrows
     void servesTheReferenceDataExuisHearingJourneysRead() {
-        JsonNode caseTypes = wiremock("/refdata/commondata/lov/categories/caseType?serviceId=AAA6&isChildRequired=Y");
+        JsonNode caseTypes = refData("/refdata/commondata/lov/categories/caseType?serviceId=AAA6&isChildRequired=Y");
         assertThat(caseTypes.findValuesAsText("key")).contains("AAA6-FAST_CLAIM");
-        assertThat(wiremock("/refdata/commondata/lov/categories/HearingType?serviceId=AAA7").findValuesAsText("key"))
+        assertThat(refData("/refdata/commondata/lov/categories/HearingType?serviceId=AAA7").findValuesAsText("key"))
             .contains("AAA7-TRI");
-        assertThat(wiremock("/refdata/commondata/caseflags/service-id=AAA7").findValuesAsText("flagCode"))
-            .contains("PF0002");
-        assertThat(wiremock("/refdata/location/court-venues?epimms_id=20262").findValuesAsText("court_name"))
+        assertThat(refData("/refdata/commondata/lov/categories/HearingChannel?serviceId=AAA6").findValuesAsText("key"))
+            .contains("INTER");
+        for (String service : new String[] {"AAA6", "AAA7"}) {
+            assertThat(refData("/refdata/commondata/caseflags/service-id=" + service).findValuesAsText("flagCode"))
+                .contains("PF0002");
+        }
+        assertThat(refData("/refdata/location/court-venues?epimms_id=20262").findValuesAsText("court_name"))
             .containsExactly("Central London County Court");
-        assertThat(wiremock("/refdata/location/court-venues/venue-search?search-string=central%20london")
+        assertThat(refData("/refdata/location/court-venues/venue-search?search-string=central%20london")
                        .findValuesAsText("epimms_id")).contains("20262");
 
         HttpResponse<String> judges = client.send(
-            HttpRequest.newBuilder(URI.create(WIREMOCK + "/refdata/judicial/users/search"))
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/refdata/judicial/users/search"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString("{\"searchString\": \"powell\"}"))
                 .build(),
@@ -206,8 +210,8 @@ class CivilCftlibTest extends CftlibTest {
     }
 
     @SneakyThrows
-    private JsonNode wiremock(String path) {
-        HttpResponse<String> response = client.send(HttpRequest.newBuilder(URI.create(WIREMOCK + path)).build(),
+    private JsonNode refData(String path) {
+        HttpResponse<String> response = client.send(HttpRequest.newBuilder(URI.create(RUNTIME + path)).build(),
                                                     HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).as(path).isEqualTo(200);
         return mapper.readTree(response.body());

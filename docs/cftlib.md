@@ -33,7 +33,12 @@ Nothing reaches AAT, so no VPN is needed.
   - The system update user also holds the `hearing-manager` and `hearing-viewer` roles HMC checks.
 - **Stand-ins for services outside CCD:**
   - Wiremock serves [civil-wiremock-mappings](https://github.com/hmcts/civil-wiremock-mappings) (fees, Docmosis, PRD, location ref data, send-letter, SendGrid and more), plus the stubs in `src/cftlib/wiremock` for GOV.UK Notify and the payments service request.
-  - ExUI's hearing journeys read their reference data from wiremock too: the lists of values (hearing types, case types, facilities, judge types, cancellation reasons and more) and case flags in `src/cftlib/wiremock/mappings/local-hearings-*.json`, the local judges, and civil-wiremock-mappings' court venues, which `startCftlibWiremock` makes searchable.
+  - ExUI's reference data comes from cftlib's [reference data stand-in](https://github.com/hmcts/rse-cft-lib#reference-data), which `hmc` brings:
+    - the lists of values (hearing types, case types, facilities, judge types, cancellation reasons and more) and case flags in `src/cftlib/refdata`, in the shape rd-commondata-api returns;
+    - civil-wiremock-mappings' court venues and hearing channels, which `startCftlibWiremock` adds;
+    - the local judges, with the personal codes in `CivilTestUsers`.
+
+    To change a list, edit its file under `src/cftlib/refdata`; the stand-in reads it on each request. A list ExUI asks for that no file has is empty.
   - cftlib's runtime stands in for dm-store, keeping documents as files under `build/cftlib/dm-store`, and answers IDAM's `/loginUser`, which civil's Playwright tests sign in with and the IDAM simulator lacks.
 
 Everything under `src/cftlib` runs only under cftlib. It holds configuration, and stand-ins only for what is particular to civil, such as its GOV.UK Notify client.

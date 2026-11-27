@@ -1,0 +1,152 @@
+{
+  "flags": [
+    {
+      "FlagDetails": [
+        {
+          "name": "Case",
+          "hearingRelevant": false,
+          "flagComment": false,
+          "defaultStatus": "Active",
+          "externallyAvailable": false,
+          "flagCode": "CATGRY",
+          "childFlags": [
+            {
+              "name": "Complex Case",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "CF0002",
+              "childFlags": [],
+              "Path": [
+                "Case"
+              ],
+              "isParent": false
+            },
+            {
+              "name": "Urgent case",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "CF0007",
+              "childFlags": [],
+              "Path": [
+                "Case"
+              ],
+              "isParent": false
+            },
+            {
+              "name": "Other",
+              "hearingRelevant": true,
+              "flagComment": true,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "OT0001",
+              "childFlags": [],
+              "Path": [
+                "Case"
+              ],
+              "isParent": false
+            }
+          ],
+          "Path": [],
+          "isParent": true
+        },
+        {
+          "name": "Party",
+          "hearingRelevant": false,
+          "flagComment": false,
+          "defaultStatus": "Active",
+          "externallyAvailable": false,
+          "flagCode": "CATGRY",
+          "childFlags": [
+            {
+              "name": "Vulnerable user",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "PF0002",
+              "childFlags": [],
+              "Path": [
+                "Party"
+              ],
+              "isParent": false
+            },
+            {
+              "name": "Language Interpreter",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "PF0015",
+              "childFlags": [],
+              "Path": [
+                "Party"
+              ],
+              "isParent": false
+            },
+            {
+              "name": "Reasonable adjustment",
+              "hearingRelevant": false,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "CATGRY",
+              "childFlags": [
+                {
+                  "name": "Step free / wheelchair access",
+                  "hearingRelevant": true,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": false,
+                  "flagCode": "RA0019",
+                  "childFlags": [],
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "isParent": false
+                },
+                {
+                  "name": "Hearing loop",
+                  "hearingRelevant": true,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": false,
+                  "flagCode": "RA0043",
+                  "childFlags": [],
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "isParent": false
+                }
+              ],
+              "Path": [
+                "Party"
+              ],
+              "isParent": true
+            },
+            {
+              "name": "Other",
+              "hearingRelevant": true,
+              "flagComment": true,
+              "defaultStatus": "Active",
+              "externallyAvailable": false,
+              "flagCode": "OT0001",
+              "childFlags": [],
+              "Path": [
+                "Party"
+              ],
+              "isParent": false
+            }
+          ],
+          "Path": [],
+          "isParent": true
+        }
+      ]
+    }
+  ]
+}
