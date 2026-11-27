@@ -78,8 +78,8 @@
         "net.bytebuddy:byte-buddy",
         "net.bytebuddy:byte-buddy-agent"
       ],
-      "allowedVersions": "!/^1\\.18\\.17(-|$)/",
-      "description": "Byte Buddy 1.18.17 stops Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
+      "allowedVersions": "!/^1\\.18\\.1[67](-|$)/",
+      "description": "Byte Buddy 1.18.16 and 1.18.17 stop Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
     },
     {
       "matchDatasources": [
@@ -90,6 +90,18 @@
       ],
       "allowedVersions": "<3.15",
       "description": "Hold actions/setup-python below 3.15: semgrep 1.177.0 needs ruamel.yaml.clib 0.2.15, which has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15"
+    },
+    {
+      "matchPackageNames": [
+        "io.projectreactor:reactor-bom",
+        "io.micrometer:micrometer-bom"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false,
+      "description": "These BOMs only set CVE minimums (DTSCCI-6473): take patch releases on the Reactor and Micrometer lines Spring Boot manages, and move to a new line together with Spring Boot"
     },
     {
       "enabled": false,
