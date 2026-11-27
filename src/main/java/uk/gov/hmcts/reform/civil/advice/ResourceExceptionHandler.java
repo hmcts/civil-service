@@ -40,6 +40,9 @@ import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.g
 @Order(2)
 public class ResourceExceptionHandler {
 
+    private static final String ROLE_ASSIGNMENT_UNAUTHORIZED =
+        "Client error when getting Role Assignments from Role Assignment Service because of 401";
+
     private final ObjectMapper objectMapper;
 
     @ExceptionHandler(value = CallbackException.class)
@@ -128,6 +131,25 @@ public class ResourceExceptionHandler {
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value = FeignException.BadRequest.class)
+    public ResponseEntity<Object> badRequestFeign(FeignException.BadRequest exception,
+                                                  ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        if (isRoleAssignmentUnauthorized(exception)) {
+            String errorMessage = "Unauthorized feign error with message: %s for case %s run by user %s";
+            log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                             getUserId(contentCachingRequestWrapper)));
+            return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        }
+        String errorMessage = "Bad request feign error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private boolean isRoleAssignmentUnauthorized(FeignException.BadRequest exception) {
+        return exception.contentUTF8().contains(ROLE_ASSIGNMENT_UNAUTHORIZED);
     }
 
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
