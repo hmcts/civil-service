@@ -6,7 +6,6 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.support.CronExpression;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +21,7 @@ class BreathingSpaceLiftPendingSchedulerBpmnTest extends BpmnBaseTest {
     }
 
     @Test
-    void schedulerShouldRaiseBreathingSpaceLiftPendingExternalTask_whenStarted() throws ParseException {
+    void schedulerShouldRaiseBreathingSpaceLiftPendingExternalTask_whenStarted() {
         assertFalse(processInstance.isEnded());
 
         assertThat(getTopics()).containsOnly(TOPIC_NAME);

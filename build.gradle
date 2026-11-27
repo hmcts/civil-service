@@ -10,16 +10,16 @@ plugins {
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '4.1.1'
   id 'org.owasp.dependencycheck' version '13.0.0'
-  id 'com.github.ben-manes.versions' version '0.66.0'
-  id 'org.sonarqube' version '7.5.0.8588'
+  id 'com.github.ben-manes.versions' version '0.67.0'
+  id 'org.sonarqube' version '7.6.0.18749'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "9.8.3"
-  id "org.flywaydb.flyway" version "10.22.0"
+  id "org.flywaydb.flyway" version "13.13.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '8.8.0'
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.2520'
-  id 'net.ltgt.errorprone' version '5.1.1'
+  id 'hmcts.ccd.sdk' version '8.14.1'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.2554'
+  id 'net.ltgt.errorprone' version '5.2.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -48,28 +48,28 @@ def versions = [
   swaggerAnnotations: '3.0.0',
   testcontainers    : '2.0.5',
   assertj           : '3.27.7',
-  azureCore         : '1.59.1',
-  azureCoreAmqp     : '2.12.1',
-  azureCoreHttpNetty: '1.16.7',
+  azureCore         : '1.61.0',
+  azureCoreAmqp     : '2.13.0',
+  azureCoreHttpNetty: '1.17.0',
   azureJson         : '1.5.1',
-  azureServiceBus   : '7.18.0',
-  cucumber          : '8.0.4',
-  elasticsearch     : '9.5.5',
+  azureServiceBus   : '7.19.1',
+  cucumber          : '8.1.0',
+  elasticsearch     : '9.5.7',
   httpclient5       : '5.6.5',
-  httpcore5         : '5.4.4',
-  jackson           : '2.22.4',
-  jackson3          : '3.2.4',
+  httpcore5         : '5.5',
+  jackson           : '2.23.0',
+  jackson3          : '3.3.0',
   kotlin            : '2.4.21',
   log4j             : '2.26.1',
   netty             : '4.2.19.Final',
   pdfbox            : '3.0.8',
-  plexusUtils       : '4.1.0',
-  postgresql        : '42.7.14',
+  plexusUtils       : '4.2.0',
+  postgresql        : '42.7.15',
   protonJ           : '0.35.0',
-  tika              : '3.3.3',
-  tomcat            : '11.0.27',
-  applicationInsights: '3.7.9',
-  commonsLang3      : '3.21.0'
+  tika              : '4.2.0',
+  tomcat            : '11.0.29',
+  applicationInsights: '3.7.10',
+  commonsLang3      : '3.22.0'
 ]
 
 allprojects {
@@ -89,7 +89,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '14.3.0'
+    toolVersion = '14.4.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -127,12 +127,12 @@ allprojects {
         entry 'guava'
       }
 
-      dependency 'com.squareup.okhttp3:okhttp:5.5.0'
+      dependency 'com.squareup.okhttp3:okhttp:5.5.1'
 
       dependency 'org.slf4j:slf4j-nop:2.0.20'
 
       // befta-fw pulls rest-assured 5.4, which breaks on the Groovy 5 that Boot 4 manages
-      dependencySet(group: 'io.rest-assured', version: '6.1.0') {
+      dependencySet(group: 'io.rest-assured', version: '6.3.0') {
         entry 'rest-assured'
         entry 'rest-assured-common'
         entry 'json-path'
@@ -161,10 +161,8 @@ allprojects {
       }
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
-      dependency 'org.bouncycastle:bcprov-jdk18on:1.86'
-      dependency 'io.projectreactor:reactor-core:3.8.7'
-      dependency 'io.micrometer:micrometer-core:1.17.1'
-      dependency 'ch.qos.logback:logback-core:1.6.5'
+      dependency 'org.bouncycastle:bcprov-jdk18on:1.87'
+      dependency 'ch.qos.logback:logback-core:1.6.8'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.3'
@@ -173,6 +171,10 @@ allprojects {
       mavenBom "tools.jackson:jackson-bom:${versions.jackson3}"
       mavenBom "org.jetbrains.kotlin:kotlin-bom:${versions.kotlin}"
       mavenBom "org.apache.logging.log4j:log4j-bom:${versions.log4j}"
+      // CVE floors (DTSCCI-6473). Import the whole release train so reactor-core and reactor-netty,
+      // and all Micrometer modules, stay on matching versions; pinning one module splits the family.
+      mavenBom 'io.projectreactor:reactor-bom:2025.0.9'
+      mavenBom 'io.micrometer:micrometer-bom:1.17.3'
     }
   }
 
@@ -722,8 +724,8 @@ allprojects {
 }
 
 dependencies {
-  errorprone 'com.google.errorprone:error_prone_core:2.50.0'
-  errorprone 'com.uber.nullaway:nullaway:0.14.2'
+  errorprone 'com.google.errorprone:error_prone_core:2.53.0'
+  errorprone 'com.uber.nullaway:nullaway:0.14.4'
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
@@ -763,11 +765,11 @@ dependencies {
   implementation "org.springframework.cloud:spring-cloud-openfeign-core"
   implementation "com.github.hmcts:service-auth-provider-java-client:6.1.2"
   implementation "org.apache.tika:tika-core:${versions.tika}"
-  implementation "io.github.openfeign:feign-httpclient:13.17"
+  implementation "io.github.openfeign:feign-httpclient:13.18"
   implementation "org.springframework.retry:spring-retry:2.0.13"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:${versions.applicationInsights}"
-  implementation "com.github.hmcts:befta-fw:9.2.10"
+  implementation "com.github.hmcts:befta-fw:9.2.12"
   implementation "com.github.hmcts:core-case-data-store-client:5.3.0"
   implementation "com.github.hmcts:document-management-client:10.0.1"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
@@ -794,7 +796,7 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-to-slf4j:${versions.log4j}"
   implementation "org.apache.commons:commons-text:1.15.0"
   implementation "org.elasticsearch:elasticsearch:${versions.elasticsearch}"
-  implementation "com.networknt:json-schema-validator:1.5.9"
+  implementation "com.networknt:json-schema-validator:3.0.9"
   implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
@@ -804,7 +806,7 @@ dependencies {
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
   implementation "org.glassfish.jaxb:jaxb-runtime:4.0.9"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
-  implementation "com.launchdarkly:launchdarkly-java-server-sdk:7.17.3"
+  implementation "com.launchdarkly:launchdarkly-java-server-sdk:7.19.0"
   implementation "com.azure:azure-core:${versions.azureCore}"
   implementation "com.azure:azure-messaging-servicebus:${versions.azureServiceBus}"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
@@ -813,8 +815,8 @@ dependencies {
   implementation 'org.apache.poi:poi:6.0.0'
   implementation 'org.apache.poi:poi-ooxml:6.0.0'
   implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
-  implementation "net.javacrumbs.shedlock:shedlock-spring:7.10.1"
-  implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.10.1"
+  implementation "net.javacrumbs.shedlock:shedlock-spring:7.12.0"
+  implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.12.0"
 
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -837,8 +839,8 @@ dependencies {
 
   testImplementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   testImplementation("org.apache.pdfbox:preflight:${versions.pdfbox}", withoutJunit4)
-  testImplementation "org.mockito:mockito-core:5.23.0"
-  testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+  testImplementation "org.mockito:mockito-core:5.24.0"
+  testImplementation "org.mockito:mockito-junit-jupiter:5.24.0"
   testImplementation "org.mockito:mockito-inline:5.2.0"
   testImplementation "net.bytebuddy:byte-buddy:1.18.14-jdk5"
   testImplementation "net.bytebuddy:byte-buddy-agent:1.18.14-jdk5"
@@ -847,16 +849,16 @@ dependencies {
   testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
   testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
   testImplementation "org.springframework.boot:spring-boot-starter-jdbc-test"
-  testImplementation "io.rest-assured:rest-assured:6.1.0"
+  testImplementation "io.rest-assured:rest-assured:6.3.0"
   testImplementation "org.assertj:assertj-core:${versions.assertj}"
   testImplementation "org.springframework.statemachine:spring-statemachine-test:${versions.springStatemachine}"
   testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
   testImplementation "org.testcontainers:testcontainers-postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:testcontainers-junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.5.252"
-  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.5'
-  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.5'
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.7.7'
+  contractTestImplementation 'au.com.dius.pact.provider:spring7:4.7.7'
   contractTestImplementation "org.hamcrest:java-hamcrest:2.0.0.0"
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:6.1.3')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:6.1.3')
