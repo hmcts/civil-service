@@ -849,7 +849,7 @@ dependencies {
   testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
   testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
   testImplementation "org.springframework.boot:spring-boot-starter-jdbc-test"
-  testImplementation "io.rest-assured:rest-assured:6.3.0"
+  testImplementation "io.rest-assured:rest-assured:7.0.0"
   testImplementation "org.assertj:assertj-core:${versions.assertj}"
   testImplementation "org.springframework.statemachine:spring-statemachine-test:${versions.springStatemachine}"
   testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
