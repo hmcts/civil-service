@@ -110,6 +110,8 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
                 lib.createProfile(user.email(), "CIVIL", "CIVIL", "CASE_ISSUED");
             }
         }
+        // The judges ExUI's hearing journeys offer, from cftlib's stand-in for judicial reference data.
+        CivilTestUsers.judgesPersonalCodes().forEach(lib::createJudicialUser);
         grantOrganisationalRoles(lib);
 
         File definitions = new File(System.getenv("CIVIL_CFTLIB_CCD_DEFINITIONS_DIR"));

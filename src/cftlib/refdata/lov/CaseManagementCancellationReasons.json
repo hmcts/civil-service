@@ -1,0 +1,69 @@
+{
+  "list_of_values": [
+    {
+      "category_key": "CaseManagementCancellationReasons",
+      "key": "withdraw",
+      "value_en": "Withdrawn",
+      "value_cy": "Wedi'i dynnu'n ôl",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 1,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": null
+    },
+    {
+      "category_key": "CaseManagementCancellationReasons",
+      "key": "struck",
+      "value_en": "Struck out",
+      "value_cy": "Wedi'i ddileu",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 2,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": null
+    },
+    {
+      "category_key": "CaseManagementCancellationReasons",
+      "key": "settled",
+      "value_en": "Settled",
+      "value_cy": "Wedi setlo",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 3,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": null
+    },
+    {
+      "category_key": "CaseManagementCancellationReasons",
+      "key": "listprepreq",
+      "value_en": "Listing preparation requirements not met",
+      "value_cy": "",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 4,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": null
+    },
+    {
+      "category_key": "CaseManagementCancellationReasons",
+      "key": "other",
+      "value_en": "Other",
+      "value_cy": "Arall",
+      "hint_text_en": "",
+      "hint_text_cy": "",
+      "lov_order": 5,
+      "parent_category": "",
+      "parent_key": "",
+      "active_flag": "Y",
+      "child_nodes": null
+    }
+  ]
+}

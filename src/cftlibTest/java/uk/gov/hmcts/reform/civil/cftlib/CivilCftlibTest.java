@@ -176,6 +176,47 @@ class CivilCftlibTest extends CftlibTest {
                                          "DJ.Amy.Powell@ejudiciary.net");
     }
 
+    /**
+     * The reference data ExUI's hearing journeys read, which cftlib's refData stand-in serves from src/cftlib/refdata
+     * and civil-wiremock-mappings, keyed as this service looks it up.
+     */
+    @Test
+    @SneakyThrows
+    void servesTheReferenceDataExuisHearingJourneysRead() {
+        JsonNode caseTypes = refData("/refdata/commondata/lov/categories/caseType?serviceId=AAA6&isChildRequired=Y");
+        assertThat(caseTypes.findValuesAsText("key")).contains("AAA6-FAST_CLAIM");
+        assertThat(refData("/refdata/commondata/lov/categories/HearingType?serviceId=AAA7").findValuesAsText("key"))
+            .contains("AAA7-TRI");
+        assertThat(refData("/refdata/commondata/lov/categories/HearingChannel?serviceId=AAA6").findValuesAsText("key"))
+            .contains("INTER");
+        for (String service : new String[] {"AAA6", "AAA7"}) {
+            assertThat(refData("/refdata/commondata/caseflags/service-id=" + service).findValuesAsText("flagCode"))
+                .contains("PF0002");
+        }
+        assertThat(refData("/refdata/location/court-venues?epimms_id=20262").findValuesAsText("court_name"))
+            .containsExactly("Central London County Court");
+        assertThat(refData("/refdata/location/court-venues/venue-search?search-string=central%20london")
+                       .findValuesAsText("epimms_id")).contains("20262");
+
+        HttpResponse<String> judges = client.send(
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/refdata/judicial/users/search"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString("{\"searchString\": \"powell\"}"))
+                .build(),
+            HttpResponse.BodyHandlers.ofString());
+        // The judge a hearing names is one who can sign in.
+        assertThat(mapper.readTree(judges.body()).findValuesAsText("idamId"))
+            .containsExactly(userInfo("DJ.Amy.Powell@ejudiciary.net").path("uid").asText());
+    }
+
+    @SneakyThrows
+    private JsonNode refData(String path) {
+        HttpResponse<String> response = client.send(HttpRequest.newBuilder(URI.create(RUNTIME + path)).build(),
+                                                    HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).as(path).isEqualTo(200);
+        return mapper.readTree(response.body());
+    }
+
     @SneakyThrows
     private JsonNode userInfo(String email) {
         HttpResponse<String> login = client.send(

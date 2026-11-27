@@ -189,7 +189,35 @@ final class CivilTestUsers {
         )
     );
 
+    /**
+     * Each judge's personal code in the judicial reference data ExUI offers judges from, by which a hearing request
+     * names them. A judge whose email holds a code has that one; the others have local codes.
+     */
+    private static final Map<String, String> PERSONAL_CODES = Map.ofEntries(
+        Map.entry("4917924EMP-@ejudiciary.net", "4917924"),
+        Map.entry("DJ.Amy.Powell@ejudiciary.net", "9000001"),
+        Map.entry("EMP42506@ejudiciary.net", "42506"),
+        Map.entry("4924221EMP-@ejudiciary.net", "4924221"),
+        Map.entry("4924246EMP-@ejudiciary.net", "4924246"),
+        Map.entry("4925359EMP-@ejudiciary.net", "4925359"),
+        Map.entry("DJ.Angel.Morgan@ejudiciary.net", "9000006"),
+        Map.entry("judge-civil-02@example.com", "9000007"),
+        Map.entry("EMP47622@ejudiciary.net", "47622"),
+        Map.entry("49932114EMP-@ejudiciary.net", "49932114")
+    );
+
     private CivilTestUsers() {
+    }
+
+    /**
+     * The judges' personal codes, by email. Startup fails if a judge has none.
+     */
+    static Map<String, String> judgesPersonalCodes() {
+        return USERS.stream()
+            .filter(user -> JUDGES.equals(user.quickLoginLabel()))
+            .collect(Collectors.toMap(IdamUser::email, user -> Optional.ofNullable(PERSONAL_CODES.get(user.email()))
+                .orElseThrow(() -> new IllegalStateException("No personal code for judge " + user.email())),
+                (first, second) -> first, LinkedHashMap::new));
     }
 
     static List<IdamUser> all() {
