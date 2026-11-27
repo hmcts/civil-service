@@ -61,7 +61,7 @@ def versions = [
   jackson3          : '3.3.0',
   kotlin            : '2.4.21',
   log4j             : '2.26.1',
-  netty             : '4.2.19.Final',
+  netty             : '4.2.21.Final',
   pdfbox            : '3.0.8',
   plexusUtils       : '4.2.0',
   postgresql        : '42.7.15',
@@ -173,8 +173,8 @@ allprojects {
       mavenBom "org.apache.logging.log4j:log4j-bom:${versions.log4j}"
       // CVE floors (DTSCCI-6473). Import the whole release train so reactor-core and reactor-netty,
       // and all Micrometer modules, stay on matching versions; pinning one module splits the family.
-      mavenBom 'io.projectreactor:reactor-bom:2025.0.9'
-      mavenBom 'io.micrometer:micrometer-bom:1.17.3'
+      mavenBom 'io.projectreactor:reactor-bom:2026.0.0'
+      mavenBom 'io.micrometer:micrometer-bom:1.18.0'
     }
   }
 
