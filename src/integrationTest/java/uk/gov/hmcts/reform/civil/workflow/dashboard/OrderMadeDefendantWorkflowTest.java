@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.workflow.dashboard;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,11 +22,6 @@ class OrderMadeDefendantWorkflowTest extends DashboardWorkflowIntegrationTest {
     public static final String DEFENDANT = "DEFENDANT";
     @MockitoBean
     private FeatureToggleService featureToggleService;
-
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-    }
 
     @Test
     void shouldCreateOrderMadeDefendantNotificationViaAboutToSubmitCallback() throws Exception {

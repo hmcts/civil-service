@@ -87,7 +87,13 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void  setup() {
-        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), userService, featureToggleService, taskManagementService);
+        handler = new SendAndReplyCallbackHandler(
+            messageService,
+            new ObjectMapper(),
+            userService,
+            featureToggleService,
+            taskManagementService
+        );
     }
 
     @Test
@@ -102,7 +108,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldClearSendAndReplyOption_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setSendAndReplyOption(SEND);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -119,7 +124,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setSendAndReplyOption(SEND);
             caseData.setClaimantBilingualLanguagePreference("BOTH");
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -141,7 +145,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             caseData.setCaseDataLiP(caseDataLiP);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -159,7 +162,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setMessages(messages);
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(messageService.createMessageSelectionList(messages)).thenReturn(expectedMessages);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -177,7 +179,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotInteractWithMessagesService_whenNoMessagesExist() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             handler.handle(params);
 
             verifyNoInteractions(messageService);

@@ -5,7 +5,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.service.search.common.PaginatedQueryProvider;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 @RequiredArgsConstructor
 public class TakeCaseOfflineQueryProvider implements PaginatedQueryProvider {
 
-    private final FeatureToggleService featureToggleService;
     private final CommonQueryConstructs commonQueryConstructs;
     private final Time time;
 
@@ -44,20 +42,12 @@ public class TakeCaseOfflineQueryProvider implements PaginatedQueryProvider {
     public BoolQueryBuilder buildQuery(String timeNow) {
         BoolQueryBuilder queryBuilder = boolQuery().minimumShouldMatch(1);
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            queryBuilder.should(
-                boolQuery()
-                    .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
-                    .must(commonQueryConstructs.beState(AWAITING_APPLICANT_INTENTION))
-                    .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                    .mustNot(existsQuery("data.applicant1ResponseDate")));
-        } else {
-            queryBuilder.should(
-                boolQuery()
-                    .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
-                    .must(commonQueryConstructs.beState(AWAITING_APPLICANT_INTENTION))
-                    .mustNot(matchQuery("data.isMintiLipCase", "Yes")));
-        }
+        queryBuilder.should(
+            boolQuery()
+                .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
+                .must(commonQueryConstructs.beState(AWAITING_APPLICANT_INTENTION))
+                .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                .mustNot(existsQuery("data.applicant1ResponseDate")));
 
         queryBuilder.should(
             boolQuery()

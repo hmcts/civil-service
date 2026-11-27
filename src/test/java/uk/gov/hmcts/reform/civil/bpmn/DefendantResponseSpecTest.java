@@ -414,7 +414,6 @@ class DefendantResponseSpecTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.FULL_ADMISSION");
         variables.put(FLOW_FLAGS, Map.of(
             LIP_CASE, true,
-            WELSH_ENABLED, true,
             CLAIM_ISSUE_BILINGUAL, true
         ));
         //complete the start business process
@@ -456,7 +455,6 @@ class DefendantResponseSpecTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.PART_ADMISSION");
         variables.put(FLOW_FLAGS, Map.of(
             LIP_CASE, true,
-            WELSH_ENABLED, true,
             CLAIM_ISSUE_BILINGUAL, true
         ));
         //complete the start business process

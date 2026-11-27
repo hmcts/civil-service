@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -23,62 +22,35 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 @Service
 public class TakeCaseOfflineSearchService extends ElasticSearchService {
 
-    private final FeatureToggleService featureToggleService;
-
-    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService) {
+    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
-        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public Query query(int startIndex, String timeNow) {
         log.info("Call to TakeCaseOfflineSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            Query query = new Query(
-                boolQuery()
-                    .minimumShouldMatch(1)
-                    .should(boolQuery()
-                                .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
-                                .must(beState(AWAITING_APPLICANT_INTENTION))
-                                .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                                .mustNot(existsQuery("data.applicant1ResponseDate"))
-                                .must(haveNoOngoingBusinessProcess()))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                .must(haveNoOngoingBusinessProcess()))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                .must(haveNoOngoingBusinessProcess())),
-                List.of("reference"),
-                startIndex
-            );
-            log.info("Take Case Offline query (WelshEnabled): {}", query);
-            return query;
-        } else {
-            Query query = new Query(
-                boolQuery()
-                    .minimumShouldMatch(1)
-                    .should(boolQuery()
-                                .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
-                                .must(beState(AWAITING_APPLICANT_INTENTION))
-                                .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                                .must(haveNoOngoingBusinessProcess()))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                .must(haveNoOngoingBusinessProcess()))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                .must(haveNoOngoingBusinessProcess())),
-                List.of("reference"),
-                startIndex
-            );
-            log.info("Take Case Offline query: {}", query);
-            return query;
-        }
+        Query query = new Query(
+            boolQuery()
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(rangeQuery("data.applicant1ResponseDeadline").lt(timeNow))
+                            .must(beState(AWAITING_APPLICANT_INTENTION))
+                            .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                            .mustNot(existsQuery("data.applicant1ResponseDate"))
+                            .must(haveNoOngoingBusinessProcess()))
+                .should(boolQuery()
+                            .must(rangeQuery("data.addLegalRepDeadlineRes1").lt(timeNow))
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                            .must(haveNoOngoingBusinessProcess()))
+                .should(boolQuery()
+                            .must(rangeQuery("data.addLegalRepDeadlineRes2").lt(timeNow))
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                            .must(haveNoOngoingBusinessProcess())),
+            List.of("reference"),
+            startIndex
+        );
+        log.info("Take Case Offline query: {}", query);
+        return query;
     }
 
     private QueryBuilder beState(CaseState caseState) {

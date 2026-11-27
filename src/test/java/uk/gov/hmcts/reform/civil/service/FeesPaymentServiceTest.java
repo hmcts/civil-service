@@ -91,8 +91,6 @@ class FeesPaymentServiceTest {
     @MockitoBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockitoBean
-    private FeatureToggleService featureToggleService;
-    @MockitoBean
     private PaymentStatusRetryService paymentStatusRetryService;
 
     @BeforeEach

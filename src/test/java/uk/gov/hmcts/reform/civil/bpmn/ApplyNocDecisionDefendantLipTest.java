@@ -32,14 +32,32 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
         super("apply_noc_decision_defendant_lip.bpmn", PROCESS_ID);
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldRunProcess(boolean welshEnabled) {
+    private void updateGaLanguagePreference() {
+        ExternalTask updateGeneralApps = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateGeneralApps,
+            PROCESS_CASE_EVENT,
+            "UPDATE_GA_LANGUAGE_PREFERENCE",
+            "UpdateGenAppLanguagePreference"
+        );
+    }
+
+    private void resetLanguagePreferenceAfterNoC() {
+        ExternalTask updateLanguage = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateLanguage,
+            PROCESS_CASE_EVENT,
+            "RESET_LANGUAGE_PREFERENCE",
+            "ResetLanguagePreferenceAfterNoC"
+        );
+    }
+
+    @Test
+    void shouldRunProcess() {
 
         VariableMap variables = Variables.createVariables();
         variables.put(FLOW_FLAGS, Map.of(
-            LIP_CASE, false,
-            WELSH_ENABLED, welshEnabled
+            LIP_CASE, false
         ));
 
         //assert process has started
@@ -63,16 +81,7 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
-        if (welshEnabled) {
-            //update GA language flag
-            ExternalTask updateGeneralApps = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(
-                updateGeneralApps,
-                PROCESS_CASE_EVENT,
-                "UPDATE_GA_LANGUAGE_PREFERENCE",
-                "UpdateGenAppLanguagePreference"
-            );
-        }
+        updateGaLanguagePreference();
 
         //complete notify all parties
         ExternalTask notifyPartiesAfterNoc = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -83,16 +92,7 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "DefendantLipRepresentedWithNoCNotifier"
         );
 
-        if (welshEnabled) {
-            //update main claim language flag
-            ExternalTask updateLanguage = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(
-                updateLanguage,
-                PROCESS_CASE_EVENT,
-                "RESET_LANGUAGE_PREFERENCE",
-                "ResetLanguagePreferenceAfterNoC"
-            );
-        }
+        resetLanguagePreferenceAfterNoC();
 
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
@@ -130,6 +130,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -138,6 +140,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //Proceed Offline
         ExternalTask proceedOfflineTask = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -222,6 +226,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -230,6 +236,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //complete dashboard notification
         ExternalTask dashboardClaimantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -279,6 +287,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -287,6 +297,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //Proceed Offline
         ExternalTask proceedOfflineTask = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -371,6 +383,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -379,6 +393,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //complete dashboard notification
         ExternalTask dashboardClaimantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -428,6 +444,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -436,6 +454,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //Proceed Offline
         ExternalTask proceedOfflineTask = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -521,6 +541,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
+        updateGaLanguagePreference();
+
         //complete notify all parties
         ExternalTask notifyPartiesAfterNoc = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -529,6 +551,8 @@ public class ApplyNocDecisionDefendantLipTest extends BpmnBaseTest {
             "NOTIFY_EVENT",
             "DefendantLipRepresentedWithNoCNotifier"
         );
+
+        resetLanguagePreferenceAfterNoC();
 
         //Proceed Offline
         ExternalTask proceedOfflineTask = assertNextExternalTask(PROCESS_CASE_EVENT);

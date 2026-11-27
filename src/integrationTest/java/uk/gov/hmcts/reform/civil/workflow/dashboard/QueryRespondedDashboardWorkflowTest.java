@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.workflow.dashboard;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.workflow.dashboard.fixture.QueryManagementDashboardFixtures;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,11 +19,6 @@ class QueryRespondedDashboardWorkflowTest extends DashboardWorkflowIntegrationTe
 
     @MockitoBean
     private FeatureToggleService featureToggleService;
-
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-    }
 
     @Test
     void shouldCreateDashboardNotificationForLipClaimantWhenQueryResponseReceived() throws Exception {

@@ -10,10 +10,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseCuiClaimantDashboardServiceTest {
@@ -24,28 +22,14 @@ class DefendantResponseCuiClaimantDashboardServiceTest {
     private DefendantResponseClaimantDashboardService claimantDashboardService;
     @Mock
     private DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private DefendantResponseCuiClaimantDashboardService dashboardService;
 
     @Test
-    void shouldDelegateToClaimantDashboardServiceWhenWelshNotEnabledForMainCaseAndIsClaimantBilingual() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        dashboardService.notifyDefendantResponse(caseData, AUTH_TOKEN);
-
-        verify(claimantDashboardService).notifyDefendantResponse(caseData, AUTH_TOKEN);
-    }
-
-    @Test
-    void shouldDelegateToClaimantDashboardServiceWhenWelshEnabledForMainCaseAndIsClaimantNotBilingual() {
+    void shouldDelegateToClaimantDashboardServiceWhenClaimantIsNotBilingual() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimantBilingualLanguagePreference(Language.ENGLISH.toString());
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         dashboardService.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -65,10 +49,9 @@ class DefendantResponseCuiClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldDelegateToWelshClaimantDashboardServiceWhenWelshIsEnabledForMainCaseAndClaimantBilingual() {
+    void shouldDelegateToWelshClaimantDashboardServiceWhenClaimantBilingual() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         dashboardService.notifyDefendantResponse(caseData, AUTH_TOKEN);
 

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT;
@@ -61,8 +60,6 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
             } else {
                 selectedScenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
             }
-        } else if (dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)) {
-            selectedScenario = SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         } else {
             dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
             selectedScenario = SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();

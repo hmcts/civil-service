@@ -9,9 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
-import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,6 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
     public static final String TASK_ID_DEFENDANT_HMC = "SendAutomaticHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT_HMC = "SendAutomaticHearingToClaimantLIP";
     private final SendHearingBulkPrintService sendHearingBulkPrintService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,32 +61,9 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            sendHearingBulkPrintService.sendHearingToLIP(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-                false);
-
-        } else {
-            sendHearingBulkPrintService.sendHearingToLIP(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-                sendWelshHearingToLip(task, caseData)
-            );
-        }
+        sendHearingBulkPrintService.sendHearingToLIP(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
-
-    private boolean sendWelshHearingToLip(String task, CaseData caseData) {
-        return (isClaimantHMC(task) && HmcDataUtils.isWelshHearingTemplateClaimant(caseData))
-            || (isDefendantHMC(task) && HmcDataUtils.isWelshHearingTemplateDefendant(caseData));
-    }
-
-    private boolean isClaimantHMC(String task) {
-        return TASK_ID_CLAIMANT_HMC.equals(task);
-    }
-
-    private boolean isDefendantHMC(String task) {
-        return TASK_ID_DEFENDANT_HMC.equals(task);
-    }
-
 }
