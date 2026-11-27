@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWithoutPrejudice;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentWithDescription;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
@@ -112,6 +114,12 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private  List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
     private  List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private  List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidence;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidenceSmallClaim;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  List<EvidenceUploadWithoutPrejudice> withoutPrejudiceSelectionEvidenceSmallClaimRes;
     //applicant
     private  List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
     private  List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
@@ -178,6 +186,15 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private  List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private  LocalDateTime caseDocumentUploadDateRes;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Element<DocumentWithDescription>> documentPart36Rejection;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Element<DocumentWithDescription>> documentPart36RejectionApp2;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Element<DocumentWithDescription>> documentPart36RejectionRes;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Element<DocumentWithDescription>> documentPart36RejectionRes2;
     private  HearingNotes hearingNotes;
     private  List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private  List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;

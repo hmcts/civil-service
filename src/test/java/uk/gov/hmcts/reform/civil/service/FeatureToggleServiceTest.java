@@ -297,6 +297,13 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenPart36Enabled(Boolean toggleStat) {
+        givenToggle("part36-enabled", toggleStat);
+        assertThat(featureToggleService.isPart36Enabled()).isEqualTo(toggleStat);
+    }
+   
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldCallBoolVariation_whenBreathingSpaceEnabled(Boolean toggleStat) {
         givenToggle("cui-breathing-space", toggleStat);
         assertThat(featureToggleService.isBreathingSpaceEnabled()).isEqualTo(toggleStat);

@@ -175,6 +175,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
     }
 
+    public boolean isPart36Enabled() {
+        return featureToggleApi.isFeatureEnabled("part36-enabled");
+    }
+  
     public boolean isBreathingSpaceEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-breathing-space");
     }
