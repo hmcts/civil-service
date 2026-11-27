@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -28,6 +29,7 @@ import java.util.function.Predicate;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT_RESPONDED;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT;
@@ -275,7 +277,8 @@ public class UploadTranslatedDocumentService {
                 moveGeneralOrder(
                     context.caseDataBuilder(),
                     context.preTranslationGaDocuments(),
-                    context.bulkPrintOriginalDocuments()
+                    context.bulkPrintOriginalDocuments(),
+                    documentType
                 );
                 break;
             case HEARING_NOTICE:
@@ -376,14 +379,34 @@ public class UploadTranslatedDocumentService {
 
     private void moveGeneralOrder(GeneralApplicationCaseData caseDataBuilder,
                                   List<Element<CaseDocument>> preTranslationGaDocuments,
-                                  List<Element<CaseDocument>> bulkPrintOriginalDocuments) {
+                                  List<Element<CaseDocument>> bulkPrintOriginalDocuments,
+                                  TranslatedDocumentType translatedDocumentType) {
+        Optional<Element<CaseDocument>> originalDocument = findAndRemovePreTranslationDocument(
+            preTranslationGaDocuments,
+            item -> item.getDocumentType() == DocumentType.GENERAL_ORDER
+        );
+        List<Element<CaseDocument>> generalOrderDocuments = getCaseDocuments(caseDataBuilder.build().getGeneralOrderDocument());
+        if (originalDocument.isEmpty()
+            && translatedDocumentType == TranslatedDocumentType.APPROVE_OR_EDIT_ORDER
+            && caseDataBuilder.getFinalOrderSelection() != null) {
+            // Generated English orders are system-authored; older records may have no author.
+            Element<CaseDocument> publishedOriginal = generalOrderDocuments.reversed().stream()
+                .filter(document -> document.getValue().getDocumentType() == DocumentType.GENERAL_ORDER)
+                .filter(document -> StringUtils.isBlank(document.getValue().getCreatedBy())
+                    || CREATED_BY.equals(document.getValue().getCreatedBy()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "No original final order available for translated approve-or-edit order bulk print"));
+            if (!bulkPrintOriginalDocuments.contains(publishedOriginal)) {
+                bulkPrintOriginalDocuments.add(publishedOriginal);
+            }
+            caseDataBuilder.originalDocumentsBulkPrint(bulkPrintOriginalDocuments);
+            return;
+        }
         appendTranslatedOrderDocument(
             caseDataBuilder,
-            findAndRemovePreTranslationDocument(
-                preTranslationGaDocuments,
-                item -> item.getDocumentType() == DocumentType.GENERAL_ORDER
-            ),
-            getCaseDocuments(caseDataBuilder.build().getGeneralOrderDocument()),
+            originalDocument,
+            generalOrderDocuments,
             caseDataBuilder::generalOrderDocument,
             bulkPrintOriginalDocuments
         );

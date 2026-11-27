@@ -33,6 +33,13 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "/^com\\.github\\.hmcts:/"
+      ],
+      "allowedVersions": "!/[-_][A-Z]{2,}-\\d+/",
+      "description": "Skip HMCTS feature-branch builds published with a ticket suffix (e.g. 4.1.0-CCD-8220, 9.2.12_CCD-8388). Maven versioning ranks unknown qualifiers above the release, so Renovate otherwise treats them as the newest stable version. Kept first so the package-specific allowedVersions rules below still override it"
+    },
+    {
+      "matchPackageNames": [
         "com.github.hmcts:core-case-data-store-client"
       ],
       "allowedVersions": "<5.4.0",
@@ -65,6 +72,36 @@
       ],
       "allowedVersions": "<1.60.0",
       "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "allowedVersions": "!/^1\\.18\\.1[67](-|$)/",
+      "description": "Byte Buddy 1.18.16 and 1.18.17 stop Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest. 1.18.15 fails the same way (ASM LimitExceededException: Too many operations). Later versions are still offered, in their own Byte Buddy group, so CI can confirm a fix"
+    },
+    {
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchDepNames": [
+        "python"
+      ],
+      "allowedVersions": "<3.15",
+      "description": "Hold actions/setup-python below 3.15: semgrep 1.177.0 needs ruamel.yaml.clib 0.2.15, which has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15"
+    },
+    {
+      "matchPackageNames": [
+        "io.projectreactor:reactor-bom",
+        "io.micrometer:micrometer-bom"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false,
+      "description": "These BOMs only set CVE minimums (DTSCCI-6473): take patch releases on the Reactor and Micrometer lines Spring Boot manages, and move to a new line together with Spring Boot"
     },
     {
       "enabled": false,
@@ -114,6 +151,17 @@
       ],
       "groupName": "Jenkins library",
       "groupSlug": "jenkins-library"
+    },
+    {
+      "description": "Keep Byte Buddy out of the non-major group: from 1.18.15 (ASM 9.11) Mockito cannot instrument CaseData ('Too many operations'), so a Byte Buddy update that fails the unit tests would otherwise hold back every other non-major update",
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "groupName": "Byte Buddy",
+      "groupSlug": "byte-buddy",
+      "automerge": true,
+      "automergeType": "pr"
     },
     {
       "groupName": "Camunda updates",

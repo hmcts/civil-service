@@ -53,7 +53,7 @@ public class NonJsonCamundaErrorResponseInterceptor implements HttpResponseInter
         byte[] body;
         try {
             body = EntityUtils.toByteArray(classicResponse.getEntity(), MAX_BODY_BYTES);
-        } catch (Exception e) {
+        } catch (Exception _) {
             // Could not buffer the body - leave the original entity in place and let the
             // client handle the read failure exactly as it does today.
             return;

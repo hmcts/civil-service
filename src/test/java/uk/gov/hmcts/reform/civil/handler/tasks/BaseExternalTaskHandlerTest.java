@@ -65,6 +65,36 @@ class BaseExternalTaskHandlerTest {
         handler = new TestBaseExternalTaskHandler(externalTaskCompletionService, eventProperties);
     }
 
+    @Test
+    void shouldLogFailureContextAndThrowableForBothFailurePaths() {
+        var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+        var appender = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();
+        appender.start();
+        logger.addAppender(appender);
+        when(externalTask.getTopicName()).thenReturn("HEARING_FEE_CHECK");
+        when(externalTask.getProcessInstanceId()).thenReturn("process-id");
+        RuntimeException failure = new RuntimeException("search failed");
+        try {
+            handler.handleTaskFailureNotRetryable(externalTask, externalTaskService, failure);
+            handler.handleTaskFailure(externalTask, externalTaskService, failure);
+
+            var events = appender.list.stream()
+                .filter(event -> event.getFormattedMessage().startsWith("Handle task failure"))
+                .toList();
+            assertThat(events).hasSize(2);
+            assertThat(events.get(0).getLevel()).isEqualTo(ch.qos.logback.classic.Level.ERROR);
+            assertThat(events.get(1).getLevel()).isEqualTo(ch.qos.logback.classic.Level.WARN);
+            assertThat(events).allSatisfy(event -> {
+                assertThat(event.getFormattedMessage()).contains("HEARING_FEE_CHECK", "process-id");
+                assertThat(event.getThrowableProxy().getMessage()).isEqualTo("search failed");
+                assertThat(event.getThrowableProxy().getStackTraceElementProxyArray()).isNotEmpty();
+            });
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+    }
+
     @Nested
     class ExecuteHandleTaskLine {
 
@@ -140,6 +170,43 @@ class BaseExternalTaskHandlerTest {
                 eq(1000L)
             );
             verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldLogTopicAndStackWhenPostSearchFailsWithBadGatewayBeforeCompletion() {
+            var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+            var appender = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();
+            appender.start();
+            logger.addAppender(appender);
+            when(externalTask.getTopicName()).thenReturn("HEARING_FEE_CHECK");
+            when(externalTask.getProcessInstanceId()).thenReturn("process-id");
+            FeignException failure = new FeignException.BadGateway(
+                "Bad Gateway",
+                Request.create(Request.HttpMethod.POST, "/searchCases?ctid=CIVIL", java.util.Map.of(), null, null, null),
+                "Bad Gateway".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                java.util.Map.of()
+            );
+            handler.throwRetryable(failure);
+            try {
+                handler.execute(externalTask, externalTaskService);
+
+                verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+                verify(externalTaskService).handleFailure(
+                    externalTask, "Bad Gateway", "Bad Gateway", 0, 1000L
+                );
+                var failures = appender.list.stream()
+                    .filter(event -> event.getFormattedMessage().startsWith("Handle task failure Not Retryable"))
+                    .toList();
+                assertThat(failures).hasSize(1);
+                var event = failures.get(0);
+                assertThat(event.getLevel()).isEqualTo(ch.qos.logback.classic.Level.ERROR);
+                assertThat(event.getFormattedMessage()).contains("HEARING_FEE_CHECK", "process-id");
+                assertThat(event.getThrowableProxy().getClassName()).isEqualTo(FeignException.BadGateway.class.getName());
+                assertThat(event.getThrowableProxy().getStackTraceElementProxyArray()).isNotEmpty();
+            } finally {
+                logger.detachAppender(appender);
+                appender.stop();
+            }
         }
 
         @Test
