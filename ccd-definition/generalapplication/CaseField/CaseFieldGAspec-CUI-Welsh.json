@@ -73,5 +73,13 @@
     "SecurityClassification": "Public",
     "_Definition":  "The details of the child application on the case for wlu",
     "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaDocumentTranslationInProgressLabel",
+    "Label": "<strong class=\"text-16\">Translation of system generated document in progress</strong>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

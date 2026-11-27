@@ -2476,30 +2476,6 @@
   },
   {
     "CaseTypeID": "CIVIL",
-    "ID": "enterBreathing",
-    "FieldType": "BreathingSpaceStartInfo",
-    "SecurityClassification": "Public",
-    "Searchable": "N",
-    "Label": " "
-  },
-  {
-    "CaseTypeID": "CIVIL",
-    "ID": "liftBreathing",
-    "FieldType": "BreathingSpaceLiftInfo",
-    "SecurityClassification": "Public",
-    "Searchable": "N",
-    "Label": " "
-  },
-  {
-    "CaseTypeID": "CIVIL",
-    "ID": "breathingSpaceLabel",
-    "Label": "<strong class=\"text-16\">This claim is in Breathing Space</strong>",
-    "FieldType": "Label",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "CIVIL",
     "ID": "respondent1SmallClaimWitnessesLabel",
     "Label": "<h2 class=\"govuk-heading-m\">Witnesses</h2>",
     "FieldType": "Label",

@@ -4,6 +4,15 @@
     "TabID": "Application",
     "TabLabel": "Application",
     "TabDisplayOrder": 1,
+    "CaseFieldID": "gaDocumentTranslationInProgressLabel",
+    "TabFieldDisplayOrder": 0,
+    "FieldShowCondition": "preTranslationGaDocumentType = \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
     "CaseFieldID": "gaApplicantDisplayName",
     "TabFieldDisplayOrder": 1
   },

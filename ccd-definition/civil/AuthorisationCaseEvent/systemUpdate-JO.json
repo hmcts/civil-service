@@ -37,12 +37,6 @@
   },
   {
     "CaseTypeID": "CIVIL",
-    "CaseEventID": "CREATE_DASHBOARD_NOTIFICATION_RECORD_JUDGMENT_DEFENDANT",
-    "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeID": "CIVIL",
     "CaseEventID": "UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_CLAIMANT",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
