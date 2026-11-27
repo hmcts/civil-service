@@ -101,13 +101,12 @@ Updates that master can't build, or that break the tests, are therefore held in 
 | Package | Hold | Reason |
 |---|---|---|
 | `com.github.hmcts:*` | skips versions with a ticket suffix, e.g. `4.1.0-CCD-8220`, `9.2.12_CCD-8388` | Feature-branch builds. Maven ranks the suffix above the release, so Renovate would otherwise offer them as the newest version. This rule comes first so the package-specific holds below override it |
-| `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes") |
+| `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.16 and 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes"). Later versions are still offered so CI can confirm a fix |
 | `python` (`actions/setup-python`) | below 3.15 | semgrep's `ruamel.yaml.clib` has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15 |
+| `io.projectreactor:reactor-bom`, `io.micrometer:micrometer-bom` | patch updates only | Imported only to set CVE minimums (DTSCCI-6473). They take patches on the Reactor and Micrometer lines Spring Boot manages and move to a new line with Spring Boot |
 | Pact packages | disabled | |
 | CCD Helm chart | disabled | DTSCCI-7065, chart size limit |
 | Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors | disabled | Set before the Spring Boot 4 migration |
-
-#8709, still open, adds two more: Byte Buddy 1.18.16 is skipped as well, and `io.projectreactor:reactor-bom` and `io.micrometer:micrometer-bom` take patch updates only, because they only set CVE minimums. Update this table when it merges.
 
 These older holds are out of date. The service is now on Spring Boot 4.1 and Java 25, so their reasons no longer apply:
 
