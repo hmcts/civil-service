@@ -6,7 +6,14 @@
   "type": "module",
   "scripts": {
     "render:bpmn": "node scripts/render-bpmn-diagrams.mjs",
-    "test:definitions": "mocha 'ccd-definition/test/definitions/**/*.test.js'"
+    "test:definitions": "mocha 'ccd-definition/test/definitions/**/*.test.js'",
+    "test:cutover": "mocha 'scripts/cutover/test/**/*.test.mjs'",
+    "cutover:seed": "node scripts/cutover/seed.mjs",
+    "cutover:check-db": "node scripts/cutover/check-db.mjs",
+    "cutover:verify-cases": "node scripts/cutover/verify-cases.mjs",
+    "cutover:verify-search": "node scripts/cutover/verify-search.mjs",
+    "cutover:verify-tasks": "node scripts/cutover/verify-tasks.mjs",
+    "cutover:verify-writes": "node scripts/cutover/verify-writes.mjs"
   },
   "dependencies": {
     "bpmn-to-image": "0.10.0"
