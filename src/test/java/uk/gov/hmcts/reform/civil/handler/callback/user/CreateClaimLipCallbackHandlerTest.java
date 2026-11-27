@@ -310,7 +310,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldLinkDraftBySubmissionIdWhenClaimantUserAndSubmissionIdPresent() {
-            when(toggleService.isDraftClaimDatabaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
@@ -336,24 +335,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSkipLinkWhenDraftClaimDatabaseDisabled() {
-            when(toggleService.isDraftClaimDatabaseEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
-                .build();
-            caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
-
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertThat(response).isNotNull();
-            verify(draftStoreService, never()).linkDraftBySubmissionId(any(), any(), any(), any());
-        }
-
-        @Test
         void shouldSkipLinkWhenClaimantUserDetailsMissing() {
-            when(toggleService.isDraftClaimDatabaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
 
@@ -366,7 +348,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSkipLinkWhenSubmissionIdMissing() {
-            when(toggleService.isDraftClaimDatabaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
@@ -381,7 +362,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldStillReturnResponseWhenLinkThrows() {
-            when(toggleService.isDraftClaimDatabaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))

@@ -92,7 +92,6 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
         given(userService.getUserInfo(anyString()))
             .willReturn(UserInfo.builder().uid(USER_ID).sub("lip@test.com").build());
         given(authTokenGenerator.generate()).willReturn(SERVICE_TOKEN);
-        given(featureToggleService.isDraftClaimDatabaseEnabled()).willReturn(true);
 
         CaseDetails createdCase = CaseDetails.builder()
             .id(CREATED_CASE_ID)
