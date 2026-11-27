@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -78,7 +80,7 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetBusinessProcessReady_whenAboutToSubmit_andReturningFromDecisionOutcome() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, CaseState.DECISION_OUTCOME);
+        CallbackParams params = requestListingAboutToSubmit(caseData, CaseState.DECISION_OUTCOME);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -89,7 +91,7 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotSetBusinessProcess_whenAboutToSubmit_andCaseIsNotReturningFromDecisionOutcome() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, CaseState.CASE_PROGRESSION);
+        CallbackParams params = requestListingAboutToSubmit(caseData, CaseState.CASE_PROGRESSION);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getData().get("businessProcess")).isNull();
@@ -104,5 +106,13 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         assertEquals(LISTING_REQUESTED, response.getConfirmationHeader());
         assertEquals(LISTING_REQUESTED_TASKS, response.getConfirmationBody());
+    }
+
+    private CallbackParams requestListingAboutToSubmit(CaseData caseData, CaseState previousState) {
+        return callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            .request(CallbackRequest.builder()
+                         .caseDetailsBefore(CaseDetails.builder().state(previousState.name()).build())
+                         .caseDetails(CaseDetails.builder().state(CaseState.CASE_PROGRESSION.name()).build())
+                         .build());
     }
 }
