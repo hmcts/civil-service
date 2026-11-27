@@ -128,5 +128,4 @@ yarn playwright test --project civil-service-master-pr-smoke --no-deps
 
 - **`DB not yet available...` repeats forever:** the shared `cftlib` Postgres volume was created by a different major version. civil uses Postgres 15, as dtsse-ccd-config-generator's e2e does. `RSE_LIB_CLEAN_BOOT=1` recreates the containers and their data.
 - **`/health` returns 405:** one health indicator fails against a library version on cftlib's classpath. `/health/liveness` and `/health/readiness` work.
-- **Hearing updates stop reaching this service after a few:** HMC's log shows `Failed to obtain a send link. entityPath:hmc-to-cft`. HMC opens a new Service Bus connection for each update without closing it, and the local Service Bus emulator stops accepting more. HMC still records the hearing's status, but this service doesn't hear about it. Restart `bootWithCCD`.
 - **Startup hangs in a Flyway migration:** a `CREATE INDEX CONCURRENTLY` migration waits on a transactional Flyway lock. bootWithCCD sets `SPRING_FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false`, as preview does.
