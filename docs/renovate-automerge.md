@@ -102,26 +102,28 @@ Updates that master can't build, or that break the tests, are therefore held in 
 | Package | Hold | Reason |
 |---|---|---|
 | `com.github.hmcts:*` | skips versions with a ticket suffix, e.g. `4.1.0-CCD-8220`, `9.2.12_CCD-8388` | Feature-branch builds. Maven ranks the suffix above the release, so Renovate would otherwise offer them as the newest version. This rule comes first so the package-specific holds below override it |
+| `com.github.hmcts:core-case-data-store-client` | below 6.0.0 | Version 6 moves to Jackson 3 (`tools.jackson`), which the CCD SDK's `jackson2ClasspathGuard` in `build.gradle` rejects. 5.x updates are still offered |
 | `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.16 and 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes"). 1.18.15 fails the same way (ASM 9.11, `LimitExceededException: Too many operations`) but isn't skipped. Later versions are still offered, in the Byte Buddy group, so CI can confirm a fix |
 | `python` (`actions/setup-python`) | below 3.15 | semgrep's `ruamel.yaml.clib` has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15 |
 | `io.projectreactor:reactor-bom`, `io.micrometer:micrometer-bom` | patch updates only | Imported only to set CVE minimums (DTSCCI-6473). They take patches on the Reactor and Micrometer lines Spring Boot manages and move to a new line with Spring Boot |
 | Pact packages | disabled | |
 | CCD Helm chart | disabled | DTSCCI-7065, chart size limit |
-| Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors | disabled | Set before the Spring Boot 4 migration |
 
-These older holds are out of date. The service is now on Spring Boot 4.1 and Java 25, so their reasons no longer apply:
+The holds set for the Spring Boot 4 and Java 25 migrations were removed once the service was on both. They are:
 
-| Package | Hold | In use | Effect now |
-|---|---|---|---|
-| `com.github.hmcts:core-case-data-store-client` | below 5.4.0 | 5.3.0 | Blocks 5.4.x, which was held for Spring Boot 4. Version 6 moves to Jackson 3, which the CCD SDK's Jackson 2 guard rejects |
-| `org.springframework.cloud:spring-cloud-dependencies` | below 2025.1.0 | 2025.1.3 | Blocks every update, including a release train that supports Spring Boot 4.2 |
-| `com.github.hmcts:send-letter-client` | below 6.0.0 | 5.1.1 | Blocks 6.x, which was held only for Java 25 |
-| `com.github.hmcts:auth-checker-lib` | below 3.2.0 | 3.2.2 | Blocks every update |
-| `com.github.hmcts:ccd-case-document-am-client` | below 1.60.0 | 2.0.0 | Blocks every update |
+- `spring-cloud-dependencies` below 2025.1.0
+- `auth-checker-lib` below 3.2.0
+- `ccd-case-document-am-client` below 1.60.0
+- `send-letter-client` below 6.0.0, held for Java 25
+- the Spring, springdoc, Spring Cloud, Jakarta Persistence and Hibernate majors rule
 
-A rule that sets only `matchUpdateTypes` for `auth-checker-lib`, `payments-java-client`, `ccd-case-document-am-client` and `core-case-data-store-client` has no effect: it doesn't set `enabled`, `allowedVersions` or a group.
+The `core-case-data-store-client` hold moved from below 5.4.0 (Spring Boot 4) to below 6.0.0 (Jackson 3). A "Restrict HMCTS library upgrades" rule was also removed: it set only `matchUpdateTypes`, so it had no effect.
 
-Review each of these holds and remove or update them. When a new Renovate PR fails the build on every rebase, find the cause and add a hold here rather than leaving it open.
+Spring and related majors now come in the "Spring Boot and related updates" group with automerge on, like its minors. They still need every required check to pass before they merge.
+
+An `auth-checker-lib` update will fail the `jackson2ClasspathGuard` check until the `allowedClasses` entry in `build.gradle` names the new version. The entry is pinned to 3.2.2 so that each upgrade is re-checked.
+
+When a new Renovate PR fails the build on every rebase, find the cause and add a hold here rather than leaving it open.
 
 ## Release freeze
 
