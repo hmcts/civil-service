@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stitch.service;
 
+import org.apache.pdfbox.Loader;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ResourceLoader;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -10,7 +11,9 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DocumentConversionService;
 import uk.gov.hmcts.reform.civil.stitch.PdfMergeException;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -56,8 +59,39 @@ class CivilStitchServiceIT {
         ))
             .isInstanceOf(PdfMergeException.class)
             .hasMessage(
-                "Document at index 1 is not a valid PDF for caseId 1776674103714442 (size: 23 bytes)"
+                "Unable to parse PDF document 'supported-document.pdf' (CDAM id: supported-document-url)"
+                    + " for caseId 1776674103714442"
             );
+
+        verify(managementService, never()).uploadDocument(anyString(), any(PDF.class));
+    }
+
+    @Test
+    void shouldIdentifyPdfWithMissingRootAndPreserveCause() throws Exception {
+        DocumentManagementService managementService = mock(DocumentManagementService.class);
+        DocumentConversionService conversionService = mock(DocumentConversionService.class);
+        CivilStitchService stitchService = new CivilStitchService(managementService, conversionService);
+        Document sealedClaim = document("sealed-claim.pdf", "http://cdam/documents/sealed-id");
+        Document upload = document("particulars.pdf", "http://cdam/documents/upload-id");
+        // No catalog exists for PDFBox to recover, despite the valid PDF header.
+        byte[] malformedPdf = ("%PDF-1.4\n1 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n"
+            + "trailer\n<< /Size 2 >>\nstartxref\n0\n%%EOF\n").getBytes(StandardCharsets.US_ASCII);
+        assertThatThrownBy(() -> Loader.loadPDF(malformedPdf))
+            .isInstanceOf(IOException.class)
+            .hasMessageContaining("Missing root object specification in trailer");
+        when(conversionService.convertDocumentToPdf(sealedClaim, CASE_ID, AUTHORISATION))
+            .thenReturn(loadResource("stitch-documents/test1.pdf"));
+        when(conversionService.convertDocumentToPdf(upload, CASE_ID, AUTHORISATION)).thenReturn(malformedPdf);
+
+        assertThatThrownBy(() -> stitchService.generateStitchedCaseDocument(
+            List.of(metadata(sealedClaim, "Sealed claim"), metadata(upload, "Particulars")),
+            "sealed_claim_form.pdf", CASE_ID, DocumentType.SEALED_CLAIM, AUTHORISATION
+        ))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Unable to parse PDF document 'particulars.pdf' (CDAM id: upload-id)"
+                            + " for caseId 1776674103714442")
+            .hasCauseInstanceOf(IOException.class)
+            .hasRootCauseMessage("Missing root object specification in trailer.");
 
         verify(managementService, never()).uploadDocument(anyString(), any(PDF.class));
     }
