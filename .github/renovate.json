@@ -33,10 +33,31 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "/^com\\.github\\.hmcts:/"
+      ],
+      "allowedVersions": "!/[-_][A-Z]{2,}-\\d+/",
+      "description": "Skip HMCTS feature-branch builds published with a ticket suffix (e.g. 4.1.0-CCD-8220, 9.2.12_CCD-8388). Maven versioning ranks unknown qualifiers above the release, so Renovate otherwise treats them as the newest stable version. Kept first so the package-specific allowedVersions rules below still override it"
+    },
+    {
+      "matchPackageNames": [
         "com.github.hmcts:core-case-data-store-client"
       ],
+      "allowedVersions": "<5.4.0",
+      "description": "Version 5.4.0 already needs Spring Boot 4 (it requires org.springframework.boot:spring-boot-http-converter), as does version 6 with Jackson 3; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "org.springframework.cloud:spring-cloud-dependencies"
+      ],
+      "allowedVersions": "<2025.1.0",
+      "description": "Spring Cloud 2025.1 targets Spring Boot 4: its OpenFeign loads org.springframework.boot.http.converter.autoconfigure.ClientHttpMessageConvertersCustomizer, which Boot 3.5 lacks, so the application context fails to start"
+    },
+    {
+      "matchPackageNames": [
+        "com.github.hmcts:send-letter-client"
+      ],
       "allowedVersions": "<6.0.0",
-      "description": "Version 6 requires Spring Boot 4 and Jackson 3; retain the compatible client until the service migrates"
+      "description": "Version 6 is built for Java 25; the service still compiles for Java 21"
     },
     {
       "matchPackageNames": [
@@ -51,6 +72,24 @@
       ],
       "allowedVersions": "<1.60.0",
       "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "allowedVersions": "!/^1\\.18\\.17(-|$)/",
+      "description": "Byte Buddy 1.18.17 stops Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
+    },
+    {
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchDepNames": [
+        "python"
+      ],
+      "allowedVersions": "<3.15",
+      "description": "Hold actions/setup-python below 3.15: semgrep 1.177.0 needs ruamel.yaml.clib 0.2.15, which has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15"
     },
     {
       "enabled": false,
@@ -120,6 +159,28 @@
       "automergeType": "pr"
     },
     {
+      "description": "DTSCCI-7065: Hold CCD chart updates until the chart size regression is resolved and the packaged civil-service chart is safely below the size limit",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "ccd"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Require manual review of AAC chart updates because the chart also bundles CCD",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "aac-manage-case-assignment"
+      ],
+      "groupName": "AAC chart updates",
+      "groupSlug": "aac-chart",
+      "automerge": false
+    },
+    {
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
@@ -132,6 +193,21 @@
         "/jakarta.persistence/",
         "/org.hibernate/"
       ]
+    },
+    {
+      "description": "No Spring major updates until the Spring Boot 4 migration (the spring-boot-4 branch) lands: the major group needs Boot 4 and cannot compile on master, so its PR fails on every rebase",
+      "matchPackageNames": [
+        "/org.springframework/",
+        "/org.springdoc/",
+        "/spring-boot/",
+        "/spring-cloud/",
+        "/jakarta.persistence/",
+        "/org.hibernate/"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
     },
     {
       "matchManagers": [

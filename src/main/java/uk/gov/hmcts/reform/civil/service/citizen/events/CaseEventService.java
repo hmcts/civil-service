@@ -352,7 +352,7 @@ public class CaseEventService {
         }
         try {
             return Optional.of(UUID.fromString(parts[1]));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             return Optional.empty();
         }
     }
