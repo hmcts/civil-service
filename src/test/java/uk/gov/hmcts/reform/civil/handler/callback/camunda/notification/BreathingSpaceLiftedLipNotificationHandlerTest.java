@@ -83,6 +83,8 @@ class BreathingSpaceLiftedLipNotificationHandlerTest {
             eq(CLAIMANT_EMAIL),
             eq(ENGLISH_CLAIMANT_TEMPLATE),
             argThat(map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(CASE_ID.toString())
+                && map.get(NotificationData.CLAIM_16_DIGIT_NUMBER).equals(CASE_ID.toString())
+                && map.get(NotificationData.CASEMAN_REF).equals("legacy ref")
                 && map.get(NotificationData.CLAIMANT_NAME).equals("Ann Claimant")
                 && map.get(NotificationData.RESPONDENT_NAME).equals("Bob Defendant")
                 && map.get(NotificationData.PARTY_NAME).equals("Ann Claimant")
@@ -122,6 +124,8 @@ class BreathingSpaceLiftedLipNotificationHandlerTest {
             eq(DEFENDANT_EMAIL),
             eq(ENGLISH_DEFENDANT_TEMPLATE),
             argThat(map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(CASE_ID.toString())
+                && map.get(NotificationData.CLAIM_16_DIGIT_NUMBER).equals(CASE_ID.toString())
+                && map.get(NotificationData.CASEMAN_REF).equals("legacy ref")
                 && map.get(NotificationData.CLAIMANT_NAME).equals("Ann Claimant")
                 && map.get(NotificationData.RESPONDENT_NAME).equals("Bob Defendant")
                 && map.get(NotificationData.PARTY_NAME).equals("Bob Defendant")),

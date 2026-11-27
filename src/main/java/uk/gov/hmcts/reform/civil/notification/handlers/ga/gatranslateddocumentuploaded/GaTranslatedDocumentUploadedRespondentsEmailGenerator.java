@@ -28,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification
 import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA.GA_LIP_RESP_NAME;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.areRespondentSolicitorsPresent;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isWithNotice;
 import static uk.gov.hmcts.reform.civil.notification.handlers.ga.gatranslateddocumentuploaded.GaTranslatedDocumentUploadedApplicantEmailGenerator.REFERENCE_TEMPLATE;
@@ -91,6 +93,8 @@ public class GaTranslatedDocumentUploadedRespondentsEmailGenerator extends GaEma
             properties.put(CASE_TITLE, Objects.requireNonNull(DocUploadNotificationService.getAllPartyNames(data)));
             properties.put(GA_LIP_RESP_NAME, Objects.requireNonNull(data.getParentClaimantIsApplicant().equals(NO)
                 ? data.getClaimant1PartyName() : data.getDefendant1PartyName()));
+            addSubjectReferences(context.mainCaseData(), data.getParentCaseReference(), properties);
+            addLipClaimantVDefendant(data, properties);
         } else {
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationService
                 .findOrganisationById(respondent.getOrganisationIdentifier())

@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
@@ -148,7 +149,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
 
         @Test
         void shouldNotifyApplicantLipSolicitor_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
+            when(notificationsProperties.getNotifyLipDjNonDivergentClaimantTemplate()).thenReturn(TEMPLATE_ID_LIP);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -162,6 +163,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
                                  .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(CaseDataBuilder.CASE_ID)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
                 .build();
@@ -215,6 +217,8 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
         Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
         ));

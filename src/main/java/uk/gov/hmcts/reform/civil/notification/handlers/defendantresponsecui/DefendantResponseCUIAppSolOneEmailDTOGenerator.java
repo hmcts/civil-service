@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -44,6 +45,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGenerator extends AppSolOneEma
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         return properties;
     }
 

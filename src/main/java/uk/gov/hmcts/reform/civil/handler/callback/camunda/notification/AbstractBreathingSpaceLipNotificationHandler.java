@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -85,6 +86,7 @@ public abstract class AbstractBreathingSpaceLipNotificationHandler extends Callb
         properties.put(PARTY_NAME, applicantEvent
             ? getPartyNameBasedOnType(caseData.getApplicant1())
             : getPartyNameBasedOnType(caseData.getRespondent1()));
+        addLipSubjectProperties(caseData, properties);
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;

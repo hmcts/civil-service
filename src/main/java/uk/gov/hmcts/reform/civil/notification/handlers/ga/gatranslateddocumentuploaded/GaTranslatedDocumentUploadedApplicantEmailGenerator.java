@@ -22,6 +22,8 @@ import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification
 import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA.GA_LIP_APPLICANT_NAME;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 
 @Component
 @RequiredArgsConstructor
@@ -70,6 +72,8 @@ public class GaTranslatedDocumentUploadedApplicantEmailGenerator extends GaEmail
         if (lip) {
             properties.put(CASE_TITLE, Objects.requireNonNull(DocUploadNotificationService.getAllPartyNames(data)));
             properties.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(data.getApplicantPartyName()));
+            addSubjectReferences(context.mainCaseData(), data.getParentCaseReference(), properties);
+            addLipClaimantVDefendant(data, properties);
         } else {
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationService
                 .findOrganisationById(data.getGeneralAppApplnSolicitor().getOrganisationIdentifier())

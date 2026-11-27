@@ -180,6 +180,8 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         properties.put("claimantvdefendant", "John Doe V Jack Jackson");
         properties.put("claimReferenceNumber", "1594901956117591");
         properties.put("name", "John Doe");
+        properties.put("claim16DigitNumber", "1594901956117591");
+        properties.put("casemanRef", "000DC001");
         return properties;
     }
 

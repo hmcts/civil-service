@@ -100,9 +100,14 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     private final CoreCaseDataService coreCaseDataService;
 
     public static String getAllPartyNames(GeneralApplicationCaseData caseData) {
+        return getAllPartyNames(caseData, "v");
+    }
+
+    public static String getAllPartyNames(GeneralApplicationCaseData caseData, String separator) {
         return format(
-            "%s v %s%s",
+            "%s %s %s%s",
             caseData.getClaimant1PartyName(),
+            separator,
             caseData.getDefendant1PartyName(),
             nonNull(caseData.getDefendant2PartyName())
                 && (NO.equals(caseData.getRespondent2SameLegalRepresentative())

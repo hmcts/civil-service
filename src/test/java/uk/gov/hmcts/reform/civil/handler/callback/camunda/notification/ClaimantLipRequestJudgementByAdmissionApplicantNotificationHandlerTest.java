@@ -29,7 +29,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
@@ -44,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -101,18 +105,21 @@ class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest ext
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id",
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 "request-judgement-by-admission-applicant-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap() {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> properties = new HashMap<>(addCommonProperties());
             properties.putAll(Map.of(
                 RESPONDENT_NAME, "Mr. Sole Trader T/A Sole Trader co",
                 CLAIMANT_NAME, "Mr. John Rambo",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
+                CASEMAN_REF, caseData.getLegacyCaseReference(),
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
                 FRONTEND_URL, "dummy_cui_front_end_url"
             ));
             return properties;

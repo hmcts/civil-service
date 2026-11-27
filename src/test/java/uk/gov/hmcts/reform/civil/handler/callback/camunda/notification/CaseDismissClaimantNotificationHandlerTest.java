@@ -152,6 +152,7 @@ class CaseDismissClaimantNotificationHandlerTest {
     public Map<String, String> getProperties(CaseData caseData, boolean isRespondentLiP) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put("claimReferenceNumber", "1594901956117591");
+        expectedProperties.put("claim16DigitNumber", "1594901956117591");
         expectedProperties.put("name", "John Doe");
         expectedProperties.put("claimantvdefendant", "John Doe V Jack Jackson");
         expectedProperties.put("partyReferences", buildPartiesReferencesEmailSubject(caseData));

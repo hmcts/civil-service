@@ -53,7 +53,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     @Test
     void shouldUseLipTemplate() {
         CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO).build();
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(LIP_TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(LIP_TEMPLATE_ID);
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(LIP_TEMPLATE_ID);
     }
 
@@ -63,7 +63,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BIL_LIP_TEMPLATE);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate()).thenReturn(BIL_LIP_TEMPLATE);
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(BIL_LIP_TEMPLATE);
     }
 

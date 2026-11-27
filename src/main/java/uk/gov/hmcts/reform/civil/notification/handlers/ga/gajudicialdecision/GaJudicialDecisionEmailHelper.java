@@ -36,6 +36,8 @@ import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialNotificationService.useDamageTemplate;
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialNotificationService.useOcmcTemplate;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.areRespondentSolicitorsPresent;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isGeneralAppConsentOrder;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.notificationCriterion;
@@ -120,9 +122,20 @@ public class GaJudicialDecisionEmailHelper {
         properties.put(GA_APPLICATION_TYPE, Objects.requireNonNull(requiredGAType(data)));
         addLipProperties(properties, data, applicant);
         addDecisionProperties(properties, data, applicant);
+        addSubjectReferences(context.mainCaseData(), data.getGeneralAppParentCaseLink().getCaseReference(), properties);
+        if (isLipTemplate(template(data, applicant))) {
+            addLipClaimantVDefendant(data, properties);
+        }
         addAllFooterItems(data, context.mainCaseData(), properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabledGa(data));
         return properties;
+    }
+
+    private boolean isLipTemplate(String template) {
+        return template != null && (template.equals(templates.getLipGeneralAppApplicantEmailTemplate())
+            || template.equals(templates.getLipGeneralAppApplicantEmailTemplateInWelsh())
+            || template.equals(templates.getLipGeneralAppRespondentEmailTemplate())
+            || template.equals(templates.getLipGeneralAppRespondentEmailTemplateInWelsh()));
     }
 
     private void addLipProperties(Map<String, String> properties, GeneralApplicationCaseData data, boolean applicant) {
