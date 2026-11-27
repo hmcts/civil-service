@@ -144,7 +144,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                    new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs")
                 ).build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
@@ -154,7 +154,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant"));
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs"));
             assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
             assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
@@ -167,10 +167,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                    new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs")
                 )
                 .reasonForReconsiderationRespondent1(
-                    new ReasonForReconsideration("Defendant comments", "Defendant - Defendant")
+                    new ReasonForReconsideration("Defendant comments", "Defendant - John Smith")
                 ).build();
             caseData.setRequestForReconsiderationDocument(applicantDocument);
             caseData.setRequestForReconsiderationDocumentRes(respondentDocument);
@@ -182,9 +182,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant"));
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs"));
             assertThat(updatedCaseData.getReconsiderationResponse())
-                .isEqualTo(new ResponseToReconsideration("Defendant - Defendant", "Defendant comments"));
+                .isEqualTo(new ResponseToReconsideration("Defendant - John Smith", "Defendant comments"));
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
         }
 
@@ -193,10 +193,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Applicant comments", "Applicant - Claimant")
+                    new ReasonForReconsideration("Claimant comments", "Claimant - Joe Blogs")
                 )
                 .reasonForReconsiderationRespondent1(
-                    new ReasonForReconsideration("Defendant reasons", "Defendant - Defendant")
+                    new ReasonForReconsideration("Defendant reasons", "Defendant - John Smith")
                 ).build();
             caseData.setCasePartyRequestForReconsideration("Respondent1");
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
@@ -207,9 +207,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Applicant comments", "Applicant - Claimant"));
+                .isEqualTo(new ReasonForReconsideration("Claimant comments", "Claimant - Joe Blogs"));
             assertThat(updatedCaseData.getReconsiderationResponse())
-                .isEqualTo(new ResponseToReconsideration("Defendant - Defendant", "Defendant reasons"));
+                .isEqualTo(new ResponseToReconsideration("Defendant - John Smith", "Defendant reasons"));
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
         }
 
@@ -218,10 +218,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                    new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs")
                 )
                 .reasonForReconsiderationRespondent1(
-                    new ReasonForReconsideration("Defendant comments", "Defendant - Defendant")
+                    new ReasonForReconsideration("Defendant comments", "Defendant - John Smith")
                 ).build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
@@ -237,12 +237,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
         @Test
         void shouldNotChangeAlreadyConvertedReasons() {
-            ReasonForReconsideration existingRequest = new ReasonForReconsideration("Request", "Applicant - Claimant");
-            ResponseToReconsideration existingResponse = new ResponseToReconsideration("Defendant - Defendant", "Comments");
+            ReasonForReconsideration existingRequest = new ReasonForReconsideration("Request", "Claimant - Joe Blogs");
+            ResponseToReconsideration existingResponse = new ResponseToReconsideration("Defendant - John Smith", "Comments");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .reasonForReconsiderationRespondent1(
-                    new ReasonForReconsideration("Legacy reasons", "Defendant - Defendant")
+                    new ReasonForReconsideration("Legacy reasons", "Defendant - John Smith")
                 ).build();
             caseData.setReconsiderationRequest(existingRequest);
             caseData.setReconsiderationResponse(existingResponse);
@@ -262,13 +262,13 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
         @Test
         void shouldNotHydrateMultiPartyReasons() {
-            Party respondent2 = new Party().setIndividualFirstName("Second").setIndividualLastName("Defendant")
+            Party respondent2 = new Party().setIndividualFirstName("Second").setIndividualLastName("John Smith")
                 .setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList)
                 .addRespondent2(YesOrNo.YES).respondent2(respondent2)
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                    new ReasonForReconsideration("Claimant reasons", "Claimant - Joe Blogs")
                 ).build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 

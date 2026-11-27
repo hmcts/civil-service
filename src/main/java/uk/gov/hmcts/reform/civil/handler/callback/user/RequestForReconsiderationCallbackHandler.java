@@ -62,7 +62,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
     private static final String AND = " and ";
-    private static final String APPLICANT_PREFIX = "Applicant - ";
+    private static final String CLAIMANT_PREFIX = "Claimant - ";
     private static final String DEFENDANT_PREFIX = "Defendant - ";
     private static final String REASON_NOT_PROVIDED = "Not provided";
     protected final ObjectMapper objectMapper;
@@ -288,7 +288,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         boolean isOtherPartyLiP;
 
         if (isApplicant) {
-            partyName = APPLICANT_PREFIX
+            partyName = CLAIMANT_PREFIX
                 + Optional.ofNullable(caseData.getApplicant1())
                 .map(Party::getPartyName)
                 .orElse("")
@@ -350,7 +350,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                                                                  : caseData.getReasonForReconsiderationRespondent1())
             .orElseGet(ReasonForReconsideration::new);
 
-        String prefix = isClaimant ? APPLICANT_PREFIX : DEFENDANT_PREFIX;
+        String prefix = isClaimant ? CLAIMANT_PREFIX : DEFENDANT_PREFIX;
         Party party1 = isClaimant ? caseData.getApplicant1() : caseData.getRespondent1();
         Party party2 = isClaimant ? caseData.getApplicant2() : null;
 

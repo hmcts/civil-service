@@ -325,7 +325,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             Party applicant = new Party().setIndividualFirstName("FirstName").setIndividualLastName("LastName")
                 .setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Applicant reasons", null))
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Claimant reasons", null))
                 .applicant1(applicant).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -336,7 +336,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Applicant reasons", "Applicant - FirstName LastName"));
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - FirstName LastName"));
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
             assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
             assertThat(updatedCaseData.getReasonForReconsiderationApplicant()).isEqualTo(updatedCaseData.getReconsiderationRequest());
@@ -380,7 +380,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Applicant - Claimant Name"));
+                .isEqualTo(new ReasonForReconsideration("Claimant reasons", "Claimant - Claimant Name"));
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
             assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
         }
@@ -391,7 +391,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .reasonForReconsiderationApplicant(
-                    new ReasonForReconsideration("Original reasons", "Applicant - Claimant Name")
+                    new ReasonForReconsideration("Original reasons", "Claimant - Claimant Name")
                 )
                 .reasonForReconsiderationRespondent1(new ReasonForReconsideration("Defendant comments", null))
                 .respondent1(respondent).build();
@@ -404,7 +404,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Original reasons", "Applicant - Claimant Name"));
+                .isEqualTo(new ReasonForReconsideration("Original reasons", "Claimant - Claimant Name"));
             assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
             assertThat(updatedCaseData.getReconsiderationResponse())
                 .isEqualTo(new ResponseToReconsideration("Defendant - Defendant Name", "Defendant comments"));
@@ -418,7 +418,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .reasonForReconsiderationApplicant(new ReasonForReconsideration("Updated reasons", null))
                 .applicant1(applicant).build();
-            caseData.setReconsiderationRequest(new ReasonForReconsideration("Original reasons", "Applicant - Previous Name"));
+            caseData.setReconsiderationRequest(new ReasonForReconsideration("Original reasons", "Claimant - Previous Name"));
             caseData.setReconsiderationRequestingParty(ReconsiderationParties.APPLICANT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -429,7 +429,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getReconsiderationRequest())
-                .isEqualTo(new ReasonForReconsideration("Updated reasons", "Applicant - FirstName LastName"));
+                .isEqualTo(new ReasonForReconsideration("Updated reasons", "Claimant - FirstName LastName"));
             assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
         }
 
@@ -440,7 +440,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             Party respondent2 = new Party().setIndividualFirstName("Second").setIndividualLastName("Defendant")
                 .setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Applicant reasons", null))
+                .reasonForReconsiderationApplicant(new ReasonForReconsideration("Claimant reasons", null))
                 .addRespondent2(YesOrNo.YES).respondent2(respondent2).applicant1(applicant).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -482,7 +482,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
         }
 
         @Test
@@ -509,7 +509,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Not provided");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
         }
 
         @Test
@@ -545,7 +545,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName and FirstName2 LastName2");
+                .isEqualTo("Claimant - FirstName LastName and FirstName2 LastName2");
         }
 
         @Test
@@ -800,7 +800,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Reason");
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
+                .isEqualTo("Claimant - FirstName LastName");
             assertThat(response.getData()).extracting("requestForReconsiderationDocument")
                 .extracting("documentName")
                 .isEqualTo("Name of document");
