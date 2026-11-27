@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.134
+version: 0.0.135
 maintainers:
   - name: HMCTS Civil team
 
@@ -11,10 +11,10 @@ annotations:
 
 dependencies:
   - name: java
-    version: 6.1.1
+    version: 6.1.2
     repository: 'oci://hmctsprod.azurecr.io/helm'
   - name: ccd
-    version: 9.3.2
+    version: 9.3.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
@@ -38,10 +38,10 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd-case-document-am-api.enabled
   - name: em-ccdorc
-    version: 2.2.2
+    version: 2.2.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-ccdorc.enabled
   - name: em-stitching
-    version: 2.0.7
+    version: 2.0.8
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-stitching.enabled
