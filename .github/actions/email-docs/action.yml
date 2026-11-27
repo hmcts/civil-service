@@ -28,22 +28,18 @@ runs:
         else
           python3 -B scripts/email_docs.py refs >> "$GITHUB_OUTPUT"
         fi
+    # civil-ccd-definition holds both the Civil and GA definitions. It is not checked out once
+    # ccd-definition/SOURCE_OF_TRUTH is in this repository: generation reads the in-repo copy.
     - name: Check out Civil CCD definitions
+      if: steps.sources.outputs.in_repo != 'true'
       uses: actions/checkout@v7
       with:
         repository: hmcts/civil-ccd-definition
         path: civil-ccd-definition
         ref: ${{ steps.sources.outputs.civil_ref }}
         persist-credentials: false
-    - name: Check out GA CCD definitions
-      uses: actions/checkout@v7
-      with:
-        repository: hmcts/civil-general-apps-ccd-definition
-        path: civil-general-apps-ccd-definition
-        ref: ${{ steps.sources.outputs.ga_ref }}
-        persist-credentials: false
     - name: Record refreshed CCD revisions
-      if: inputs.refresh == 'true'
+      if: inputs.refresh == 'true' && steps.sources.outputs.in_repo != 'true'
       shell: bash
       run: python3 -B scripts/email_docs.py record
     - name: Test generator and verification

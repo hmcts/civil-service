@@ -18,8 +18,8 @@ public class UploadTranslatedDocumentFreeFeeApplicationTest extends BpmnBaseGAAf
     //BPMN Settings
     private static final String MESSAGE_NAME = "UPLOAD_TRANSLATED_DOCUMENT_FOR_FREE_FEE_APPLICATION";
     private static final String PROCESS_ID = "UPLOAD_TRANSLATED_FREE_GA_SUMMARY_DOC";
-    private static final String NOTIFYING_RESPONDENTS_EVENT = "NOTIFY_GENERAL_APPLICATION_RESPONDENT";
-    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "GeneralApplicationNotifying";
+    private static final String NOTIFYING_RESPONDENTS_EVENT = "NOTIFY_EVENT";
+    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "NotifyGaApplicationCreated";
     private static final String LIP_APPLICANT = "LIP_APPLICANT";
     private static final String LIP_RESPONDENT = "LIP_RESPONDENT";
     private static final String UPDATE_CLAIMANT_DASHBOARD_GA_EVENT = "UPDATE_CLAIMANT_TASK_LIST_GA";

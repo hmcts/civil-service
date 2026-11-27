@@ -41,7 +41,7 @@ public class DashboardTaskContext {
         if (!callbackParams.isCivilCaseType()) {
             try {
                 return generalApplication(callbackParams.getGeneralApplicationCaseData(), authToken, callbackParams);
-            } catch (IllegalStateException ignored) {
+            } catch (IllegalStateException _) {
                 return civil(callbackParams.getCaseData(), authToken, callbackParams);
             }
         }
