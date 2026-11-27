@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
@@ -420,6 +422,147 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
         assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
+    }
+
+    @Test
+    void shouldStitchRespondent1Documents_whenRespondent1RespondsAfterRespondent2() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = oneVTwoCaseDataWithBothDefendantsDocuments();
+        localCaseData.setRespondent2ResponseDate(LocalDateTime.now().minusDays(1));
+        localCaseData.setRespondent1ResponseDate(LocalDateTime.now());
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form", "Claim timeline", "Supported docs");
+        assertThat(stitched.get(1).getDocument().getDocumentFileName()).isEqualTo("timeline-d1.pdf");
+        assertThat(stitched.get(2).getDocument().getDocumentFileName()).isEqualTo("support-d1.pdf");
+    }
+
+    @Test
+    void shouldStitchRespondent2Documents_whenRespondent2RespondsAfterRespondent1() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = oneVTwoCaseDataWithBothDefendantsDocuments();
+        localCaseData.setRespondent1ResponseDate(LocalDateTime.now().minusDays(1));
+        localCaseData.setRespondent2ResponseDate(LocalDateTime.now());
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form", "Claim timeline", "Supported docs");
+        assertThat(stitched.get(1).getDocument().getDocumentFileName()).isEqualTo("timeline-d2.pdf");
+        assertThat(stitched.get(2).getDocument().getDocumentFileName()).isEqualTo("support-d2.pdf");
+    }
+
+    @Test
+    void shouldStitchRespondent2Documents_whenRespondent2RespondsFirst() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = oneVTwoCaseDataWithBothDefendantsDocuments();
+        localCaseData.setSpecResponseTimelineDocumentFiles(null);
+        localCaseData.setRespondent1SpecDefenceResponseDocument(null);
+        localCaseData.setRespondent1ResponseDate(null);
+        localCaseData.setRespondent2ResponseDate(LocalDateTime.now());
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form", "Claim timeline", "Supported docs");
+        assertThat(stitched.get(1).getDocument().getDocumentFileName()).isEqualTo("timeline-d2.pdf");
+        assertThat(stitched.get(2).getDocument().getDocumentFileName()).isEqualTo("support-d2.pdf");
+    }
+
+    @Test
+    void shouldNotStitchRespondent1Documents_whenRespondent2RespondsWithManualTimelineAndNoSupportingDoc() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = oneVTwoCaseDataWithBothDefendantsDocuments();
+        localCaseData.setSpecResponsTimelineDocumentFiles2(null);
+        localCaseData.setRespondent2SpecDefenceResponseDocument(null);
+        localCaseData.setRespondent1ResponseDate(LocalDateTime.now().minusDays(1));
+        localCaseData.setRespondent2ResponseDate(LocalDateTime.now());
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form");
+    }
+
+    @Test
+    void shouldStitchRespondent1Documents_whenOneVTwoSameSolicitorAndRespondent2ResponseDateIsLater() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .multiPartyClaimTwoDefendantSameSolicitorsSpec()
+            .build();
+        addBothDefendantsDocuments(localCaseData);
+        localCaseData.setSpecResponsTimelineDocumentFiles2(null);
+        localCaseData.setRespondent2SpecDefenceResponseDocument(null);
+        LocalDateTime responseDate = LocalDateTime.now();
+        localCaseData.setRespondent1ResponseDate(responseDate);
+        localCaseData.setRespondent2ResponseDate(responseDate.plusNanos(1000));
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form", "Claim timeline", "Supported docs");
+        assertThat(stitched.get(1).getDocument().getDocumentFileName()).isEqualTo("timeline-d1.pdf");
+        assertThat(stitched.get(2).getDocument().getDocumentFileName()).isEqualTo("support-d1.pdf");
+    }
+
+    @Test
+    void shouldStitchRespondent1Documents_whenOneVOne() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build();
+        addBothDefendantsDocuments(localCaseData);
+        localCaseData.setRespondent1ResponseDate(LocalDateTime.now());
+
+        List<DocumentMetaData> stitched = handleAndCaptureStitchedDocuments(localCaseData);
+
+        assertThat(stitched).extracting(DocumentMetaData::getDescription)
+            .containsExactly("Sealed Claim form", "Claim timeline", "Supported docs");
+        assertThat(stitched.get(1).getDocument().getDocumentFileName()).isEqualTo("timeline-d1.pdf");
+        assertThat(stitched.get(2).getDocument().getDocumentFileName()).isEqualTo("support-d1.pdf");
+    }
+
+    private CaseData oneVTwoCaseDataWithBothDefendantsDocuments() {
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .multiPartyClaimTwoDefendantSolicitorsSpec()
+            .build();
+        addBothDefendantsDocuments(localCaseData);
+        return localCaseData;
+    }
+
+    private void addBothDefendantsDocuments(CaseData localCaseData) {
+        localCaseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        localCaseData.setSpecResponseTimelineDocumentFiles(document("timeline-d1.pdf"));
+        localCaseData.setSpecResponsTimelineDocumentFiles2(document("timeline-d2.pdf"));
+        ResponseDocument respondent1Supporting = new ResponseDocument();
+        respondent1Supporting.setFile(document("support-d1.pdf"));
+        localCaseData.setRespondent1SpecDefenceResponseDocument(respondent1Supporting);
+        ResponseDocument respondent2Supporting = new ResponseDocument();
+        respondent2Supporting.setFile(document("support-d2.pdf"));
+        localCaseData.setRespondent2SpecDefenceResponseDocument(respondent2Supporting);
+    }
+
+    private static Document document(String fileName) {
+        Document document = new Document();
+        document.setDocumentUrl("url/" + fileName);
+        document.setDocumentBinaryUrl("binary-url/" + fileName);
+        document.setDocumentFileName(fileName);
+        return document;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<DocumentMetaData> handleAndCaptureStitchedDocuments(CaseData localCaseData) {
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        ArgumentCaptor<List<DocumentMetaData>> captor = ArgumentCaptor.forClass(List.class);
+        when(civilStitchService.generateStitchedCaseDocument(captor.capture(), anyString(), anyLong(),
+                                                             eq(DEFENDANT_DEFENCE), anyString())).thenReturn(STITCHED_DOC);
+
+        handler.handle(callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
+
+        return captor.getValue();
     }
 
     @Test

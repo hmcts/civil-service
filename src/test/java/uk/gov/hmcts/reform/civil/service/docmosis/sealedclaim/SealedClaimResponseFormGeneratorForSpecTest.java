@@ -251,6 +251,97 @@ class SealedClaimResponseFormGeneratorForSpecTest {
     }
 
     @Test
+    void getTemplateData_1v2_respondent2RespondsSecondWithUpload_usesRespondent2TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setSpecResponseTimelineDocumentFiles(timelineDocument("timeline-d1.pdf"));
+        caseData.setSpecResponsTimelineDocumentFiles2(timelineDocument("timeline-d2.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isTrue();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isEqualTo("timeline-d2.pdf");
+        assertThat(dto.getRespondent1SpecDefenceResponseDocument()).isEqualTo("resp2-def.pdf");
+    }
+
+    @Test
+    void getTemplateData_1v2_respondent2RespondsSecondWithManualTimeline_ignoresRespondent1TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setSpecResponseTimelineDocumentFiles(timelineDocument("timeline-d1.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isFalse();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isNull();
+        assertThat(dto.getTimeline()).hasSize(1);
+        assertThat(dto.getTimeline().get(0).getTimelineDescription()).isEqualTo("r2-timeline");
+    }
+
+    @Test
+    void getTemplateData_1v2_respondent2RespondsFirstWithUpload_usesRespondent2TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setRespondent1ResponseDate(null);
+        caseData.setSpecResponseTimelineOfEvents(null);
+        caseData.setRespondent1SpecDefenceResponseDocument(null);
+        caseData.setSpecResponsTimelineDocumentFiles2(timelineDocument("timeline-d2.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isTrue();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isEqualTo("timeline-d2.pdf");
+        assertThat(dto.getRespondent1SpecDefenceResponseDocument()).isEqualTo("resp2-def.pdf");
+    }
+
+    @Test
+    void getTemplateData_1v2_respondent1RespondsSecondWithUpload_usesRespondent1TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setRespondent2ResponseDate(LocalDateTime.now().minusDays(5));
+        caseData.setSpecResponseTimelineDocumentFiles(timelineDocument("timeline-d1.pdf"));
+        caseData.setSpecResponsTimelineDocumentFiles2(timelineDocument("timeline-d2.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isTrue();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isEqualTo("timeline-d1.pdf");
+        assertThat(dto.getRespondent1SpecDefenceResponseDocument()).isEqualTo("resp1-def.pdf");
+    }
+
+    @Test
+    void getTemplateData_1v2_respondent1RespondsSecondWithManualTimeline_ignoresRespondent2TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setRespondent2ResponseDate(LocalDateTime.now().minusDays(5));
+        caseData.setSpecResponsTimelineDocumentFiles2(timelineDocument("timeline-d2.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isFalse();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isNull();
+        assertThat(dto.getTimeline()).hasSize(1);
+        assertThat(dto.getTimeline().get(0).getTimelineDescription()).isEqualTo("r1-timeline");
+    }
+
+    @Test
+    void getTemplateData_1v2SameSolicitor_respondent2ResponseDateLater_usesRespondent1TimelineDocument() {
+        CaseData caseData = base1v2LatestIsResp2;
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+        LocalDateTime responseDate = LocalDateTime.now();
+        caseData.setRespondent1ResponseDate(responseDate);
+        caseData.setRespondent2ResponseDate(responseDate.plusNanos(1000));
+        caseData.setSpecResponseTimelineDocumentFiles(timelineDocument("timeline-d1.pdf"));
+
+        SealedClaimResponseFormForSpec dto = generator.getTemplateData(caseData, AUTH);
+
+        assertThat(dto.isTimelineUploaded()).isTrue();
+        assertThat(dto.getSpecResponseTimelineDocumentFiles()).isEqualTo("timeline-d1.pdf");
+    }
+
+    private static Document timelineDocument(String fileName) {
+        Document document = new Document();
+        document.setDocumentFileName(fileName);
+        return document;
+    }
+
+    @Test
     void getTemplateData_paymentMethod_Other_uses_custom_text() {
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(new BigDecimal("250")); // £2.50

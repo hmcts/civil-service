@@ -333,6 +333,7 @@ public class CaseData extends CaseDataParent implements MappableObject, Notifiab
     private  List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private  TimelineUploadTypeSpec specClaimResponseTimelineList;
     private  Document specResponseTimelineDocumentFiles;
+    private  Document specResponsTimelineDocumentFiles2;
     private  List<Evidence> specResponselistYourEvidenceList;
     private  List<Evidence> specResponselistYourEvidenceList2;
 
