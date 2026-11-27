@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 class ApplyPendingBreathingSpaceLiftCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -30,7 +31,7 @@ class ApplyPendingBreathingSpaceLiftCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldLiftBreathingSpace_whenExpectedEndIsToday() {
-            CaseData caseData = pendingLift(LocalDate.now());
+            CaseData caseData = pendingLift(LocalDate.now(LOCAL_ZONE));
 
             var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
@@ -50,7 +51,7 @@ class ApplyPendingBreathingSpaceLiftCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldLiftBreathingSpace_whenExpectedEndIsBeforeToday() {
-            CaseData caseData = pendingLift(LocalDate.now().minusDays(1));
+            CaseData caseData = pendingLift(LocalDate.now(LOCAL_ZONE).minusDays(1));
 
             var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
@@ -67,7 +68,7 @@ class ApplyPendingBreathingSpaceLiftCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldLeaveBreathingSpaceActive_whenExpectedEndIsAfterToday() {
-            CaseData caseData = pendingLift(LocalDate.now().plusDays(1));
+            CaseData caseData = pendingLift(LocalDate.now(LOCAL_ZONE).plusDays(1));
 
             var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
