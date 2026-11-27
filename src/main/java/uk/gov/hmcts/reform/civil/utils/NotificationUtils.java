@@ -197,18 +197,18 @@ public class NotificationUtils {
 
         if (isRespondent1) {
 
-            if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
-                && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
-                id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            String policyOrgId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
+            if (policyOrgId != null) {
+                id = policyOrgId;
             } else if (caseData.getRespondent1OrganisationIDCopy() != null) {
                 id = caseData.getRespondent1OrganisationIDCopy();
             }
 
         } else {
 
-            if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
-                && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
-                id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            String policyOrgId = getOrganisationId(caseData.getRespondent2OrganisationPolicy());
+            if (policyOrgId != null) {
+                id = policyOrgId;
             } else if (caseData.getRespondent2OrganisationIDCopy() != null) {
                 id = caseData.getRespondent2OrganisationIDCopy();
             }
@@ -224,6 +224,13 @@ public class NotificationUtils {
             }
         }
         return legalOrganisationName;
+    }
+
+    private static String getOrganisationId(OrganisationPolicy organisationPolicy) {
+        return Optional.ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .orElse(null);
     }
 
     public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {

@@ -626,4 +626,40 @@ class NotificationUtilsTest {
         }
     }
 
+    @Nested
+    class GetLegalOrganizationNameForRespondent {
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturnNull_whenOrganisationPolicyAndIdCopyAreMissing(boolean isRespondent1) {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .respondent1OrganisationIDCopy(null)
+                .respondent2OrganisationIDCopy(null)
+                .build();
+
+            assertThat(NotificationUtils.getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService))
+                .isNull();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldFallBackToOrganisationIdCopy_whenOrganisationPolicyIsMissing(boolean isRespondent1) {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .respondent1OrganisationIDCopy("ORG1")
+                .respondent2OrganisationIDCopy("ORG2")
+                .build();
+            String expectedId = isRespondent1 ? "ORG1" : "ORG2";
+            uk.gov.hmcts.reform.civil.prd.model.Organisation organisation =
+                new uk.gov.hmcts.reform.civil.prd.model.Organisation();
+            organisation.setName("Org name");
+            when(organisationService.findOrganisationById(expectedId)).thenReturn(Optional.of(organisation));
+
+            assertThat(NotificationUtils.getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService))
+                .isEqualTo("Org name");
+        }
+    }
 }
