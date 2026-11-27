@@ -27,10 +27,39 @@ fi
 
 BASEDIR=$(dirname "$0")
 
-USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
-USER_ID=$($BASEDIR/idam-user-id.sh $USER_TOKEN)
-SERVICE_TOKEN=$(IDAM_SERVICE_SECRET="${S2S_SECRET:-AABBCCDDEEFFGGHH}" \
-  "$BASEDIR/idam-lease-service-token.sh" civil_service)
+# When ORG_ROLE_TOKEN_CACHE names a directory (add-org-roles-to-users.sh creates a private one for each run), a
+# user's token and id and the civil_service S2S token are fetched once and reused for that user's other roles.
+# Without it, every call fetches its own tokens, as before.
+USER_CACHE=""
+SERVICE_CACHE=""
+if [ -n "${ORG_ROLE_TOKEN_CACHE:-}" ] && [ -d "${ORG_ROLE_TOKEN_CACHE}" ]; then
+  USER_CACHE="${ORG_ROLE_TOKEN_CACHE}/user-${USERNAME//[^A-Za-z0-9._@-]/_}"
+  SERVICE_CACHE="${ORG_ROLE_TOKEN_CACHE}/service-civil_service"
+fi
+
+is_usable() {
+  [ -n "$1" ] && [ "$1" != "null" ]
+}
+
+if [ -n "${USER_CACHE}" ] && [ -s "${USER_CACHE}" ]; then
+  { read -r USER_TOKEN; read -r USER_ID; } < "${USER_CACHE}"
+else
+  USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
+  USER_ID=$($BASEDIR/idam-user-id.sh $USER_TOKEN)
+  if [ -n "${USER_CACHE}" ] && is_usable "${USER_TOKEN}" && is_usable "${USER_ID}"; then
+    (umask 077 && printf '%s\n%s\n' "${USER_TOKEN}" "${USER_ID}" > "${USER_CACHE}")
+  fi
+fi
+
+if [ -n "${SERVICE_CACHE}" ] && [ -s "${SERVICE_CACHE}" ]; then
+  read -r SERVICE_TOKEN < "${SERVICE_CACHE}"
+else
+  SERVICE_TOKEN=$(IDAM_SERVICE_SECRET="${S2S_SECRET:-AABBCCDDEEFFGGHH}" \
+    "$BASEDIR/idam-lease-service-token.sh" civil_service)
+  if [ -n "${SERVICE_CACHE}" ] && is_usable "${SERVICE_TOKEN}"; then
+    (umask 077 && printf '%s\n' "${SERVICE_TOKEN}" > "${SERVICE_CACHE}")
+  fi
+fi
 
 echo "\n\nCreating role assignment: \n User: ${USER_ID}\n Role name: ${ROLE_NAME}\n ROLE_CLASSIFICATION: ${ROLE_CLASSIFICATION}\n"
 echo "\n\nROLE ASSIGNMENT URL: \n Url: ${ROLE_ASSIGNMENT_URL}\n"

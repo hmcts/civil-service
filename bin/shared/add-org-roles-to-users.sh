@@ -13,6 +13,12 @@ JUDGE_PWD="${JUDGE_PASSWORD:-${JUDGE_DEFAULT_PASSWORD}}"
 ADMIN_PWD="${DEFAULT_PASSWORD:-${CITIZEN_PASSWORD}}"
 WLU_PWD="${WLU_DEFAULT_PASSWORD:-Password123}"
 
+# Each user is given several roles. organisational-role-assignment.sh keeps a user's tokens here after the first
+# role, so the user signs in to IDAM once per run instead of once per role. Private to this run, removed on exit.
+ORG_ROLE_TOKEN_CACHE=$(mktemp -d "${TMPDIR:-/tmp}/org-role-tokens.XXXXXX")
+export ORG_ROLE_TOKEN_CACHE
+trap 'rm -rf "${ORG_ROLE_TOKEN_CACHE}"' EXIT
+
 echo ""
 echo "Setting up Users with role assignments..."
 
