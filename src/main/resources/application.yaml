@@ -75,6 +75,11 @@ spring:
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
+    # Session-level advisory lock instead of Flyway's default transaction-level one. The transactional lock
+    # keeps a transaction open while migrations run, and CREATE INDEX CONCURRENTLY waits for every open
+    # transaction to finish, so such a migration can wait on Flyway itself (DTSCCI-7194).
+    postgresql:
+      transactional-lock: false
 
   cloud:
     openfeign:
