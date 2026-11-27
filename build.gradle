@@ -17,8 +17,8 @@ plugins {
   id "org.flywaydb.flyway" version "13.13.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '8.14.1'
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.2554'
+  id 'hmcts.ccd.sdk' version '8.15.0'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.2572'
   id 'net.ltgt.errorprone' version '5.2.0'
 }
 
@@ -839,8 +839,8 @@ dependencies {
 
   testImplementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   testImplementation("org.apache.pdfbox:preflight:${versions.pdfbox}", withoutJunit4)
-  testImplementation "org.mockito:mockito-core:5.24.0"
-  testImplementation "org.mockito:mockito-junit-jupiter:5.24.0"
+  testImplementation "org.mockito:mockito-core:5.25.0"
+  testImplementation "org.mockito:mockito-junit-jupiter:5.25.0"
   testImplementation "org.mockito:mockito-inline:5.2.0"
   testImplementation "net.bytebuddy:byte-buddy:1.18.14-jdk5"
   testImplementation "net.bytebuddy:byte-buddy-agent:1.18.14-jdk5"
