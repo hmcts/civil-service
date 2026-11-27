@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,6 +74,34 @@ public interface CamundaRuntimeApi {
         @RequestParam(value = "maxResults", defaultValue = "1") int maxResults
     );
 
+    /**
+     * Open incidents of one type raised inside a time window. Used by the short-interval retry, which
+     * selects by when the incident was raised rather than by when the activity last ran.
+     */
+    @GetMapping("/incident")
+    List<CamundaIncident> getOpenIncidentsRaisedBetween(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @RequestParam("open") boolean open,
+        @RequestParam("incidentType") String incidentType,
+        @RequestParam("incidentTimestampAfter") String incidentTimestampAfter,
+        @RequestParam("incidentTimestampBefore") String incidentTimestampBefore,
+        @RequestParam("tenantIdIn") String tenantIdIn,
+        @RequestParam(value = "sortBy", defaultValue = "incidentTimestamp") String sortBy,
+        @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
+        @RequestParam(value = "firstResult", defaultValue = "0") int firstResult,
+        @RequestParam(value = "maxResults", defaultValue = "50") int maxResults
+    );
+
+    /**
+     * Fetches one external task. The response carries {@code topicName}, which is how a failed
+     * external task incident (whose configuration is the external task id) is tied to a handler.
+     */
+    @GetMapping("/external-task/{id}")
+    Map<String, Object> getExternalTask(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("id") String externalTaskId
+    );
+
     @PutMapping("/job/{jobId}/retries")
     void setJobRetries(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
@@ -109,6 +138,16 @@ public interface CamundaRuntimeApi {
         @PathVariable("processInstanceId") String processInstanceId,
         @PathVariable("variableName") String variableName,
         @RequestBody CamundaVariableValue variableValue
+    );
+
+    /**
+     * REST equivalent of {@code runtimeService.removeVariable(processInstanceId, name)}.
+     */
+    @DeleteMapping("/process-instance/{processInstanceId}/variables/{variableName}")
+    void deleteProcessVariable(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("processInstanceId") String processInstanceId,
+        @PathVariable("variableName") String variableName
     );
 
     /**
