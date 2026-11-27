@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -106,6 +108,14 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
         "For the date of service please enter a working day";
+
+    // With Spring Boot 4.2 the @MockitoBean mocks are not reset between the @Nested tests of this
+    // PER_CLASS test, so a validation message stubbed in one test leaked into the next.
+    @AfterEach
+    void resetMocks() {
+        Mockito.reset(workingDayIndicator, deadlinesCalculator, serviceOfDateValidationMessageUtils, time,
+                      featureToggleService);
+    }
 
     @Nested
     class AboutToStartCallback {
