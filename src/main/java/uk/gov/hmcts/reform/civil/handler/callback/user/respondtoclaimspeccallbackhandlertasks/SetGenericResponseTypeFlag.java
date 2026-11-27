@@ -294,17 +294,49 @@ public class SetGenericResponseTypeFlag implements CaseTask {
 
     private boolean isAnyRespondentOrClaimantFullDefence(CaseData caseData) {
         log.debug("Checking if any respondent or claimant has full defence for caseId: {}", caseData.getCcdCaseReference());
-        return caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
-                || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE
+        return respondent1ResponseTypeForCurrentSolicitor(caseData) == FULL_DEFENCE
+                || respondent2ResponseTypeForCurrentSolicitor(caseData) == FULL_DEFENCE
                 || caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE;
     }
 
     private boolean isRespondent2AdmitOrCounterClaim(CaseData caseData) {
         log.debug("Checking if respondent 2 admits or counter claims for caseId: {}", caseData.getCcdCaseReference());
-        return RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+        RespondentResponseTypeSpec respondent2ResponseType = respondent2ResponseTypeForCurrentSolicitor(caseData);
+        return RespondentResponseTypeSpec.FULL_ADMISSION.equals(respondent2ResponseType)
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(respondent2ResponseType)
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(respondent2ResponseType);
+    }
+
+    /**
+     * In 1v2 different solicitors each defendant responds separately, so the other defendant's
+     * already-submitted response must not drive the flags (and therefore the pages) of the
+     * defendant currently responding.
+     */
+    private RespondentResponseTypeSpec respondent1ResponseTypeForCurrentSolicitor(CaseData caseData) {
+        if (isOnlyRespondentSolicitorTwo(caseData)) {
+            return null;
+        }
+        return caseData.getRespondent1ClaimResponseTypeForSpec();
+    }
+
+    private boolean isOnlyRespondentSolicitorOne(CaseData caseData) {
+        return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                && YES.equals(caseData.getIsRespondent1())
+                && !YES.equals(caseData.getIsRespondent2());
+    }
+
+    private boolean isOnlyRespondentSolicitorTwo(CaseData caseData) {
+        return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                && YES.equals(caseData.getIsRespondent2())
+                && !YES.equals(caseData.getIsRespondent1());
+    }
+
+    private RespondentResponseTypeSpec respondent2ResponseTypeForCurrentSolicitor(CaseData caseData) {
+        if (isOnlyRespondentSolicitorOne(caseData)) {
+            return null;
+        }
+        return caseData.getRespondent2ClaimResponseTypeForSpec();
     }
 
     private void setSpecFullAdmissionOrPartAdmission(CaseData caseData) {

@@ -397,6 +397,53 @@ class SetGenericResponseTypeFlagTest {
     }
 
     @Test
+    void shouldIgnoreRespondent2AdmissionWhenRespondent1RespondsSecondInOneVTwoTwoLegalRepScenario() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .isRespondent1(YES)
+                .isRespondent2(NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdCaseReference(1234L)
+                .build();
+
+        AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
+
+        assertEquals("NOT_FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+    }
+
+    @Test
+    void shouldIgnoreRespondent2FullDefenceWhenRespondent1RespondsSecondInOneVTwoTwoLegalRepScenario() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .isRespondent1(YES)
+                .isRespondent2(NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .ccdCaseReference(1234L)
+                .build();
+
+        AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
+
+        assertEquals("PART_ADMISSION", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+    }
+
+    @Test
+    void shouldIgnoreRespondent1FullDefenceWhenRespondent2RespondsSecondInOneVTwoTwoLegalRepScenario() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .isRespondent1(NO)
+                .isRespondent2(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdCaseReference(1234L)
+                .build();
+
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+        AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
+
+        assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+    }
+
+    @Test
     void shouldNotSetCounterAdmitOrAdmitPartFlagWhenClaimant1HasFullDefence() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
@@ -540,7 +587,8 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
 
         assertEquals("PART_ADMISSION", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
-        assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+        // Respondent 1 is answering, so Respondent 2's stored response must not drive the multi-party flag
+        assertEquals("NOT_FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
         assertEquals("Yes", response.getData().get(SPEC_FULL_ADMISSION_OR_PART_ADMISSION));
     }
 

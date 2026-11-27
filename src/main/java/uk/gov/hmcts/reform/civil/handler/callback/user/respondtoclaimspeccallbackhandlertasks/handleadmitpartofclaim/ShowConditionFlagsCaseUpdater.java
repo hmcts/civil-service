@@ -49,6 +49,7 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
                 NEED_FINANCIAL_DETAILS_2,
                 WHY_1_DOES_NOT_PAY_IMMEDIATELY,
                 WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+                REPAYMENT_PLAN_2,
                 WHEN_WILL_CLAIM_BE_PAID
         ));
         currentShowFlags.addAll(checkNecessaryFinancialDetails(caseData));
@@ -93,9 +94,9 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
         log.info("Checking Respondent 2 financial details for caseId: {}", caseData.getCcdCaseReference());
         if (isRespondent2Individual(caseData)) {
             checkFinancialInfoForRespondent2(caseData, necessary, scenario);
-            checkImmediatePaymentForRespondent2(caseData, necessary, scenario);
-            checkRepaymentPlanForRespondent2(caseData, necessary);
         }
+        checkImmediatePaymentForRespondent2(caseData, necessary, scenario);
+        checkRepaymentPlanForRespondent2(caseData, necessary);
     }
 
     private boolean isRespondent2Individual(CaseData caseData) {
