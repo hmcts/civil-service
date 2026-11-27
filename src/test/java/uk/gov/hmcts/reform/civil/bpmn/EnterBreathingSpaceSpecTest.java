@@ -4,6 +4,8 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,73 +22,21 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         super("enter_breathing_space_spec.bpmn", PROCESS_ID);
     }
 
-    @Test
-    void shouldSuccessfullyComplete_whenSingleRespondentRepresentative() {
-        VariableMap variables = flowFlagVariables(true, false, false, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenTwoRespondentRepresentatives() {
-        VariableMap variables = flowFlagVariables(false, true, false, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(false, false, true, true);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLrDefendant() {
-        VariableMap variables = flowFlagVariables(true, false, true, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceEnterNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLrClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(false, false, false, true);
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+        "Single respondent representative, true,  false, false, false",
+        "Two respondent representatives,   false, true,  false, false",
+        "LiP claimant v LiP defendant,     false, false, true,  true",
+        "LiP claimant v LR defendant,      true,  false, true,  false",
+        "LR claimant v LiP defendant,      false, false, false, true"
+    })
+    void shouldNotifyAllPartiesInSingleNotifyPartiesTask_whenBreathingSpaceEntered(String scenario,
+                                                                                   boolean oneRespondentRepresentative,
+                                                                                   boolean twoRespondentRepresentatives,
+                                                                                   boolean lipCase,
+                                                                                   boolean unrepresentedDefendantOne) {
+        VariableMap variables = flowFlagVariables(
+            oneRespondentRepresentative, twoRespondentRepresentatives, lipCase, unrepresentedDefendantOne);
 
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);

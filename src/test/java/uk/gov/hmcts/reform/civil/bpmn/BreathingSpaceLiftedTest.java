@@ -4,6 +4,8 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,57 +22,17 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         super("breathing_space_lifted.bpmn", PROCESS_ID);
     }
 
-    @Test
-    void shouldSuccessfullyComplete_whenLrClaimantAndLrDefendant() {
-        VariableMap variables = flowFlagVariables(false, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(true, true);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLrDefendant() {
-        VariableMap variables = flowFlagVariables(true, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-        assertCompleteExternalTask(
-            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
-            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLrClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(false, true);
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+        "LR claimant v LR defendant,   false, false",
+        "LiP claimant v LiP defendant, true,  true",
+        "LiP claimant v LR defendant,  true,  false",
+        "LR claimant v LiP defendant,  false, true"
+    })
+    void shouldNotifyAllPartiesInSingleNotifyPartiesTask_whenBreathingSpaceLifted(String scenario,
+                                                                                  boolean lipCase,
+                                                                                  boolean unrepresentedDefendantOne) {
+        VariableMap variables = flowFlagVariables(lipCase, unrepresentedDefendantOne);
 
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
