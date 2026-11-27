@@ -140,7 +140,10 @@ class BreathingSpaceNotifiersTest {
             notifier = new BreathingSpaceEnterNotifier(notificationService, tracking, new BreathingSpaceEnterAllPartiesEmailGenerator(
                 new BreathingSpaceEnterAppSolOneEmailDTOGenerator(organisations, helper, templates),
                 new BreathingSpaceEnterRespSolOneEmailDTOGenerator(organisations, helper, templates),
-                new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)));
+                new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine),
+                new BreathingSpaceEnterClaimantEmailDTOGenerator(helper, templates),
+                new BreathingSpaceEnterDefendantEmailDTOGenerator(helper, templates)
+            ));
             taskId = "BreathingSpaceEnterNotifyParties";
         } else {
             when(engine.evaluate(data)).thenReturn(flow);
@@ -149,7 +152,10 @@ class BreathingSpaceNotifiersTest {
             notifier = new BreathingSpaceLiftedNotifier(notificationService, tracking, new BreathingSpaceLiftedAllPartiesEmailGenerator(
                 new BreathingSpaceLiftedAppSolOneEmailDTOGenerator(organisations, helper, templates),
                 new BreathingSpaceLiftedRespSolOneEmailDTOGenerator(organisations, helper, templates),
-                new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)));
+                new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine),
+                new BreathingSpaceLiftedClaimantEmailDTOGenerator(helper, templates),
+                new BreathingSpaceLiftedDefendantEmailDTOGenerator(helper, templates)
+            ));
             taskId = "BreathingSpaceLiftedNotifyParties";
         }
         data.setBusinessProcess(new BusinessProcess().setActivityId(taskId));

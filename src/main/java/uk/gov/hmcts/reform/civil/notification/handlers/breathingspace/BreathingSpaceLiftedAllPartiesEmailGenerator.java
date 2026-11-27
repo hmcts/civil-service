@@ -11,7 +11,9 @@ public class BreathingSpaceLiftedAllPartiesEmailGenerator extends AllPartiesEmai
     public BreathingSpaceLiftedAllPartiesEmailGenerator(
         BreathingSpaceLiftedAppSolOneEmailDTOGenerator appSolOne,
         BreathingSpaceLiftedRespSolOneEmailDTOGenerator respSolOne,
-        BreathingSpaceLiftedRespSolTwoEmailDTOGenerator respSolTwo) {
-        super(List.of(appSolOne, respSolOne, respSolTwo));
+        BreathingSpaceLiftedRespSolTwoEmailDTOGenerator respSolTwo,
+        BreathingSpaceLiftedClaimantEmailDTOGenerator claimant,
+        BreathingSpaceLiftedDefendantEmailDTOGenerator defendant) {
+        super(List.of(appSolOne, respSolOne, respSolTwo, claimant, defendant));
     }
 }
