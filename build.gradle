@@ -132,7 +132,7 @@ allprojects {
       dependency 'org.slf4j:slf4j-nop:2.0.20'
 
       // befta-fw pulls rest-assured 5.4, which breaks on the Groovy 5 that Boot 4 manages
-      dependencySet(group: 'io.rest-assured', version: '6.3.0') {
+      dependencySet(group: 'io.rest-assured', version: '7.0.0') {
         entry 'rest-assured'
         entry 'rest-assured-common'
         entry 'json-path'
