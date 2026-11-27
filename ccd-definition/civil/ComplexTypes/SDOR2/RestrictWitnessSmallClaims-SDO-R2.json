@@ -1,0 +1,28 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsRestrictWitness",
+    "ListElementCode": "noOfWitnessClaimant",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Limit number of witnesses (claimant)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsRestrictWitness",
+    "ListElementCode": "noOfWitnessDefendant",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Limit number of witnesses (defendant)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsRestrictWitness",
+    "ListElementCode": "partyIsCountedAsWitnessTxt",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": " "
+  }
+]

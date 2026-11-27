@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "isFlightDelayClaim",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "flightDelayDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

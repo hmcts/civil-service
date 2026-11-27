@@ -127,8 +127,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     public String getDefendantAdmittedAmount(CaseData caseData) {
         BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
         if (nonNull(defendantAdmittedAmount)) {
-            String formattedDefendantAmount = "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
-            return formattedDefendantAmount;
+            return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
         }
         log.debug("defendantAdmittedAmount is null, returning empty string");
         return "";

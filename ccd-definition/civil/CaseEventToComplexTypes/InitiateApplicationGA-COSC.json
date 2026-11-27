@@ -1,0 +1,12 @@
+[
+  {
+    "ID": "GATypePage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppTypeLR",
+    "ListElementCode": "types",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "GeneralApplicationDetailsGAspec",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Claimant is applicant",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,503 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "totalClaimAmountPlusInterest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "CITIZEN-DEFENDANT-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "totalClaimAmountPlusInterestString",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "CITIZEN-DEFENDANT-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1ClaimAdmitFullInterestLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2ClaimAdmitFullInterestLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabel2",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabelBothDefendants",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "totalClaimAmountPlusInterestAdmitPart",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "totalClaimAmountPlusInterestAdmitPartString",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "responseToClaimAdmitPartTotalAmountWithInterestLabel1",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "responseToClaimAdmitPartTotalAmountWithInterestLabel2",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1RepaymentPlanAdmitFullLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1RepaymentPlanAdmitFullInterestLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2RepaymentPlanAdmitFullLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2RepaymentPlanAdmitFullInterestLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1ClaimPartAdmitImmediatelyLabelWithInterest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "CITIZEN-CLAIMANT-PROFILE",
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1ClaimPartAdmitBySetDateLabelWithInterest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "CITIZEN-CLAIMANT-PROFILE",
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1ClaimPartAdmitInstalmentLabelWithInterest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "CITIZEN-CLAIMANT-PROFILE",
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "ccjJudgmentAmountShowInterest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1RepaymentPlanLabelPartAdmit",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondentGenericRepaymentPlanLabelPartAdmit",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2RepaymentPlanLabelPartAdmit",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "ccjJudgmentAmountClaimAmountWithInterestLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "claimFixedCostsExist",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "partAdmit1v1Defendant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "partAdmissionWhenWillDefendantPayImmediatelyLRALabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "finalOrderMadeRadioListLabel",
+    "ID": "FinalOrderMadeDatesDropdown",
+    "ElementLabel": "#### Enter date(s) of hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "finalOrderMadeRadioList",
+    "ID": "FinalOrderMadeDatesDropdown",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FinalOrderMadeRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "singleDateSelection",
+    "ID": "FinalOrderMadeDatesDropdown",
+    "ElementLabel": " ",
+    "FieldType": "SingleDateHeardFinalOrders",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "finalOrderMadeRadioList=\"SINGLE_DATE\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "dateRangeSelection",
+    "ID": "FinalOrderMadeDatesDropdown",
+    "ElementLabel": " ",
+    "FieldType": "DateRangeHeardFinalOrders",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "finalOrderMadeRadioList=\"DATE_RANGE\""
+  },
+
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "bespokeRangeSelection",
+    "ID": "FinalOrderMadeDatesDropdown",
+    "ElementLabel": " ",
+    "FieldType": "BespokeDateHeardFinalOrders",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "finalOrderMadeRadioList=\"BESPOKE_RANGE\""
+  }
+]
+

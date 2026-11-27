@@ -254,6 +254,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setAssistedOrderCostsReserved(null);
         caseData.setAssistedOrderMakeAnOrderForCosts(null);
         caseData.setAssistedOrderCostsBespoke(null);
+        caseData.setAssistedOrderPenalNoticeToggle(null);
         caseData.setFinalOrderAppealToggle(null);
         caseData.setFinalOrderAppealComplex(null);
         caseData.setOrderMadeOnDetailsList(null);
@@ -459,17 +460,21 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
         LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        DynamicListElement otherLocation = new DynamicListElement()
+            .setCode("OTHER_LOCATION")
+            .setLabel("Other location");
+        if (locationRefData == null) {
+            return new DynamicList()
+                .setListItems(List.of(otherLocation))
+                .setValue(otherLocation);
+        }
+
         DynamicListElement currentLocation = new DynamicListElement()
             .setCode("LOCATION_LIST")
             .setLabel(locationRefData.getSiteName());
 
         return new DynamicList()
-            .setListItems(List.of(
-                currentLocation,
-                new DynamicListElement()
-                    .setCode("OTHER_LOCATION")
-                    .setLabel("Other location")
-            ))
+            .setListItems(List.of(currentLocation, otherLocation))
             .setValue(new DynamicListElement()
                 .setCode("LOCATION_LIST")
                 .setLabel(locationRefData.getSiteName()));

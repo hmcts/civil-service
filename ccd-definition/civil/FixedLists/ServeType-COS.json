@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ServeTypeCoS",
+    "ListElementCode": "HANDED",
+    "ListElement": "Personally handed it to or left it with",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ServeTypeCoS",
+    "ListElementCode": "DELIVERED",
+    "ListElement": "Delivered to or left at permitted place",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ServeTypeCoS",
+    "ListElementCode": "POSTED",
+    "ListElement": "Sent by first class post or another service which delivers on the next business day",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ServeTypeCoS",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other means permitted by the court",
+    "DisplayOrder": 4
+  }
+]

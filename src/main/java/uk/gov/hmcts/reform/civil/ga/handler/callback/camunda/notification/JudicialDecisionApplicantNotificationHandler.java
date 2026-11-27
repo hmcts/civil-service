@@ -21,6 +21,12 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION;
 
+/**
+ * Retained for pre-migration GA decision process instances until they have drained.
+ *
+ * @deprecated Replaced by GaJudicialDecisionNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Slf4j
 @Service
 @RequiredArgsConstructor

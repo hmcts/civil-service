@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "introLine",
+    "FieldType": "Label",
+    "ElementLabel": "Expert evidence is directed as follows:",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseA",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseB",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "firstReportDateBy",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseCBeforeDate",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "jointStatementDateBy",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseCAfterDate",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseD",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HousingDisrepair",
+    "ListElementCode": "clauseE",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

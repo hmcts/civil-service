@@ -1,0 +1,53 @@
+[
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "documentName",
+    "FieldType": "Text",
+    "ElementLabel": "Document Name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "documentLink",
+    "FieldType": "Document",
+    "ElementLabel": "Document URL",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png"
+  },
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "documentType",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "StaffDocumentType",
+    "ElementLabel": "Document Type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "documentTypeOther",
+    "FieldType": "Text",
+    "ElementLabel": "What type of document is it?",
+    "FieldShowCondition": "documentType=\"OTHER\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "documentSize",
+    "FieldType": "Number",
+    "ElementLabel": "Document size",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StaffDocument",
+    "ListElementCode": "createdDatetime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Uploaded on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

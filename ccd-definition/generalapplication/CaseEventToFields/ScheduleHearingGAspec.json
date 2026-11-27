@@ -1,0 +1,36 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeApplication",
+    "PageID": "HearingNoticeGADetail",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "HearingDetails",
+    "PageDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/hearing-check-date"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeInformation",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "HearingInformation",
+    "PageDisplayOrder": 3,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  }
+]

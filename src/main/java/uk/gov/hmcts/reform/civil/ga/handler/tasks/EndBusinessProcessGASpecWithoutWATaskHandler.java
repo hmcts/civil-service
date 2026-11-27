@@ -48,7 +48,10 @@ public class EndBusinessProcessGASpecWithoutWATaskHandler extends BaseExternalTa
             externalTask.getAllVariables(),
             ExternalTaskInput.class
         );
-        String caseId = externalTaskInput.getCaseId();
+        String caseId = externalTaskInput.getGeneralApplicationCaseId();
+        if (caseId == null) {
+            caseId = externalTaskInput.getCaseId();
+        }
         log.info("Calling end business process event for caseId {}", caseId);
         StartEventResponse startEventResponse = coreCaseDataService
             .startGaUpdate(caseId, END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK);

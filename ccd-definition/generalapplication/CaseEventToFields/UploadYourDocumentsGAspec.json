@@ -1,0 +1,25 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "addnDocumentLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "GAUploadDocumentsScreen",
+    "PageLabel": "Additional documents for applications",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "uploadDocument",
+    "DisplayContext": "MANDATORY",
+    "PageID": "GAUploadDocumentsScreen",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  }
+]

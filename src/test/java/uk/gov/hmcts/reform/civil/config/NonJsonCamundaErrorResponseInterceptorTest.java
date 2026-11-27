@@ -85,7 +85,7 @@ class NonJsonCamundaErrorResponseInterceptorTest {
     }
 
     @Test
-    void leavesSuccessResponsesUntouched() throws Exception {
+    void leavesSuccessResponsesUntouched() {
         HttpEntity original = new ByteArrayEntity("[]".getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON);
         ClassicHttpResponse response = response(200, original);
 
@@ -95,7 +95,7 @@ class NonJsonCamundaErrorResponseInterceptorTest {
     }
 
     @Test
-    void toleratesAnErrorResponseWithNoBody() throws Exception {
+    void toleratesAnErrorResponseWithNoBody() {
         ClassicHttpResponse response = response(503, null);
 
         interceptor.process(response, null, null);

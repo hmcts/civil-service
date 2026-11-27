@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -379,8 +380,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("orderOnCourtsList")).isNull();
         }
 
-        @Test
-        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted(boolean otherRemedyEnabled) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderMadeSelection(YES).finalOrderDateHeardComplex(new OrderMade())
@@ -397,6 +399,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderGiveReasonsComplex(new AssistedOrderReasons().setReasonsText("text"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isOtherRemedyEnabled()).thenReturn(otherRemedyEnabled);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
@@ -414,6 +417,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("assistedOrderCostsReserved")).isNull();
             assertThat(response.getData().get("assistedOrderMakeAnOrderForCosts")).isNull();
             assertThat(response.getData().get("assistedOrderCostsBespoke")).isNull();
+            assertThat(response.getData().get("assistedOrderPenalNoticeToggle")).isNull();
             assertThat(response.getData().get("finalOrderAppealToggle")).isNull();
             assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
             assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
@@ -635,6 +639,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
+        }
+
+        @Test
+        void shouldOfferOtherLocation_whenCurrentHearingLocationIsMissing() {
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now());
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(new ArrayList<>());
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(null);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("hearingLocationList").asString().contains("Other location");
         }
 
         @Test

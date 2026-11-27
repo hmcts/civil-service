@@ -1,0 +1,93 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "fixedCosts",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY",
+    "PageID": "CcjPaymentPaidSome",
+    "FieldShowCondition": "ccjPaymentPaidSomeLabel=\"DO NOT SHOW IN UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentFixedCostOptionLabel",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "FixedCost",
+    "PageShowCondition": "fixedCosts.claimFixedCosts!=\"No\"",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-up-ccj-amount-summary",
+    "ShowSummaryChangeOption": "Y",
+    "DisplayContext": "READONLY"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentAmountShowInterest",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 22,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjPaymentPaidSome",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "ccjPaymentPaidSomeLabel=\"DO NOT SHOW IN UI\" OR ccjPaymentPaidSomeLabelInsetHelpText=\"DO NOT SHOW IN UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentAmountClaimAmountLabel",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjJudgmentSummary",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "ccjJudgmentAmountShowInterest !=\"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentAmountClaimAmountWithInterestLabel",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjJudgmentSummary",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "ccjJudgmentAmountShowInterest =\"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentAmountInterestToDateLabel",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjJudgmentSummary",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "claimInterest =\"Yes\" AND ccjJudgmentAmountShowInterest !=\"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "ccjJudgmentFixedCostAmountLabel",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 11,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjJudgmentSummary",
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "ccjJudgmentFixedCostOption =\"Yes\" OR fixedCosts.claimFixedCosts =\"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "CaseFieldID": "claimInterest",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY",
+    "PageID": "CcjPaymentPaidSome",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "ccjPaymentPaidSomeLabel=\"DO NOT SHOW IN UI\" OR ccjPaymentPaidSomeLabelInsetHelpText=\"DO NOT SHOW IN UI\"",
+    "RetainHiddenValue": "Y"
+  }
+]

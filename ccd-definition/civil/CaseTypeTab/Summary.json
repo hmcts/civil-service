@@ -1,0 +1,185 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimType",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "detailsOfClaim",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimValue",
+    "TabFieldDisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimFee",
+    "TabFieldDisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "applicantSolicitor1PbaAccounts",
+    "TabFieldDisplayOrder": 9
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "issueDate",
+    "TabFieldDisplayOrder": 10
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "submittedDate",
+    "TabFieldDisplayOrder": 11
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "allocatedTrack",
+    "TabFieldDisplayOrder": 12
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "responseClaimTrack",
+    "TabFieldDisplayOrder": 13
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "respondent1ResponseDeadline",
+    "TabFieldDisplayOrder": 14
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "respondent2ResponseDeadline",
+    "FieldShowCondition": "respondent2Represented = \"Yes\"",
+    "TabFieldDisplayOrder": 15
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimNotificationDate",
+    "TabFieldDisplayOrder": 16
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimIssuedPaymentDetails",
+    "TabFieldDisplayOrder": 17
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "otherDetails",
+    "TabFieldDisplayOrder": 18
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "transferCaseDetails",
+    "TabFieldDisplayOrder": 19
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "reasonForTransfer",
+    "TabFieldDisplayOrder": 20
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "isOtherRemedyAbandoned",
+    "TabFieldDisplayOrder": 203,
+    "FieldShowCondition": "claimType = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "isClaimDeclarationAdded",
+    "TabFieldDisplayOrder": 204,
+    "FieldShowCondition": "claimType = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimDeclarationDescription",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "isClaimDeclarationAdded = \"Yes\" AND (claimType = \"HOUSING_DISREPAIR\" OR claimType = \"DAMAGES_AND_OTHER_REMEDY\")"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "isHumanRightsActIssues",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "claimType = \"HOUSING_DISREPAIR\" OR claimType = \"DAMAGES_AND_OTHER_REMEDY\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "otherRemedyAbandonedDate",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "(isOtherRemedyAbandoned = \"Yes\" OR isOtherRemedyAbandoned = \"No\") AND (claimType = \"HOUSING_DISREPAIR\" OR claimType = \"DAMAGES_AND_OTHER_REMEDY\")"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "otherRemedyFee",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "isClaimDeclarationAdded = \"Yes\" AND (claimType = \"HOUSING_DISREPAIR\" OR claimType = \"DAMAGES_AND_OTHER_REMEDY\")"
+  }
+]

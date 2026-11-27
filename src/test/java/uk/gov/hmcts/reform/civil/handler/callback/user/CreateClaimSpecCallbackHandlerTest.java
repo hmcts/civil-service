@@ -10,10 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -129,7 +129,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     CreateClaimSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimUrlsConfiguration.class,
     ExitSurveyConfiguration.class,
@@ -185,13 +185,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private final Organisation bulkOrganisation = new Organisation()
         .setPaymentAccount(List.of("12345", "98765"));
 
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    @MockBean
+    @MockitoBean
     private FeesService feesService;
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
     @Autowired
@@ -206,13 +206,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objMapper;
 
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
 
     @Autowired
     private PartyValidator partyValidator;
 
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
     @Value("${civil.response-pack-url}")
@@ -227,22 +227,22 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Value("${civil.n215-url}")
     private String n215Link;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
-    @MockBean
+    @MockitoBean
     private ToggleConfiguration toggleConfiguration;
 
-    @MockBean
+    @MockitoBean
     protected LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private AirlineEpimsDataLoader airlineEpimsDataLoader;
 
-    @MockBean
+    @MockitoBean
     private AirlineEpimsService airlineEpimsService;
 
     @Nested

@@ -1,0 +1,417 @@
+[
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant2LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantExperts",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantExperts",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantExperts",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantWitnesses",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantWitnesses",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicantWitnesses",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Witnesses",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Witnesses",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Witnesses",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Experts",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Experts",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1Experts",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Witnesses",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Witnesses",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Witnesses",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Experts",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Experts",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2Experts",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1LRIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1LRIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1LRIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1LRIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1LRIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1LRIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2LRIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2LRIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2LRIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1OrgIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1OrgIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant1OrgIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant2OrgIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant2OrgIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "applicant2OrgIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1OrgIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1OrgIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent1OrgIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2OrgIndividuals",
+    "ListElementCode": "firstName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2OrgIndividuals",
+    "ListElementCode": "lastName",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "CaseFieldID": "respondent2OrgIndividuals",
+    "ListElementCode": "flags",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  }
+]
