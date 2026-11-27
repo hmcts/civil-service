@@ -297,6 +297,13 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenEarlyClaimTerminationEnabled(Boolean toggleStat) {
+        givenToggle("early-claim-termination", toggleStat);
+        assertThat(featureToggleService.isEarlyClaimTerminationEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldCallBoolVariation_whenBreathingSpaceEnabled(Boolean toggleStat) {
         givenToggle("cui-breathing-space", toggleStat);
         assertThat(featureToggleService.isBreathingSpaceEnabled()).isEqualTo(toggleStat);

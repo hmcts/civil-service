@@ -175,6 +175,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
     }
 
+    public boolean isEarlyClaimTerminationEnabled() {
+        return featureToggleApi.isFeatureEnabled("early-claim-termination");
+    }
+
     public boolean isBreathingSpaceEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-breathing-space");
     }
