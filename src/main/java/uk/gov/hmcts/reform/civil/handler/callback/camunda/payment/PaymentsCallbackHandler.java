@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -98,7 +99,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             if (e.status() == 403 || e.status() == 422 || e.status() == 504) {
                 updateWithBusinessError(caseData, e);
             } else {
-                errors.add(ERROR_MESSAGE);
+                errors.add(CallbackFailureClassifier.labelledErrorForNonIdempotentCall(ERROR_MESSAGE, e));
             }
         } catch (InvalidPaymentRequestException e) {
             log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",

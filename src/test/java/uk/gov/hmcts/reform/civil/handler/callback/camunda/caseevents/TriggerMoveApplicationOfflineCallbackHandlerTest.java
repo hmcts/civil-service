@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier.NOT_RETRYABLE;
+import static uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier.RETRYABLE;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE;
@@ -91,8 +96,27 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isNotNull();
-        assertThat(response.getErrors()).contains(expectedErrorMessage);
+        assertThat(response.getErrors()).singleElement().asString()
+            .startsWith(NOT_RETRYABLE + expectedErrorMessage + " (java.lang.RuntimeException");
+    }
+
+    @Test
+    void transientCcdFailureIsLabelledRetryable() {
+        // 2 Nov 2026: CCD's connection pool was exhausted mid-loop, a retry would have worked
+        CaseData baseCaseData = CaseDataBuilder.builder().build();
+        baseCaseData.setCcdCaseReference(1234L);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDetails(baseCaseData, true, true, true, true,
+                                        getOriginalStatusOfGeneralApplication());
+        Request request = Request.create(Request.HttpMethod.GET, "http://ccd-data-store-api/event-triggers/token",
+                                         Map.of(), null, StandardCharsets.UTF_8, null);
+        when(helperService.triggerEvent(any(CaseData.class), eq(APPLICATION_PROCEEDS_IN_HERITAGE)))
+            .thenThrow(new FeignException.InternalServerError("[500 Internal Server Error]", request, null, null));
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        assertThat(response.getErrors()).singleElement().asString()
+            .startsWith(RETRYABLE + "Could not trigger event to take application offline under the case: " + caseData.getCcdCaseReference());
     }
 
     private Map<String, String> getOriginalStatusOfGeneralApplication() {

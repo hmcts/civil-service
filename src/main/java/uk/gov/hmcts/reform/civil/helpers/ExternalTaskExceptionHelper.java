@@ -5,6 +5,7 @@ import feign.Request;
 import feign.RetryableException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 
 import static org.apache.hc.core5.http.Method.isIdempotent;
 
@@ -25,6 +26,13 @@ public class ExternalTaskExceptionHelper {
     public static boolean isRetryable(Throwable throwable) {
         for (Throwable current = throwable; current != null; current = current.getCause()) {
             if (current instanceof RetryableException) {
+                return true;
+            }
+
+            if (current instanceof FeignException feignException
+                && CallbackFailureClassifier.isRetryableCallbackError(feignException)) {
+                // CCD rejected the event because a civil-service callback failed transiently and said so
+                // (DTSCCI-7095). The event was not saved, so retrying the submit cannot duplicate it.
                 return true;
             }
 

@@ -114,7 +114,9 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).doesNotHaveToString("paymentReference");
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains("Technical error occurred");
+            // DTSCCI-7095: a payments 500 may come after the payment was taken, so a retry could take it twice
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith("NOT RETRYABLE: Technical error occurred (");
         }
 
         private FeignException buildFeignException(int status) throws JsonProcessingException {

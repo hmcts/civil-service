@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -81,6 +82,9 @@ class PaymentsServiceTest {
     @MockitoBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private ServiceRequestLookupService serviceRequestLookupService;
+
     @BeforeEach
     void setUp() {
         given(paymentsClient.createServiceRequest(any(), any())).willReturn(PAYMENT_SERVICE_RESPONSE);
@@ -105,6 +109,28 @@ class PaymentsServiceTest {
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 
+    }
+
+    @Test
+    void shouldReuseUnpaidServiceRequest_insteadOfCreatingAnother() {
+        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData();
+        given(serviceRequestLookupService.findUnpaidServiceRequest(any(), any())).willReturn(Optional.of("2026-1795511306447"));
+
+        PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
+
+        assertThat(serviceRequestResponse.getServiceRequestReference()).isEqualTo("2026-1795511306447");
+        verify(paymentsClient, never()).createServiceRequest(any(), any());
+    }
+
+    @Test
+    void shouldReuseUnpaidServiceRequestGa_insteadOfCreatingAnother() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
+        given(serviceRequestLookupService.findUnpaidServiceRequest(any(), any())).willReturn(Optional.of("2026-1795511306448"));
+
+        PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequestGa(caseData, AUTH_TOKEN);
+
+        assertThat(serviceRequestResponse.getServiceRequestReference()).isEqualTo("2026-1795511306448");
+        verify(paymentsClient, never()).createServiceRequest(any(), any());
     }
 
     @Test
