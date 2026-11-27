@@ -201,7 +201,9 @@ abstract class CivilCitizenUiProviderSupport {
             referenceSearchService, pinService, assignCaseService, lipAssignmentService, coreCaseDataService);
         DashboardController dashboardController = new DashboardController(
             taskListService, dashboardNotificationService, dashboardScenariosService);
-        DocumentController documentController = new DocumentController(claimFormService, documentManagementService);
+        DocumentController documentController = new DocumentController(
+            claimFormService, documentManagementService,
+            mock(uk.gov.hmcts.reform.civil.service.documentmanagement.UploadedDocumentDeletionService.class));
         LocationController locationController = new LocationController(locationReferenceDataService, new CourtLocationUtils());
         FlightController flightController = new FlightController(airlineEpimsDataLoader);
         stateVerification = () -> { };
