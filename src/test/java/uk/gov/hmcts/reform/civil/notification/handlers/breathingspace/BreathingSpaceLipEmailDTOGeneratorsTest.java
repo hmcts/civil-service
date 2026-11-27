@@ -183,6 +183,19 @@ class BreathingSpaceLipEmailDTOGeneratorsTest {
             .containsExactlyInAnyOrder(CLAIMANT_EMAIL, DEFENDANT_EMAIL);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldNotifyApplicantSolicitorAndLipDefendantWhenOnlyDefendantIsUnrepresented(boolean enter) {
+        CaseData data = lipCaseData().toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+
+        Set<EmailDTO> emails = allPartiesGenerator(enter).getPartiesToNotify(data, taskId(enter));
+
+        assertThat(emails).extracting(EmailDTO::getTargetEmail)
+            .containsExactlyInAnyOrder(data.getApplicantSolicitor1UserDetails().getEmail(), DEFENDANT_EMAIL);
+    }
+
     private EmailDTOGenerator<CaseData> claimantGenerator(boolean enter) {
         return enter
             ? new BreathingSpaceEnterClaimantEmailDTOGenerator(helper, templates)
