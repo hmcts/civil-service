@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.HandleAdmitPartOfClaim;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.SetApplicantResponseDeadlineSpec;
@@ -45,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
@@ -168,6 +171,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
+        Long caseId = caseData.getCcdCaseReference();
+
+        log.info(
+            "Building DEFENDANT_RESPONSE_SPEC confirmation for caseId {}, claimNumber {}, "
+                + "responseType={}, paymentTimeRoute={}, isRespondent2={}, multipartyScenario={}",
+            caseId,
+            claimNumber,
+            caseData.getCurrentDefendantClaimResponseTypeForSpec(),
+            caseData.getCurrentDefendantPaymentTimeRoute(),
+            caseData.isCurrentDefendantRespondent2(),
+            MultiPartyScenario.getMultiPartyScenario(caseData)
+        );
 
         String body = CaseDataToTextGenerator.getTextFor(
                 confirmationTextSpecGenerators.stream(),
@@ -181,6 +196,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
                 caseData,
                 featureToggleService
+        );
+
+        log.info(
+            "Built DEFENDANT_RESPONSE_SPEC confirmation for caseId {}: header={}, body={}",
+            caseId,
+            header,
+            body
         );
 
         return SubmittedCallbackResponse.builder()
@@ -199,7 +221,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                     format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
-        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getCurrentDefendantClaimResponseTypeForSpec())
                 && (caseData.isPayBySetDate())) {
             return format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"
