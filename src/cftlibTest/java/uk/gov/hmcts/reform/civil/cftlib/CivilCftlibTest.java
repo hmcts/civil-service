@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.rse.ccd.lib.Database;
 import uk.gov.hmcts.rse.ccd.lib.test.CftlibTest;
 
 import java.net.URI;
@@ -21,6 +22,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -131,6 +135,78 @@ class CivilCftlibTest extends CftlibTest {
         JsonNode user = mapper.readTree(userInfo.body());
         assertThat(user.path("email").asText()).isEqualTo(SOLICITOR);
         assertThat(user.path("roles").toString()).contains("caseworker-civil-solicitor");
+    }
+
+    /**
+     * One user of each kind civil's tests sign in as, with an IDAM role and an organisational role that kind holds.
+     */
+    @Test
+    @SneakyThrows
+    void signsInEachKindOfCivilUserWithTheirRoles() {
+        Map<String, List<String>> users = Map.of(
+            "DJ.Amy.Powell@ejudiciary.net", List.of("caseworker-civil-judge", "judge"),
+            "49932114EMP-@ejudiciary.net", List.of("caseworker-civil-judge", "fee-paid-judge"),
+            "hearing_center_admin_reg1@justice.gov.uk", List.of("caseworker-civil-admin", "hearing-centre-admin"),
+            "tribunal_legal_caseworker_reg1@justice.gov.uk", List.of("caseworker-civil", "tribunal-caseworker"),
+            "ctsc_admin@justice.gov.uk", List.of("ctsc", "ctsc-team-leader"),
+            "nbc_admin_region1@justice.gov.uk", List.of("caseworker-civil-admin", "national-business-centre"),
+            "caseworkerwlutl@justice.gov.uk", List.of("caseworker-civil-admin", "wlu-team-leader"),
+            // Stands in for the region 1 hearing centre admin.
+            "civil-admin@mailnesia.com", List.of("caseworker-civil-admin", "hearing-centre-admin")
+        );
+        for (var user : users.entrySet()) {
+            JsonNode details = userInfo(user.getKey());
+            assertThat(details.path("roles").toString()).as(user.getKey()).contains(user.getValue().get(0));
+            assertThat(organisationalRoles(details.path("uid").asText())).as(user.getKey())
+                .contains(user.getValue().get(1));
+        }
+        assertThat(userInfo("civilmoneyclaimsdemo@gmail.com").path("roles").toString()).contains("citizen");
+    }
+
+    @Test
+    @SneakyThrows
+    void listsTheUsersOnTheLoginPageByKind() {
+        HttpResponse<String> page = client.send(
+            HttpRequest.newBuilder(URI.create(
+                "http://localhost:5062/login?client_id=xuiwebapp&redirect_uri=http://localhost:3000/oauth2/callback"))
+                .build(),
+            HttpResponse.BodyHandlers.ofString());
+        assertThat(page.body()).contains("Judges", "Hearing centre admins", "Legal operations", "CTSC",
+                                         "National Business Centre", "Welsh Language Unit", "Solicitors", "Citizens",
+                                         "DJ.Amy.Powell@ejudiciary.net");
+    }
+
+    @SneakyThrows
+    private JsonNode userInfo(String email) {
+        HttpResponse<String> login = client.send(
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/loginUser"
+                                                  + "?username=" + URLEncoder.encode(email, StandardCharsets.UTF_8)
+                                                  + "&password=" + PASSWORD))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build(),
+            HttpResponse.BodyHandlers.ofString());
+        assertThat(login.statusCode()).as(email).isEqualTo(200);
+        HttpResponse<String> userInfo = client.send(
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/o/userinfo"))
+                .header("Authorization", "Bearer " + mapper.readTree(login.body()).path("access_token").asText())
+                .build(),
+            HttpResponse.BodyHandlers.ofString());
+        return mapper.readTree(userInfo.body());
+    }
+
+    @SneakyThrows
+    private List<String> organisationalRoles(String userId) {
+        try (var connection = cftlib().getConnection(Database.AM)) {
+            var query = connection.prepareStatement(
+                "select role_name from role_assignment where actor_id = ? and role_type = 'ORGANISATION'");
+            query.setString(1, userId);
+            var results = query.executeQuery();
+            List<String> roles = new ArrayList<>();
+            while (results.next()) {
+                roles.add(results.getString(1));
+            }
+            return roles;
+        }
     }
 
     private String serviceToken() {
