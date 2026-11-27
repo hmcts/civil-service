@@ -1,6 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.robotics.support;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
@@ -24,8 +31,25 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class RoboticsCaseDataSupportTest {
 
+    private static final Long CASE_REFERENCE = 1234567890123456L;
+
     private final RoboticsCaseDataSupport support =
         new RoboticsCaseDataSupport(new RoboticsAddressMapper(new AddressLinesMapper()), new RoboticsPartyLookup());
+    private final Logger logger = (Logger) LoggerFactory.getLogger(RoboticsCaseDataSupport.class);
+    private ListAppender<ILoggingEvent> logAppender;
+
+    @BeforeEach
+    void captureLogs() {
+        logAppender = new ListAppender<>();
+        logAppender.start();
+        logger.addAppender(logAppender);
+    }
+
+    @AfterEach
+    void detachLogAppender() {
+        logger.detachAppender(logAppender);
+        logAppender.stop();
+    }
 
     @Test
     void buildLitigiousParty_populatesCoreFields() {
@@ -47,7 +71,8 @@ class RoboticsCaseDataSupportTest {
             "001",
             "SOL1",
             "ORG1",
-            LocalDate.of(2023, 5, 1)
+            LocalDate.of(2023, 5, 1),
+            CASE_REFERENCE
         );
 
         assertThat(litigiousParty.getId()).isEqualTo("001");
@@ -59,6 +84,35 @@ class RoboticsCaseDataSupportTest {
         assertThat(litigiousParty.getSolicitorOrganisationID()).isEqualTo("ORG1");
         assertThat(litigiousParty.getAddresses().getContactAddress().getAddressLine1()).isEqualTo("10 Street");
         assertThat(litigiousParty.getAddresses().getContactAddress().getPostCode()).isEqualTo("AB1 1AB");
+        assertThat(logAppender.list).isEmpty();
+    }
+
+    @Test
+    void buildLitigiousParty_preservesPartyAndWarnsWhenPrimaryAddressIsMissing() {
+        Party party = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe")
+            .setIndividualDateOfBirth(LocalDate.of(1990, 1, 1));
+
+        LitigiousParty litigiousParty = support.buildLitigiousParty(
+            party, null, "Defendant", "002", "SOL1", "ORG1", LocalDate.of(2023, 5, 1), CASE_REFERENCE
+        );
+
+        assertThat(litigiousParty.getAddresses()).isNull();
+        assertThat(litigiousParty.getId()).isEqualTo("002");
+        assertThat(litigiousParty.getName()).isEqualTo("John Doe");
+        assertThat(litigiousParty.getType()).isEqualTo("Defendant");
+        assertThat(litigiousParty.getDateOfBirth()).isEqualTo("1990-01-01");
+        assertThat(litigiousParty.getDateOfService()).isEqualTo("2023-05-01");
+        assertThat(litigiousParty.getSolicitorID()).isEqualTo("SOL1");
+        assertThat(litigiousParty.getSolicitorOrganisationID()).isEqualTo("ORG1");
+        assertThat(logAppender.list).singleElement().satisfies(event -> {
+            assertThat(event.getLevel()).isEqualTo(Level.WARN);
+            assertThat(event.getFormattedMessage())
+                .contains(CASE_REFERENCE.toString(), "002", "primaryAddress")
+                .doesNotContain("John", "Doe");
+        });
     }
 
     @Test

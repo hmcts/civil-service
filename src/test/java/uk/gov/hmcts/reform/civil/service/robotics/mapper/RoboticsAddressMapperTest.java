@@ -105,11 +105,8 @@ class RoboticsAddressMapperTest {
         }
 
         @Test
-        void shouldThrowNullPointerException_whenAddressIsNullForToRoboticsAddresses() {
-            assertThrows(NullPointerException.class, () ->
-                             mapper.toRoboticsAddresses((Address) null),
-                         "address cannot be null"
-            );
+        void shouldMapToNull_whenAddressIsNullForToRoboticsAddresses() {
+            Assertions.assertThat(mapper.toRoboticsAddresses((Address) null)).isNull();
         }
 
         @Test

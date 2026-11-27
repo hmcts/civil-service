@@ -256,7 +256,8 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 caseData.isLipvLipOneVOne()
                     ? null
                     : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
-                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
+                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null),
+                caseData.getCcdCaseReference()
             ),
             caseDataSupport.buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -265,7 +266,8 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 RESPONDENT_ID,
                 respondent1SolicitorId,
                 OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData),
-                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
+                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null),
+                caseData.getCcdCaseReference()
             )
         ));
 
@@ -279,7 +281,8 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 caseData.getApplicant2OrganisationPolicy() != null
                     ? caseData.getApplicant2OrganisationPolicy().getOrganisation().getOrganisationID()
                     : null,
-                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
+                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null),
+                caseData.getCcdCaseReference()
             ));
         }
 
@@ -299,7 +302,8 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 RESPONDENT2_ID,
                 respondent2SolicitorId,
                 OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData),
-                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
+                ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null),
+                caseData.getCcdCaseReference()
             ));
         }
         return respondentParties;

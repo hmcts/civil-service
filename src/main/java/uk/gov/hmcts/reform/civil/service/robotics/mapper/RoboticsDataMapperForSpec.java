@@ -223,7 +223,8 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
                 APPLICANT_ID,
                 APPLICANT_SOLICITOR_ID,
                 caseDataSupport.organisationId(caseData.getApplicant1OrganisationPolicy()).orElse(null),
-                dateOfService
+                dateOfService,
+                caseData.getCcdCaseReference()
             ),
             caseDataSupport.buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -232,7 +233,8 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
                 RESPONDENT_ID,
                 respondent1SolicitorId,
                 caseDataSupport.organisationId(caseData.getRespondent1OrganisationPolicy()).orElse(null),
-                dateOfService
+                dateOfService,
+                caseData.getCcdCaseReference()
             )
         ));
 
@@ -244,7 +246,8 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
                 APPLICANT2_ID,
                 APPLICANT_SOLICITOR_ID,
                 caseDataSupport.organisationId(caseData.getApplicant2OrganisationPolicy()).orElse(null),
-                dateOfService
+                dateOfService,
+                caseData.getCcdCaseReference()
             ));
         }
 
@@ -264,7 +267,8 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
                 RESPONDENT2_ID,
                 respondent2SolicitorId,
                 caseDataSupport.organisationId(caseData.getRespondent2OrganisationPolicy()).orElse(null),
-                dateOfService
+                dateOfService,
+                caseData.getCcdCaseReference()
             ));
         }
         return respondentParties;
