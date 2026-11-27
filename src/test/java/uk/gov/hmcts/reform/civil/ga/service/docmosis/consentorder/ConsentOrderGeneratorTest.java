@@ -38,7 +38,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CONSENT_ORDER_FORM;
 
-@SuppressWarnings("ALL")
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings({"ALL", "removal"})
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     Jackson2AutoConfiguration.class,

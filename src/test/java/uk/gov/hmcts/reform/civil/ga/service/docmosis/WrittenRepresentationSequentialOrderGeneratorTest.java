@@ -48,6 +48,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.WRITTEN_REPRESENTATION_SEQUENTIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService.DATE_FORMATTER;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     WrittenRepresentationSequentialOrderGenerator.class,

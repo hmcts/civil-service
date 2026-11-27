@@ -126,6 +126,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCal
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_LIP_CONFIRMATION_BODY_PBAV3;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     CreateClaimSpecCallbackHandler.class,

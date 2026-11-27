@@ -57,6 +57,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     NonDivergentSpecDefaultJudgmentFormGenerator.class,

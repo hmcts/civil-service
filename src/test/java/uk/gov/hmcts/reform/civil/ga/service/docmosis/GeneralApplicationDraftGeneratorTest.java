@@ -74,7 +74,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings("ALL")
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings({"ALL", "removal"})
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {

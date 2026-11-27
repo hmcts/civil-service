@@ -28,6 +28,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.REQUEST_FOR_RECONSIDERATION;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     LiPRequestReconsiderationGeneratorService.class,

@@ -126,7 +126,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
     ValidateExpertsTask.class,
     ValidateWitnessesTask.class
 })
-@SuppressWarnings("unchecked")
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings({"removal", "unchecked"})
 class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired

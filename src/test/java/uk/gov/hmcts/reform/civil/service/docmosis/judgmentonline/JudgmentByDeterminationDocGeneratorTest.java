@@ -48,6 +48,8 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelectio
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     JudgmentByDeterminationDocGenerator.class,

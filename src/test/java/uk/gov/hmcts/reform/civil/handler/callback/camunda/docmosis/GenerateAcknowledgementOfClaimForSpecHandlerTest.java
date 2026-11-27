@@ -28,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.AC
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(classes = {
     GenerateAcknowledgementOfClaimForSpecCallbackHandler.class,
     Jackson2AutoConfiguration.class

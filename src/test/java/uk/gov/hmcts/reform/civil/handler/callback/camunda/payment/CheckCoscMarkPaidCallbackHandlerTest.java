@@ -29,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus.ACTIVE;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(classes = {
     CheckCoscMarkPaidCallbackHandler.class,
     Jackson2AutoConfiguration.class,

@@ -51,6 +51,8 @@ import static org.mockito.Mockito.when;
  * applied, so the sibling test can only assert at the method level and cannot prove the
  * {@code noRetryFor} classification actually short-circuits the three attempts.
  */
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(
     properties = "document-management.retry.delay-ms=0",
     classes = {

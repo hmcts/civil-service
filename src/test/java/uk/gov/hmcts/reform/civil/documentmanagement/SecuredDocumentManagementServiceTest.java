@@ -62,6 +62,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadExcep
 import static uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService.DOC_UUID_LENGTH;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
     Jackson2AutoConfiguration.class,

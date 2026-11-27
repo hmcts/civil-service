@@ -34,6 +34,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LIP_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CLAIMANT_LIP_MANUAL_DETERMINATION_PDF;
 
+// Spring Boot 4 marks Jackson2AutoConfiguration for removal; civil-service stays on Jackson 2.
+@SuppressWarnings("removal")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     ClaimantLipManualDeterminationFormGenerator.class,
