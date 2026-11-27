@@ -82,4 +82,13 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
+
+    @Test
+    void shouldNotNotifyWhenClaimNotifiedButRespondent1IsUnrepresented() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build().toBuilder()
+            .respondent1Represented(NO)
+            .respondent1OrganisationPolicy(null)
+            .build();
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
+    }
 }
