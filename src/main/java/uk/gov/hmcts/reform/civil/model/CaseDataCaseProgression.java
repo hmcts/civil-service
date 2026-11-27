@@ -80,6 +80,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sdo.ResponseToReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
@@ -372,6 +373,10 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private ReasonForReconsideration reasonForReconsiderationApplicant;
     private ReasonForReconsideration reasonForReconsiderationRespondent1;
     private ReasonForReconsideration reasonForReconsiderationRespondent2;
+    private ReasonForReconsideration reconsiderationRequest;
+    private ResponseToReconsideration reconsiderationResponse;
+    private ReconsiderationParties reconsiderationRequestingParty;
+    private YesOrNo isReconsiderationRoleAgnostic;
     private String casePartyRequestForReconsideration;
     private List<ReconsiderationParties> casePartiesRequestingReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;

@@ -14,11 +14,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sdo.ResponseToReconsideration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -29,12 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS;
@@ -77,6 +82,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
 
     private CallbackResponse getUpholdingPreviousOrderReason(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        hydrateRoleAgnosticReasons(caseData);
 
         Optional<Element<CaseDocument>> sdoDocLatest = caseData.getSystemGeneratedCaseDocuments().stream().filter(
             caseDocumentElement -> caseDocumentElement.getValue().getDocumentType().equals(
@@ -118,6 +124,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
 
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        hydrateRoleAgnosticReasons(caseData);
         if (DecisionOnRequestReconsiderationOptions.YES.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
             if (caseData.getDecisionOnReconsiderationDocument() != null) {
                 CaseDocument requestForReconsiderationDocument = caseData.getDecisionOnReconsiderationDocument();
@@ -144,6 +151,73 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private void hydrateRoleAgnosticReasons(CaseData caseData) {
+        if (!isOneVOne(caseData) || caseData.getReconsiderationRequest() != null) {
+            return;
+        }
+
+        ReasonForReconsideration applicantReason = caseData.getReasonForReconsiderationApplicant();
+        ReasonForReconsideration respondentReason = caseData.getReasonForReconsiderationRespondent1();
+        boolean applicantReasonPresent = isReasonPopulated(applicantReason);
+        boolean respondentReasonPresent = isReasonPopulated(respondentReason);
+
+        if (applicantReasonPresent && !respondentReasonPresent) {
+            setReconsiderationRequest(caseData, ReconsiderationParties.APPLICANT, applicantReason);
+        } else if (respondentReasonPresent && !applicantReasonPresent) {
+            setReconsiderationRequest(caseData, ReconsiderationParties.RESPONDENT1, respondentReason);
+        } else if (applicantReasonPresent && respondentReasonPresent) {
+            ReconsiderationParties requestingParty = determineRequestingParty(caseData);
+            if (requestingParty == null) {
+                return;
+            }
+            ReasonForReconsideration request = requestingParty == ReconsiderationParties.APPLICANT
+                ? applicantReason : respondentReason;
+            ReasonForReconsideration response = requestingParty == ReconsiderationParties.APPLICANT
+                ? respondentReason : applicantReason;
+            setReconsiderationRequest(caseData, requestingParty, request);
+            caseData.setReconsiderationResponse(toResponse(response));
+        }
+    }
+
+    private ReconsiderationParties determineRequestingParty(CaseData caseData) {
+        CaseDocument applicantDocument = caseData.getRequestForReconsiderationDocument();
+        CaseDocument respondentDocument = caseData.getRequestForReconsiderationDocumentRes();
+        if (applicantDocument != null && applicantDocument.getCreatedDatetime() != null
+            && respondentDocument != null && respondentDocument.getCreatedDatetime() != null
+            && !applicantDocument.getCreatedDatetime().equals(respondentDocument.getCreatedDatetime())) {
+            return applicantDocument.getCreatedDatetime().isBefore(respondentDocument.getCreatedDatetime())
+                ? ReconsiderationParties.APPLICANT : ReconsiderationParties.RESPONDENT1;
+        }
+
+        ReconsiderationParties latestSubmitter = switch (caseData.getCasePartyRequestForReconsideration() == null
+            ? "" : caseData.getCasePartyRequestForReconsideration()) {
+            case "Applicant" -> ReconsiderationParties.APPLICANT;
+            case "Respondent1" -> ReconsiderationParties.RESPONDENT1;
+            default -> null;
+        };
+        if (latestSubmitter == null) {
+            return null;
+        }
+        return latestSubmitter == ReconsiderationParties.APPLICANT
+            ? ReconsiderationParties.RESPONDENT1 : ReconsiderationParties.APPLICANT;
+    }
+
+    private boolean isReasonPopulated(ReasonForReconsideration reason) {
+        return reason != null && (isNotBlank(reason.getRequestor())
+            || isNotBlank(reason.getReasonForReconsiderationTxt()));
+    }
+
+    private void setReconsiderationRequest(CaseData caseData, ReconsiderationParties requestingParty,
+                                           ReasonForReconsideration request) {
+        caseData.setReconsiderationRequest(request);
+        caseData.setReconsiderationRequestingParty(requestingParty);
+        caseData.setIsReconsiderationRoleAgnostic(YesOrNo.YES);
+    }
+
+    private ResponseToReconsideration toResponse(ReasonForReconsideration reason) {
+        return new ResponseToReconsideration(reason.getRequestor(), reason.getReasonForReconsiderationTxt());
     }
 
     private CaseDocument createDecisionOnReconsiderationDocmosisDoc(CallbackParams callbackParams,

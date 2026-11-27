@@ -18,13 +18,18 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sdo.ResponseToReconsideration;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -134,6 +139,148 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
     @Nested
     class AboutToStartCallback {
+        @Test
+        void shouldHydrateSingleLegacyApplicantReasonAsRequest() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                ).build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant"));
+            assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldHydrateBothLegacyReasonsUsingDocumentTimestamps() {
+            CaseDocument applicantDocument = new CaseDocument().setCreatedDatetime(LocalDateTime.now().minusDays(3));
+            CaseDocument respondentDocument = new CaseDocument().setCreatedDatetime(LocalDateTime.now().minusDays(2));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                )
+                .reasonForReconsiderationRespondent1(
+                    new ReasonForReconsideration("Defendant comments", "Defendant - Defendant")
+                ).build();
+            caseData.setRequestForReconsiderationDocument(applicantDocument);
+            caseData.setRequestForReconsiderationDocumentRes(respondentDocument);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant"));
+            assertThat(updatedCaseData.getReconsiderationResponse())
+                .isEqualTo(new ResponseToReconsideration("Defendant - Defendant", "Defendant comments"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+        }
+
+        @Test
+        void shouldHydrateBothLegacyReasonsUsingLatestSubmitterWhenDocumentsAreUnavailable() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Applicant comments", "Applicant - Claimant")
+                )
+                .reasonForReconsiderationRespondent1(
+                    new ReasonForReconsideration("Defendant reasons", "Defendant - Defendant")
+                ).build();
+            caseData.setCasePartyRequestForReconsideration("Respondent1");
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Applicant comments", "Applicant - Claimant"));
+            assertThat(updatedCaseData.getReconsiderationResponse())
+                .isEqualTo(new ResponseToReconsideration("Defendant - Defendant", "Defendant reasons"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+        }
+
+        @Test
+        void shouldLeaveLegacyReasonsUnconvertedWhenSubmissionOrderIsUnknown() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                )
+                .reasonForReconsiderationRespondent1(
+                    new ReasonForReconsideration("Defendant comments", "Defendant - Defendant")
+                ).build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest()).isNull();
+            assertThat(updatedCaseData.getReconsiderationResponse()).isNull();
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isNull();
+        }
+
+        @Test
+        void shouldNotChangeAlreadyConvertedReasons() {
+            ReasonForReconsideration existingRequest = new ReasonForReconsideration("Request", "Applicant - Claimant");
+            ResponseToReconsideration existingResponse = new ResponseToReconsideration("Defendant - Defendant", "Comments");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .reasonForReconsiderationRespondent1(
+                    new ReasonForReconsideration("Legacy reasons", "Defendant - Defendant")
+                ).build();
+            caseData.setReconsiderationRequest(existingRequest);
+            caseData.setReconsiderationResponse(existingResponse);
+            caseData.setReconsiderationRequestingParty(ReconsiderationParties.APPLICANT);
+            caseData.setIsReconsiderationRoleAgnostic(YesOrNo.YES);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest()).isEqualTo(existingRequest);
+            assertThat(updatedCaseData.getReconsiderationResponse()).isEqualTo(existingResponse);
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.APPLICANT);
+        }
+
+        @Test
+        void shouldNotHydrateMultiPartyReasons() {
+            Party respondent2 = new Party().setIndividualFirstName("Second").setIndividualLastName("Defendant")
+                .setType(Party.Type.INDIVIDUAL);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(sdoDocList)
+                .addRespondent2(YesOrNo.YES).respondent2(respondent2)
+                .reasonForReconsiderationApplicant(
+                    new ReasonForReconsideration("Applicant reasons", "Applicant - Claimant")
+                ).build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest()).isNull();
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isNull();
+        }
+
         @Test
         void shouldPopulateUpholdingPreviousOrderReason() {
             //Given : Casedata
@@ -276,6 +423,26 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
     @Nested
     class AboutToSubmitCallback {
+        @Test
+        void shouldPersistHydratedLegacyReasonWhenJudgeSubmitsDecision() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(new ArrayList<>())
+                .reasonForReconsiderationRespondent1(
+                    new ReasonForReconsideration("Defendant reasons", "Defendant - Defendant")
+                ).build();
+            caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
+            );
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getReconsiderationRequest())
+                .isEqualTo(new ReasonForReconsideration("Defendant reasons", "Defendant - Defendant"));
+            assertThat(updatedCaseData.getReconsiderationRequestingParty()).isEqualTo(ReconsiderationParties.RESPONDENT1);
+            assertThat(updatedCaseData.getIsReconsiderationRoleAgnostic()).isEqualTo(YesOrNo.YES);
+        }
+
         @Test
         void shouldPopulateDecisionOnReconsiderationDetails() {
             //Given : Casedata
