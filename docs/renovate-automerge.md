@@ -12,7 +12,8 @@ Repo-level settings:
 - `rebaseWhen`: `behind-base-branch`, so Renovate refreshes branches that fall behind `master`.
 - `automergeStrategy`: `squash`.
 - `prConcurrentLimit`: `5`.
-- Non-major, Helm, Spring-related, Terraform and Lombok updates set `automerge: true` and `automergeType: pr`.
+- Non-major, Helm, Spring-related, Terraform, Lombok and Byte Buddy updates set `automerge: true` and `automergeType: pr`.
+- Byte Buddy (`byte-buddy`, `byte-buddy-agent`) has its own group, so an update that fails the unit tests doesn't hold back the rest of the non-major group.
 - Camunda updates deliberately set `automerge: false`.
 - Pact updates are disabled.
 
@@ -101,7 +102,7 @@ Updates that master can't build, or that break the tests, are therefore held in 
 | Package | Hold | Reason |
 |---|---|---|
 | `com.github.hmcts:*` | skips versions with a ticket suffix, e.g. `4.1.0-CCD-8220`, `9.2.12_CCD-8388` | Feature-branch builds. Maven ranks the suffix above the release, so Renovate would otherwise offer them as the newest version. This rule comes first so the package-specific holds below override it |
-| `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.16 and 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes"). Later versions are still offered so CI can confirm a fix |
+| `net.bytebuddy:byte-buddy`, `byte-buddy-agent` | skips 1.18.16 and 1.18.17 | Breaks Mockito mocking of `CaseData` on Java 25 ("Could not modify all classes"). 1.18.15 fails the same way (ASM 9.11, `LimitExceededException: Too many operations`) but isn't skipped. Later versions are still offered, in the Byte Buddy group, so CI can confirm a fix |
 | `python` (`actions/setup-python`) | below 3.15 | semgrep's `ruamel.yaml.clib` has no 3.15 build (pii-log-check), and the email-docs generator tests fail on 3.15 |
 | `io.projectreactor:reactor-bom`, `io.micrometer:micrometer-bom` | patch updates only | Imported only to set CVE minimums (DTSCCI-6473). They take patches on the Reactor and Micrometer lines Spring Boot manages and move to a new line with Spring Boot |
 | Pact packages | disabled | |

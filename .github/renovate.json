@@ -79,7 +79,7 @@
         "net.bytebuddy:byte-buddy-agent"
       ],
       "allowedVersions": "!/^1\\.18\\.1[67](-|$)/",
-      "description": "Byte Buddy 1.18.16 and 1.18.17 stop Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest; later versions are still offered so CI can confirm a fix"
+      "description": "Byte Buddy 1.18.16 and 1.18.17 stop Mockito mocking CaseData on Java 25 ('Could not modify all classes'), aborting EventHistoryMapperTest. 1.18.15 fails the same way (ASM LimitExceededException: Too many operations). Later versions are still offered, in their own Byte Buddy group, so CI can confirm a fix"
     },
     {
       "matchDatasources": [
@@ -151,6 +151,17 @@
       ],
       "groupName": "Jenkins library",
       "groupSlug": "jenkins-library"
+    },
+    {
+      "description": "Keep Byte Buddy out of the non-major group: from 1.18.15 (ASM 9.11) Mockito cannot instrument CaseData ('Too many operations'), so a Byte Buddy update that fails the unit tests would otherwise hold back every other non-major update",
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "groupName": "Byte Buddy",
+      "groupSlug": "byte-buddy",
+      "automerge": true,
+      "automergeType": "pr"
     },
     {
       "groupName": "Camunda updates",
