@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmai
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 /**
- * Retained for in-flight instances started on the pre-OCCC-840 breathing space BPMNs
+ * Retained for in-flight instances started on the pre-OCCC-840 breathing space BPMNs.
  * New instances will use the Claimant and Defendant EmailDTOGenerators
  * Remove this class, its subclasses and the NOTIFY_LIP_*_BREATHING_SPACE_* CaseEvents once those instances complete
  */
