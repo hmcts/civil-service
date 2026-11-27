@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationServic
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -66,9 +65,6 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
     @Mock
     private IdamClient idamClient;
-
-    @Mock
-    private AssignCategoryId assignCategoryId;
 
     @Mock
     private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
@@ -239,7 +235,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(new UploadDocumentByType()
-                                                      .setDocumentType("witness")
+                                                      .setDocumentType("Application Bundle")
                                                       .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
@@ -270,6 +266,12 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
             assertThat(responseCaseData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
             assertThat(responseCaseData.getIsDocumentVisible()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getGaAddlDocClaimant()).singleElement().satisfies(document -> {
+                assertThat(document.getValue().getDocumentName()).isEqualTo("Application Bundle");
+                assertThat(document.getValue().getDocumentLink().getDocumentBinaryUrl())
+                    .isEqualTo("http://dm-store:8080/documents");
+            });
+            assertThat(responseCaseData.getGaAddlDocBundle()).isNull();
         }
 
         @Test
@@ -278,7 +280,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
             List<Element<UploadDocumentByType>> uploadDocumentByRespondent = new ArrayList<>();
             uploadDocumentByRespondent.add(element(new UploadDocumentByType()
-                                                       .setDocumentType("witness")
+                                                       .setDocumentType("application bundle")
                                                        .setAdditionalDocument(new Document()
                                                                                .setDocumentFileName("witness_document.pdf")
                                                                                .setDocumentUrl("http://dm-store:8080")
@@ -310,7 +312,12 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
             assertThat(responseCaseData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
             assertThat(responseCaseData.getIsDocumentVisible()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
+            assertThat(responseCaseData.getGaAddlDocRespondentSol()).singleElement().satisfies(document -> {
+                assertThat(document.getValue().getDocumentName()).isEqualTo("application bundle");
+                assertThat(document.getValue().getDocumentLink().getDocumentBinaryUrl())
+                    .isEqualTo("http://dm-store:8080/documents");
+            });
+            assertThat(responseCaseData.getGaAddlDocBundle()).isNull();
             verify(docUploadDashboardNotificationService).createDashboardNotification(any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
         }
 
@@ -513,53 +520,6 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
             assertThat(responseCaseData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
             assertThat(responseCaseData.getIsDocumentVisible()).isEqualTo(YesOrNo.NO);
-        }
-
-        @Test
-        void shouldPutBundleInBundleCollection() {
-            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
-
-            List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
-                                                      .setDocumentType("bundle")
-                                                      .setAdditionalDocument(new Document()
-                                                                              .setDocumentFileName("witness_document.pdf")
-                                                                              .setDocumentUrl("http://dm-store:8080")
-                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
-
-            List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
-                                             .setId("222")
-                                             .setEmail(DUMMY_EMAIL)
-                                             .setOrganisationIdentifier("2")));
-            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
-                                             .setId(STRING_CONSTANT)
-                                             .setEmail(DUMMY_EMAIL)
-                                             .setOrganisationIdentifier("3")));
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .ccdCaseReference(1678356749555475L)
-                .build().copy()
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .generalAppConsentOrder(YES)
-                .generalAppRespondentSolicitors(gaRespSolicitors)
-                .parentClaimantIsApplicant(NO)
-                .isMultiParty(YES)
-                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
-                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
-                .uploadDocument(uploadDocumentByApplicant)
-                .claimant1PartyName("Mr. John Rambo")
-                .defendant1PartyName("Mr. Sole Trader")
-                .build();
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-
-            assertThat(responseCaseData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
-            assertThat(responseCaseData.getIsDocumentVisible()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getGaAddlDocRespondentSolTwo()).isNull();
-            assertThat(responseCaseData.getGaAddlDocBundle().size()).isEqualTo(1);
         }
     }
 
