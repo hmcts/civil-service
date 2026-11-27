@@ -842,8 +842,8 @@ dependencies {
   testImplementation "org.mockito:mockito-core:5.25.0"
   testImplementation "org.mockito:mockito-junit-jupiter:5.25.0"
   testImplementation "org.mockito:mockito-inline:5.2.0"
-  testImplementation "net.bytebuddy:byte-buddy:1.18.14-jdk5"
-  testImplementation "net.bytebuddy:byte-buddy-agent:1.18.14-jdk5"
+  testImplementation "net.bytebuddy:byte-buddy:1.18.15"
+  testImplementation "net.bytebuddy:byte-buddy-agent:1.18.15"
   testImplementation libraries.junit5
   testImplementation "org.springframework.boot:spring-boot-starter-test"
   testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
