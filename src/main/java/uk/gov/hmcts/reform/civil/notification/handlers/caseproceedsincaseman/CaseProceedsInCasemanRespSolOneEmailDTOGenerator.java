@@ -32,7 +32,11 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOne
         return REFERENCE_TEMPLATE;
     }
 
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
+        if (caseData.isRespondent1LiP()) {
+            return Boolean.FALSE;
+        }
         return ClaimPredicate.isSpec.negate()
             .and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData)
             || (TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued).test(caseData)
