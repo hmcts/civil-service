@@ -5,7 +5,7 @@
         False positive: CVE-2025-21199 affects Microsoft Azure Agent for Backup/Site Recovery installers,
         not the Application Insights Java web SDK.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-web@3\.7\.9$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-web@3\.7\.10$</packageUrl>
         <cve>CVE-2025-21199</cve>
     </suppress>
     <suppress>
@@ -13,7 +13,7 @@
         False positive: CVE-2025-21199 affects Microsoft Azure Agent for Backup/Site Recovery installers,
         not the Application Insights Java core SDK.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-core@3\.7\.9$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights-core@3\.7\.10$</packageUrl>
         <cve>CVE-2025-21199</cve>
     </suppress>
     <suppress>
@@ -21,7 +21,7 @@
         False positive: CVE-2026-33117 affects com.azure:azure-security-keyvault-keys
         local cryptographic verification before 4.10.6, not the shared azure-core runtime.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core@1\.59\.1$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core@1\.61\.0$</packageUrl>
         <cve>CVE-2026-33117</cve>
     </suppress>
     <suppress>
@@ -29,7 +29,7 @@
         False positive: CVE-2026-33117 affects com.azure:azure-security-keyvault-keys
         local cryptographic verification before 4.10.6, not the AMQP core runtime.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core-amqp@2\.12\.1$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core-amqp@2\.13\.0$</packageUrl>
         <cve>CVE-2026-33117</cve>
     </suppress>
     <suppress>
@@ -37,7 +37,7 @@
         False positive: CVE-2026-33117 affects com.azure:azure-security-keyvault-keys
         local cryptographic verification before 4.10.6, not the Netty transport adapter.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core-http-netty@1\.16\.7$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com\.azure/azure-core-http-netty@1\.17\.0$</packageUrl>
         <cve>CVE-2026-33117</cve>
     </suppress>
     <suppress>
@@ -63,5 +63,16 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-stdlib@2\.4\.10$</packageUrl>
         <cve>CVE-2026-53914</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+        False positive: CVE-2026-54428 (HTTP/2 HPACK decoder) and CVE-2026-54399 (HTTP/1.1 parser) affect
+        Apache HttpComponents Core 5.0 to 5.4.2 and the 5.5-alpha1/5.5-beta1 pre-releases. The final 5.5
+        release contains the fixes; dependency-check matches it against the 5.5:alpha1 and 5.5:beta1 CPEs.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents\.core5/httpcore5(-h2)?@5\.5$</packageUrl>
+        <cve>CVE-2026-54428</cve>
+        <cve>CVE-2026-54399</cve>
     </suppress>
 </suppressions>
